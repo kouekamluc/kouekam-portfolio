@@ -30,7 +30,8 @@ db.sqlite3
 db.sqlite3-journal
 /media
 /staticfiles
-/static
+# Allow static source files, but ignore generated output
+/static/css/output.css
 
 # Environment variables
 .env
@@ -66,7 +67,4 @@ htmlcov/
 *.sock
 logs/
 *.sql.gz
-
-# Tailwind CSS
-static/css/output.css
 
