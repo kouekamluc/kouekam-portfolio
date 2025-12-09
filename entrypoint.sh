@@ -15,6 +15,9 @@ fi
 echo "Running migrations..."
 python manage.py migrate --noinput
 
+echo "Creating superuser (if not exists)..."
+python create_superuser.py
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
 

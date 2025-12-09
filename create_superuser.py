@@ -6,8 +6,12 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kouekam_hub.settings")
 django.setup()
 
 User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'adminpassword')
-    print("Superuser 'admin' created.")
+username = 'kouekam'
+email = os.getenv('SUPERUSER_EMAIL', 'kouekam@example.com')
+password = 'kklkinkklk'
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username, email, password)
+    print(f"Superuser '{username}' created successfully.")
 else:
-    print("Superuser 'admin' already exists.")
+    print(f"Superuser '{username}' already exists.")

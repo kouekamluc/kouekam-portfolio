@@ -37,9 +37,10 @@ When you start Docker Compose, the following happens automatically:
 1. **PostgreSQL Database** starts and becomes healthy
 2. **Django Application** waits for database
 3. **Migrations** run automatically (`python manage.py migrate`)
-4. **Static Files** are collected automatically (`python manage.py collectstatic`)
-5. **Tailwind CSS** is built during Docker image build
-6. **Gunicorn Server** starts and serves the application
+4. **Superuser** is created automatically (username: `kouekam`, password: `kklkinkklk`) if it doesn't exist
+5. **Static Files** are collected automatically (`python manage.py collectstatic`)
+6. **Tailwind CSS** is built during Docker image build
+7. **Gunicorn Server** starts and serves the application
 
 ## Docker Services
 
@@ -91,6 +92,15 @@ docker-compose exec web python manage.py shell
 docker-compose exec web python manage.py collectstatic
 ```
 
+### Default Superuser
+
+A superuser is automatically created on first startup:
+- **Username**: `kouekam`
+- **Password**: `kklkinkklk`
+- **Email**: Set via `SUPERUSER_EMAIL` environment variable (defaults to `kouekam@example.com`)
+
+You can log in to the Django admin at `/admin/` using these credentials.
+
 ### Access database
 ```bash
 docker-compose exec db psql -U kouekam_user -d kouekam_db
@@ -107,6 +117,7 @@ Key environment variables (set in `.env` file):
 - `DATABASE_URL`: Full database URL (auto-generated in docker-compose.yml)
 - `OPENAI_API_KEY`: For AI assistant features (optional)
 - `EMAIL_*`: Email configuration (optional)
+- `SUPERUSER_EMAIL`: Email for the auto-created superuser (defaults to `kouekam@example.com`)
 
 ## Volumes
 
