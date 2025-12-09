@@ -11,10 +11,15 @@ bind = f"0.0.0.0:{os.getenv('PORT', '8000')}"
 backlog = 2048
 
 # Worker processes
-workers = multiprocessing.cpu_count() * 2 + 1
-worker_class = 'sync'
+# Use environment variable or calculate reasonable default (max 10 workers)
+# This prevents excessive workers in Docker containers with many CPUs
+cpu_count = multiprocessing.cpu_count()
+default_workers = min(cpu_count * 2 + 1, 10)  # Cap at 10 workers to prevent resource exhaustion
+workers_env = os.getenv('GUNICORN_WORKERS')
+workers = int(workers_env) if workers_env else default_workers
+worker_class = 'gthread'  # Use threaded workers for better I/O handling
 worker_connections = 1000
-threads = 2
+threads = int(os.getenv('GUNICORN_THREADS', '2'))
 timeout = 120
 keepalive = 5
 
