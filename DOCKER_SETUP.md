@@ -112,7 +112,7 @@ Key environment variables (set in `.env` file):
 
 - `SECRET_KEY`: Django secret key (required)
 - `DEBUG`: Set to `True` for development, `False` for production
-- `ALLOWED_HOSTS`: Comma-separated list of allowed hosts
+- `ALLOWED_HOSTS`: **IMPORTANT** - Comma-separated list of allowed hosts. Must include your domain name (e.g., `kouekamkamgou.uk,www.kouekamkamgou.uk`). Without this, you'll get HTTP 400 errors.
 - `DB_NAME`, `DB_USER`, `DB_PASSWORD`: Database credentials
 - `DATABASE_URL`: Full database URL (auto-generated in docker-compose.yml)
 - `OPENAI_API_KEY`: For AI assistant features (optional)
@@ -129,6 +129,16 @@ The following directories are mounted as volumes (persist between container rest
 - `postgres_data` → PostgreSQL data (Docker volume)
 
 ## Troubleshooting
+
+### HTTP 400 Bad Request errors
+If you're getting HTTP 400 errors when accessing your site, it's likely because `ALLOWED_HOSTS` doesn't include your domain. 
+
+**Fix**: Set the `ALLOWED_HOSTS` environment variable to include your domain:
+```
+ALLOWED_HOSTS=kouekamkamgou.uk,www.kouekamkamgou.uk
+```
+
+Or if using a platform like Railway, add it in your environment variables settings. The domain must match exactly what's in the Host header of incoming requests.
 
 ### Port already in use
 If port 8000 or 5432 is already in use, change them in `.env`:
