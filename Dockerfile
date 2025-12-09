@@ -7,9 +7,10 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy Tailwind config and source CSS
+# Copy Tailwind config
 COPY tailwind.config.js postcss.config.js ./
-COPY static/css/input.css ./static/css/input.css
+# Copy input.css (Docker will create directory structure automatically)
+COPY static/css/input.css ./static/css/
 
 # Build Tailwind CSS (without watch mode for Docker build)
 RUN npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
