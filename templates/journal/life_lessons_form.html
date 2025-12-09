@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Life Lesson</h1>
+        
+        <form method="post" class="max-w-2xl space-y-6">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                <input type="text" name="title" value="{% if lesson %}{{ lesson.title }}{% endif %}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lesson</label>
+                <textarea name="lesson" rows="6" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if lesson %}{{ lesson.lesson }}{% endif %}</textarea>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Context</label>
+                <textarea name="context" rows="4"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if lesson %}{{ lesson.context }}{% endif %}</textarea>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date Learned</label>
+                <input type="date" name="date_learned" value="{% if lesson %}{{ lesson.date_learned|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Save</button>
+            <a href="{% url 'life_lessons_list' %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_type }} Course - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <a href="{% if course %}{% url 'course_detail' course.id %}{% else %}{% url 'academic_dashboard' %}{% endif %}" 
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+            </a>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">{{ form_type }} Course</h1>
+            <p class="text-gray-600 dark:text-gray-400">{% if form_type == 'Create' %}Add a new course to track{% else %}Update course information{% endif %}</p>
+        </div>
+        
+        <div class="card max-w-2xl">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Course Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" value="{% if course %}{{ course.name }}{% endif %}" required
+                        class="input-field" placeholder="e.g., Introduction to Computer Science">
+                    {% if form.name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course Code</label>
+                    <input type="text" id="code" name="code" value="{% if course %}{{ course.code }}{% endif %}"
+                        class="input-field" placeholder="e.g., CS101">
+                    {% if form.code.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.code.errors }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="semester" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Semester</label>
+                        <input type="text" id="semester" name="semester" value="{% if course %}{{ course.semester }}{% endif %}"
+                            class="input-field" placeholder="e.g., Fall 2024">
+                        {% if form.semester.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.semester.errors }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="credits" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Credits <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" step="0.1" id="credits" name="credits" value="{% if course %}{{ course.credits }}{% else %}3.0{% endif %}" required
+                            class="input-field" placeholder="3.0">
+                        {% if form.credits.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.credits.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                    <select id="status" name="status" class="input-field">
+                        <option value="ongoing" {% if course and course.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                        <option value="completed" {% if course and course.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="dropped" {% if course and course.status == 'dropped' %}selected{% endif %}>Dropped</option>
+                    </select>
+                    {% if form.status.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.status.errors }}</p>
+                    {% endif %}
+                </div>
+                
+                {% if form_type == 'Update' %}
+                <div>
+                    <label for="grade" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Grade</label>
+                    <input type="number" step="0.01" id="grade" name="grade" value="{% if course.grade %}{{ course.grade }}{% endif %}"
+                        class="input-field" placeholder="e.g., 85.5" min="0" max="100">
+                    {% if form.grade.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.grade.errors }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>Save Course
+                    </button>
+                    <a href="{% if course %}{% url 'course_detail' course.id %}{% else %}{% url 'academic_dashboard' %}{% endif %}" 
+                       class="btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

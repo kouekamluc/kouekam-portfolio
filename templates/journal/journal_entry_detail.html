@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-4 dark:text-white">{{ entry.date|date:"F d, Y" }}</h1>
+                <div class="flex gap-3">
+                    {% if entry.mood %}
+                    <span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                        Mood: {{ entry.get_mood_display }}
+                    </span>
+                    {% endif %}
+                    {% if entry.energy_level %}
+                    <span class="px-3 py-1 rounded-full text-sm bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        Energy: {{ entry.get_energy_level_display }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{% url 'journal_entry_update' entry.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</a>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
+            <div class="prose dark:prose-invert max-w-none">
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line text-lg leading-relaxed">{{ entry.content }}</p>
+            </div>
+            
+            {% if entry.tags %}
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold mb-3 dark:text-white">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">{{ entry.tags }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mt-8">
+            <a href="{% url 'journal_entry_list' %}" class="text-blue-600 hover:underline">← Back to Entries</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

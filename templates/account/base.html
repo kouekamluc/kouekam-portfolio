@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block head_title %}Account{% endblock %} - Kouekam Digital Hub</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ensure navbar doesn't overlap content */
+        :root {
+            --navbar-height-mobile: 5rem;  /* 80px */
+            --navbar-height-desktop: 6rem; /* 96px */
+        }
+        
+        body {
+            padding-top: var(--navbar-height-mobile);
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding-top: var(--navbar-height-desktop);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+    {% include 'components/navbar.html' %}
+
+    <main class="flex-grow">
+        <div class="max-w-2xl mx-auto px-4 py-8">
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div id="alert-{{ forloop.counter }}" class="flex items-center p-4 mb-4 {% if message.tags == 'error' %}text-red-800 bg-red-50{% elif message.tags == 'success' %}text-green-800 bg-green-50{% else %}text-blue-800 bg-blue-50{% endif %} rounded-lg" role="alert">
+                            <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            <span class="sr-only">Info</span>
+                            <div class="ms-3 text-sm font-medium">
+                                {{ message }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    {% include 'components/footer.html' %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Study Mode - {{ course.code }}</h1>
+        
+        <div id="flashcard-container" class="max-w-2xl mx-auto">
+            {% if flashcards %}
+            <div class="bg-white dark:bg-gray-800 border-2 border-blue-600 rounded-lg p-8 min-h-64 flex items-center justify-center cursor-pointer" onclick="flipCard()">
+                <div id="card-front" class="text-center">
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">Question</p>
+                    <p class="text-2xl font-semibold dark:text-white" id="question-text"></p>
+                </div>
+                <div id="card-back" class="text-center hidden">
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">Answer</p>
+                    <p class="text-2xl font-semibold dark:text-white" id="answer-text"></p>
+                </div>
+            </div>
+            <div class="flex justify-between mt-8">
+                <button onclick="previousCard()" class="bg-gray-600 text-white px-6 py-2 rounded-lg">Previous</button>
+                <button onclick="flipCard()" class="bg-blue-600 text-white px-6 py-2 rounded-lg">Flip</button>
+                <button onclick="nextCard()" class="bg-gray-600 text-white px-6 py-2 rounded-lg">Next</button>
+            </div>
+            {% else %}
+            <p class="text-center text-gray-600 dark:text-gray-400">No flashcards available.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+const flashcards = {{ flashcards|safe }};
+let currentIndex = 0;
+let isFlipped = false;
+
+function showCard() {
+    document.getElementById('question-text').textContent = flashcards[currentIndex].question;
+    document.getElementById('answer-text').textContent = flashcards[currentIndex].answer;
+    document.getElementById('card-back').classList.add('hidden');
+    document.getElementById('card-front').classList.remove('hidden');
+    isFlipped = false;
+}
+
+function flipCard() {
+    isFlipped = !isFlipped;
+    if (isFlipped) {
+        document.getElementById('card-front').classList.add('hidden');
+        document.getElementById('card-back').classList.remove('hidden');
+    } else {
+        document.getElementById('card-back').classList.add('hidden');
+        document.getElementById('card-front').classList.remove('hidden');
+    }
+}
+
+function nextCard() {
+    if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        showCard();
+    }
+}
+
+function previousCard() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showCard();
+    }
+}
+
+if (flashcards.length > 0) {
+    showCard();
+}
+</script>
+{% endblock %}
+
+
+
+

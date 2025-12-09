@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold dark:text-white">Philosophy</h1>
+            <a href="{% url 'philosophy_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Philosophy</a>
+        </div>
+        
+        <div class="flex gap-4 mb-6">
+            <a href="{% url 'philosophy_list' %}" class="px-4 py-2 rounded {% if not category_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
+            <a href="?category=life" class="px-4 py-2 rounded {% if category_filter == 'life' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Life</a>
+            <a href="?category=work" class="px-4 py-2 rounded {% if category_filter == 'work' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Work</a>
+            <a href="?category=growth" class="px-4 py-2 rounded {% if category_filter == 'growth' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Growth</a>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {% for philosophy in philosophies %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-3 dark:text-white">{{ philosophy.title }}</h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">{{ philosophy.content|truncatewords:30 }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="px-3 py-1 rounded-full text-sm bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+                        {{ philosophy.get_category_display }}
+                    </span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ philosophy.date_written|date:"M Y" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <p class="col-span-3 text-center text-gray-600 dark:text-gray-400">No philosophy notes yet. <a href="{% url 'philosophy_create' %}" class="text-blue-600 hover:underline">Create one</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

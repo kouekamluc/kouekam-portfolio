@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Business Plan</h1>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">For: {{ plan.business_idea.title }}</p>
+        
+        <div class="space-y-8">
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Executive Summary</h2>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ plan.executive_summary }}</p>
+                </div>
+            </div>
+            
+            {% if plan.financial_data %}
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Financial Data</h2>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-4">
+                    {% if plan.financial_data.revenue_projections %}
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Revenue Projections</h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ plan.financial_data.revenue_projections }}</p>
+                    </div>
+                    {% endif %}
+                    {% if plan.financial_data.expense_projections %}
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Expense Projections</h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ plan.financial_data.expense_projections }}</p>
+                    </div>
+                    {% endif %}
+                    {% if plan.financial_data.funding_needed %}
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Funding Needed</h3>
+                        <p class="text-gray-700 dark:text-gray-300">{{ plan.financial_data.funding_needed }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mt-8">
+            <a href="{% url 'business_idea_detail' plan.business_idea.id %}" class="text-blue-600 hover:underline">← Back to Business Idea</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-4 dark:text-white">{{ idea.title }}</h1>
+                <span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                    {{ idea.get_status_display }}
+                </span>
+            </div>
+            <a href="{% url 'business_idea_update' idea.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</a>
+        </div>
+        
+        <div class="grid gap-8 lg:grid-cols-3">
+            <div class="lg:col-span-2 space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Description</h2>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ idea.description }}</p>
+                </div>
+                
+                {% if idea.market_size %}
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Market Size</h2>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ idea.market_size }}</p>
+                </div>
+                {% endif %}
+                
+                {% if idea.competitors %}
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Competitors</h2>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ idea.competitors }}</p>
+                </div>
+                {% endif %}
+                
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Market Research</h2>
+                    {% if market_research %}
+                    <div class="space-y-4">
+                        {% for research in market_research %}
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ research.date|date:"M d, Y" }}</p>
+                            <p class="text-gray-700 dark:text-gray-300 mb-2">{{ research.findings }}</p>
+                            {% if research.sources %}<p class="text-sm text-gray-600 dark:text-gray-400">Sources: {{ research.sources }}</p>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-600 dark:text-gray-400">No market research yet.</p>
+                    {% endif %}
+                    <a href="{% url 'market_research_create' idea.id %}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Research</a>
+                </div>
+                
+                {% if business_plan %}
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Business Plan</h2>
+                    <a href="{% url 'business_plan_detail' business_plan.id %}" class="text-blue-600 hover:underline">View Business Plan →</a>
+                </div>
+                {% else %}
+                <div>
+                    <a href="{% url 'business_plan_create' idea.id %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Create Business Plan</a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4 dark:text-white">Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'market_research_create' idea.id %}" class="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-center">Add Research</a>
+                        <a href="{% url 'financial_projections' idea.id %}" class="block w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-center">Financial Projections</a>
+                        {% if not business_plan %}
+                        <a href="{% url 'business_plan_create' idea.id %}" class="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-center">Create Plan</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

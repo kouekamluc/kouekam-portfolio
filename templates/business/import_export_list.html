@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold dark:text-white">Import/Export Records</h1>
+            <a href="{% url 'import_export_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Record</a>
+        </div>
+        
+        <div class="flex gap-4 mb-6">
+            <a href="{% url 'import_export_list' %}" class="px-4 py-2 rounded {% if not type_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
+            <a href="?type=import" class="px-4 py-2 rounded {% if type_filter == 'import' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Imports</a>
+            <a href="?type=export" class="px-4 py-2 rounded {% if type_filter == 'export' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Exports</a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Product</th>
+                        <th class="px-6 py-3">Type</th>
+                        <th class="px-6 py-3">Quantity</th>
+                        <th class="px-6 py-3">Value</th>
+                        <th class="px-6 py-3">Country</th>
+                        <th class="px-6 py-3">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ record.product }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-sm {% if record.type == 'import' %}bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200{% else %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200{% endif %}">
+                                {{ record.get_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">{{ record.quantity }}</td>
+                        <td class="px-6 py-4">${{ record.value|floatformat:2 }}</td>
+                        <td class="px-6 py-4">{{ record.country }}</td>
+                        <td class="px-6 py-4">{{ record.date|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center">No records yet. <a href="{% url 'import_export_create' %}" class="text-blue-600 hover:underline">Add one</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Journal Entry</h1>
+        
+        <form method="post" class="max-w-2xl space-y-6">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
+                <input type="date" name="date" value="{% if entry %}{{ entry.date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
+                <textarea name="content" rows="12" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if entry %}{{ entry.content }}{% endif %}</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mood</label>
+                    <select name="mood" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Select mood</option>
+                        <option value="excellent" {% if entry and entry.mood == 'excellent' %}selected{% endif %}>Excellent</option>
+                        <option value="good" {% if entry and entry.mood == 'good' %}selected{% endif %}>Good</option>
+                        <option value="okay" {% if entry and entry.mood == 'okay' %}selected{% endif %}>Okay</option>
+                        <option value="poor" {% if entry and entry.mood == 'poor' %}selected{% endif %}>Poor</option>
+                        <option value="terrible" {% if entry and entry.mood == 'terrible' %}selected{% endif %}>Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Energy Level</label>
+                    <select name="energy_level" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Select energy</option>
+                        <option value="high" {% if entry and entry.energy_level == 'high' %}selected{% endif %}>High</option>
+                        <option value="medium" {% if entry and entry.energy_level == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="low" {% if entry and entry.energy_level == 'low' %}selected{% endif %}>Low</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tags (comma-separated)</label>
+                <input type="text" name="tags" value="{% if entry %}{{ entry.tags }}{% endif %}"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    placeholder="e.g., work, personal, reflection">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Save</button>
+            {% if entry %}
+            <a href="{% url 'journal_entry_detail' entry.id %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+            {% else %}
+            <a href="{% url 'journal_entry_list' %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+            {% endif %}
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

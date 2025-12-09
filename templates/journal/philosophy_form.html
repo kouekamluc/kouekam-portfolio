@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Philosophy</h1>
+        
+        <form method="post" class="max-w-2xl space-y-6">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                <input type="text" name="title" value="{% if philosophy %}{{ philosophy.title }}{% endif %}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
+                <textarea name="content" rows="12" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if philosophy %}{{ philosophy.content }}{% endif %}</textarea>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                <select name="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="life" {% if philosophy and philosophy.category == 'life' %}selected{% endif %}>Life Philosophy</option>
+                    <option value="work" {% if philosophy and philosophy.category == 'work' %}selected{% endif %}>Work Philosophy</option>
+                    <option value="relationships" {% if philosophy and philosophy.category == 'relationships' %}selected{% endif %}>Relationships</option>
+                    <option value="growth" {% if philosophy and philosophy.category == 'growth' %}selected{% endif %}>Personal Growth</option>
+                    <option value="values" {% if philosophy and philosophy.category == 'values' %}selected{% endif %}>Values & Beliefs</option>
+                    <option value="other" {% if philosophy and philosophy.category == 'other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Save</button>
+            <a href="{% url 'philosophy_list' %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

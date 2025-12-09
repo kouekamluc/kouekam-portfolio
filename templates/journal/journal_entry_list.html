@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold dark:text-white">Journal Entries</h1>
+            <a href="{% url 'journal_entry_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">New Entry</a>
+        </div>
+        
+        <div class="space-y-6">
+            {% for entry in entries %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold dark:text-white">{{ entry.date|date:"F d, Y" }}</h3>
+                        <div class="flex gap-3 mt-2">
+                            {% if entry.mood %}
+                            <span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                Mood: {{ entry.get_mood_display }}
+                            </span>
+                            {% endif %}
+                            {% if entry.energy_level %}
+                            <span class="px-3 py-1 rounded-full text-sm bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                Energy: {{ entry.get_energy_level_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{% url 'journal_entry_detail' entry.id %}" class="text-blue-600 hover:underline">View →</a>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">{{ entry.content|truncatewords:50 }}</p>
+                {% if entry.tags %}
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in entry.tags|make_list %}
+                    {% if tag != ',' and tag != ' ' %}
+                    <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm">{{ tag }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-600 dark:text-gray-400">No journal entries yet. <a href="{% url 'journal_entry_create' %}" class="text-blue-600 hover:underline">Create one</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

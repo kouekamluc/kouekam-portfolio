@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Projects - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
+            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Our Projects</h2>
+            <p class="font-light text-gray-600 lg:mb-16 sm:text-xl dark:text-gray-400">Explore our engineering and
+                software development portfolio.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
+            <a href="{% url 'project_list' %}"
+                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border-2 {% if not active_category %}bg-blue-600 text-white border-blue-600 shadow-md{% else %}bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500{% endif %}">
+                <i class="fas fa-th mr-2"></i>All
+            </a>
+            <a href="?category=ai"
+                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border-2 {% if active_category == 'ai' %}bg-blue-600 text-white border-blue-600 shadow-md{% else %}bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500{% endif %}">
+                <i class="fas fa-robot mr-2"></i>AI & ML
+            </a>
+            <a href="?category=electronics"
+                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border-2 {% if active_category == 'electronics' %}bg-blue-600 text-white border-blue-600 shadow-md{% else %}bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500{% endif %}">
+                <i class="fas fa-microchip mr-2"></i>Electronics
+            </a>
+            <a href="?category=web"
+                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border-2 {% if active_category == 'web' %}bg-blue-600 text-white border-blue-600 shadow-md{% else %}bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500{% endif %}">
+                <i class="fas fa-code mr-2"></i>Web Dev
+            </a>
+        </div>
+
+        <div class="grid gap-8 mb-6 lg:mb-16 md:grid-cols-2 lg:grid-cols-3">
+            {% for project in projects %}
+            <div
+                class="group bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                <a href="{% url 'project_detail' project.slug %}">
+                    {% if project.image %}
+                    <div class="relative overflow-hidden rounded-t-lg h-48">
+                        <img class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+                            src="{{ project.image.url }}" alt="{{ project.title }}">
+                    </div>
+                    {% else %}
+                    <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
+                        <span class="text-gray-500">No Image</span>
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="p-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <span
+                            class="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                            {{ project.get_category_display }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ project.created_at|date:"M Y"
+                            }}</span>
+                    </div>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        <a href="{% url 'project_detail' project.slug %}">{{ project.title }}</a>
+                    </h5>
+                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 line-clamp-3">{{ project.description }}
+                    </p>
+
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        {% for tech in project.tech_stack %}
+                        <span
+                            class="text-xs font-medium px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
+                            {{ tech }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <a href="{% url 'project_detail' project.slug %}"
+                        class="inline-flex items-center mt-4 font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                        View Details
+                        <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full">
+                <div class="card text-center py-12">
+                    <i class="fas fa-folder-open text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Projects Found</h3>
+                    <p class="text-gray-600 dark:text-gray-400">No projects found in this category. Try selecting a different filter.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

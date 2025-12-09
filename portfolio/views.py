@@ -1,0 +1,91 @@
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Profile, Timeline, Skill, Project
+
+def home(request):
+    profile = Profile.objects.first() # Simplification for single-user portfolio
+    skills = Skill.objects.all()
+    timeline = Timeline.objects.all()
+    # Featured/Recent projects can also be added here
+    recent_projects = Project.objects.filter(status='active').order_by('-created_at')[:3]
+    context = {
+        'profile': profile,
+        'skills': skills,
+        'timeline': timeline,
+        'recent_projects': recent_projects
+    }
+    return render(request, 'home.html', context)
+
+def about(request):
+    profile = Profile.objects.first()
+    timeline = Timeline.objects.all()
+    context = {
+        'profile': profile,
+        'timeline': timeline,
+    }
+    return render(request, 'portfolio/about.html', context)
+
+def skills(request):
+    skills = Skill.objects.all()
+    # Group skills by category
+    skills_by_category = {}
+    for skill in skills:
+        if skill.category not in skills_by_category:
+            skills_by_category[skill.category] = []
+        skills_by_category[skill.category].append(skill)
+    
+    context = {
+        'skills': skills,
+        'skills_by_category': skills_by_category,
+    }
+    return render(request, 'portfolio/skills.html', context)
+
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        if name and email and message:
+            try:
+                send_mail(
+                    subject=f'Contact Form: {subject}',
+                    message=f'From: {name} ({email})\n\n{message}',
+                    from_email=settings.DEFAULT_FROM_EMAIL or email,
+                    recipient_list=[settings.DEFAULT_FROM_EMAIL or 'admin@example.com'],
+                    fail_silently=False,
+                )
+                messages.success(request, 'Thank you! Your message has been sent successfully.')
+                return HttpResponseRedirect(request.path)
+            except Exception as e:
+                messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    profile = Profile.objects.first()
+    return render(request, 'portfolio/contact.html', {'profile': profile})
+
+def download_cv(request):
+    profile = Profile.objects.first()
+    if profile and profile.cv_file:
+        response = HttpResponse(profile.cv_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{profile.cv_file.name}"'
+        return response
+    else:
+        messages.error(request, 'CV not available.')
+        return HttpResponseRedirect('/')
+
+def project_list(request):
+    projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')
+    category = request.GET.get('category')
+    if category:
+        projects = projects.filter(category=category)
+    return render(request, 'portfolio/project_list.html', {'projects': projects, 'active_category': category})
+
+def project_detail(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    return render(request, 'portfolio/project_detail.html', {'project': project})

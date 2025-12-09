@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <!-- Header -->
+        <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                <a href="{% url 'academic_dashboard' %}" class="hover:underline">Dashboard</a>
+                <span>/</span>
+                <span class="text-gray-900 dark:text-white">{{ course.code }}</span>
+            </div>
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{{ course.name }}</h1>
+            <div class="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
+                <span>{{ course.semester }}</span>
+                <span>{{ course.credits }} Credits</span>
+                <span class="capitalize">{{ course.get_status_display }}</span>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Main Content: Notes and Flashcards -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Notes Section -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Study Notes</h2>
+                    <div class="space-y-4">
+                        {% for note in notes %}
+                        <div
+                            class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ note.title }}</h3>
+                            <div
+                                class="prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                {{ note.content|linebreaks|truncatewords:50 }}
+                            </div>
+                            {% if note.file %}
+                            <a href="{{ note.file.url }}"
+                                class="text-blue-600 hover:underline text-sm flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                Download Attachment
+                            </a>
+                            {% endif %}
+                            <p class="text-xs text-gray-400 mt-4">Last updated: {{ note.updated_at|date:"M d, Y" }}</p>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 italic">No notes created yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Flashcards Section -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Flashcards</h2>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        {% for card in flashcards %}
+                        <div
+                            class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 rounded-lg">
+                            <p class="font-medium text-gray-900 dark:text-white mb-2">Q: {{ card.question }}</p>
+                            <div class="pt-2 border-t border-yellow-200 dark:border-yellow-900/50">
+                                <p class="text-gray-600 dark:text-gray-300 text-sm">A: {{ card.answer }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 italic col-span-2">No flashcards availble.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar: Study Sessions -->
+            <div class="lg:col-span-1">
+                <div
+                    class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 sticky top-24 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Study Sessions</h3>
+                    <div class="relative border-l border-gray-200 dark:border-gray-700 ml-3">
+                        {% for session in sessions %}
+                        <div class="mb-6 ml-6">
+                            <span
+                                class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-gray-50 dark:ring-gray-800 dark:bg-blue-900">
+                                <svg class="w-3 h-3 text-blue-800 dark:text-blue-300" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </span>
+                            <h4 class="flex items-center mb-1 text-sm font-semibold text-gray-900 dark:text-white">{{
+                                session.date|date:"M d, Y" }}</h4>
+                            <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Duration: {{
+                                session.duration_minutes }} min</p>
+                            {% if session.topics_covered %}
+                            <p class="mt-1 text-xs text-gray-500 italic">"{{ session.topics_covered }}"</p>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="ml-6">
+                            <p class="text-gray-500 text-sm">No sessions recorded.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

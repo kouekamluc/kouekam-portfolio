@@ -1,0 +1,81 @@
+<footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-auto">
+    <div class="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
+        <div class="md:flex md:justify-between">
+            <div class="mb-6 md:mb-0">
+                <a href="{% url 'home' %}" class="flex items-center group">
+                    <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-white transition-colors">
+                        Kouekam<span class="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">.Hub</span>
+                    </span>
+                </a>
+                <p class="mt-4 text-gray-600 dark:text-gray-400 max-w-sm">
+                    Empowering your digital journey with tools for productivity, learning, and business management.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                <div>
+                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Portfolio</h2>
+                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
+                        <li>
+                            <a href="{% url 'project_list' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fas fa-briefcase mr-2 text-sm"></i>Projects
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'contact' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fas fa-envelope mr-2 text-sm"></i>Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Connect</h2>
+                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
+                        <li>
+                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fab fa-github mr-2 text-sm"></i>GitHub
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fab fa-linkedin mr-2 text-sm"></i>LinkedIn
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Resources</h2>
+                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
+                        <li>
+                            <a href="{% url 'blog_list' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fas fa-blog mr-2 text-sm"></i>Blog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
+                                <i class="fas fa-question-circle mr-2 text-sm"></i>Help
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+        <div class="sm:flex sm:items-center sm:justify-between">
+            <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024 <a href="{% url 'home' %}"
+                    class="hover:underline">Kouekam Digital Hub</a>. All Rights Reserved.
+            </span>
+            <div class="flex mt-4 sm:justify-center sm:mt-0">
+                <!-- Social Icons -->
+                <a href="#" class="text-gray-500 hover:text-gray-900 dark:hover:text-white ms-5">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 .333A9.911 9.911 0 0 0 6.866 19.65c.5.092.678-.215.678-.477 0-.237-.01-1.017-.014-1.845-2.757.6-3.338-1.169-3.338-1.169a2.719 2.719 0 0 0-1.11-1.466c-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.943 0-1.091.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.326 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="sr-only">GitHub account</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>

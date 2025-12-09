@@ -1,0 +1,189 @@
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm">
+    <div class="max-w-screen-xl mx-auto px-6 py-4 lg:px-8 lg:py-5">
+        <div class="flex items-center justify-between">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="flex items-center space-x-2 rtl:space-x-reverse group">
+                <span class="self-center text-2xl lg:text-3xl font-bold whitespace-nowrap dark:text-white transition-colors">
+                    Kouekam<span class="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">.Hub</span>
+                </span>
+            </a>
+            
+            <!-- Desktop: Navigation Menu + User Info -->
+            <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
+                <!-- Navigation Menu -->
+                <div class="flex items-center">
+                    <ul class="flex items-center space-x-2 lg:space-x-3 font-medium">
+                        <li>
+                            <a href="{% url 'home' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name == 'home' %}text-blue-600 dark:text-blue-400{% endif %}"
+                                aria-current="page">
+                                <i class="fas fa-home mr-2"></i>Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'project_list' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-briefcase mr-2"></i>Projects
+                            </a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'academic_dashboard' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-graduation-cap mr-2"></i>Academic
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'productivity_dashboard' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-tasks mr-2"></i>Productivity
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'assistant_hub' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-robot mr-2"></i>AI Assistant
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'business_dashboard' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-briefcase mr-2"></i>Business
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'journal_dashboard' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-book mr-2"></i>Journal
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="{% url 'blog_list' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-blog mr-2"></i>Blog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'contact' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-envelope mr-2"></i>Contact
+                            </a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'account_logout' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-red-600 dark:text-white dark:hover:bg-transparent dark:hover:text-red-400 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="{% url 'account_login' %}"
+                                class="block py-2 px-3 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <!-- User Info (Desktop Only) -->
+                {% if user.is_authenticated %}
+                <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 ml-2">
+                    <i class="fas fa-user-circle text-lg"></i>
+                    <span class="font-medium">{{ user.username }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button data-collapse-toggle="navbar-sticky" type="button"
+                class="inline-flex items-center p-2.5 w-11 h-11 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
+                aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="hidden w-full md:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-5 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2 dark:border-gray-700">
+                <li>
+                    <a href="{% url 'home' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors {% if request.resolver_match.url_name == 'home' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}"
+                        aria-current="page">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project_list' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-briefcase mr-2"></i>Projects
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'academic_dashboard' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-graduation-cap mr-2"></i>Academic
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'productivity_dashboard' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-tasks mr-2"></i>Productivity
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'assistant_hub' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-robot mr-2"></i>AI Assistant
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'business_dashboard' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-briefcase mr-2"></i>Business
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'journal_dashboard' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-book mr-2"></i>Journal
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{% url 'blog_list' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-blog mr-2"></i>Blog
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'contact' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-envelope mr-2"></i>Contact
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'account_logout' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'account_login' %}"
+                        class="block py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

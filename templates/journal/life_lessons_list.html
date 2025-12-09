@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold dark:text-white">Life Lessons</h1>
+            <a href="{% url 'life_lessons_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Lesson</a>
+        </div>
+        
+        <div class="space-y-6">
+            {% for lesson in lessons %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold dark:text-white">{{ lesson.title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Learned: {{ lesson.date_learned|date:"M d, Y" }}</p>
+                    </div>
+                    <a href="{% url 'life_lessons_update' lesson.id %}" class="text-blue-600 hover:underline">Edit</a>
+                </div>
+                <div class="mb-4">
+                    <h4 class="font-semibold mb-2 dark:text-white">Lesson:</h4>
+                    <p class="text-gray-700 dark:text-gray-300">{{ lesson.lesson }}</p>
+                </div>
+                {% if lesson.context %}
+                <div>
+                    <h4 class="font-semibold mb-2 dark:text-white">Context:</h4>
+                    <p class="text-gray-700 dark:text-gray-300">{{ lesson.context }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-600 dark:text-gray-400">No life lessons yet. <a href="{% url 'life_lessons_create' %}" class="text-blue-600 hover:underline">Add one</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

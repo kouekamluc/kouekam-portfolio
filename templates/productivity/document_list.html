@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">Document Storage</h2>
+            <a href="/admin/productivity/document/add/"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Upload
+                File</a>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {% for doc in documents %}
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                <div class="mb-4 text-gray-400 dark:text-gray-500">
+                    <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-lg font-bold text-gray-900 dark:text-white truncate w-full">{{ doc.title }}</h3>
+                <span
+                    class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300 mb-4">
+                    {{ doc.category|default:"General" }}
+                </span>
+                <a href="{{ doc.file.url }}" download
+                    class="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center">
+                    Download
+                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </a>
+                <p class="text-xs text-gray-400 mt-2">{{ doc.uploaded_at|date:"M d, Y" }}</p>
+            </div>
+            {% empty %}
+            <div class="col-span-full py-12 text-center">
+                <p class="text-gray-500 text-xl">No documents uploaded yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

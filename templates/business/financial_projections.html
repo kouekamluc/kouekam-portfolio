@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Financial Projections</h1>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">Business Idea: {{ idea.title }}</p>
+        
+        <form method="post" class="max-w-2xl space-y-6 mb-8">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Monthly Revenue (Starting)</label>
+                <input type="number" step="0.01" name="monthly_revenue" value="{{ monthly_revenue|default:0 }}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Growth Rate (%)</label>
+                <input type="number" step="0.1" name="growth_rate" value="{{ growth_rate|default:0 }}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Number of Months</label>
+                <input type="number" name="months" value="{{ months|default:12 }}" min="1" max="60" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Calculate</button>
+        </form>
+        
+        {% if projections %}
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4 dark:text-white">Projections</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th class="px-6 py-3">Month</th>
+                            <th class="px-6 py-3">Projected Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for projection in projections %}
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">Month {{ projection.month }}</td>
+                            <td class="px-6 py-4">${{ projection.revenue|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="mt-8">
+            <a href="{% url 'business_idea_detail' idea.id %}" class="text-blue-600 hover:underline">← Back to Business Idea</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

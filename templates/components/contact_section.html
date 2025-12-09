@@ -1,0 +1,44 @@
+<section id="contact" class="bg-gray-50 dark:bg-gray-800">
+    <div class="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+        <div class="text-center mb-8 lg:mb-12">
+            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Contact Us</h2>
+            <p class="font-light text-gray-600 dark:text-gray-400 sm:text-xl max-w-2xl mx-auto">
+                Got a technical issue? Want to send feedback about a beta feature? Need details about our Business plan? Let us know.
+            </p>
+        </div>
+        <form action="{% url 'contact' %}" method="post" class="card space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Your Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="name" name="name" required
+                    class="input-field" placeholder="John Doe">
+            </div>
+            <div>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Your Email <span class="text-red-500">*</span>
+                </label>
+                <input type="email" id="email" name="email" required
+                    class="input-field" placeholder="name@example.com">
+            </div>
+            <div>
+                <label for="subject" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Subject
+                </label>
+                <input type="text" id="subject" name="subject"
+                    class="input-field" placeholder="Let us know how we can help">
+            </div>
+            <div>
+                <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Your Message <span class="text-red-500">*</span>
+                </label>
+                <textarea id="message" name="message" rows="6" required
+                    class="input-field" placeholder="Leave a comment..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary w-full sm:w-auto">
+                <i class="fas fa-paper-plane mr-2"></i>Send Message
+            </button>
+        </form>
+    </div>
+</section>

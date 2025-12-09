@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">{{ conversation.title|default:"Untitled Conversation" }}</h1>
+                <p class="text-gray-600 dark:text-gray-400 capitalize">{{ conversation.get_assistant_type_display }}</p>
+            </div>
+            <a href="{% url 'conversation_list' %}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Conversations
+            </a>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chat-messages" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6 h-96 overflow-y-auto">
+            {% for message in messages %}
+            <div class="mb-4 {% if message.role == 'user' %}text-right{% else %}text-left{% endif %}">
+                <div class="inline-block max-w-3xl {% if message.role == 'user' %}bg-blue-100 dark:bg-blue-900{% else %}bg-gray-100 dark:bg-gray-700{% endif %} rounded-lg p-4">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {% if message.role == 'user' %}
+                            <i class="fas fa-user mr-1"></i>You
+                        {% else %}
+                            <i class="fas fa-robot mr-1"></i>Assistant
+                        {% endif %}
+                        <span class="ml-2">{{ message.timestamp|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="text-gray-900 dark:text-white whitespace-pre-wrap">{{ message.content }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                <i class="fas fa-comments text-4xl mb-4"></i>
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Form -->
+        <form id="message-form" method="post" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    {{ form.message }}
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-paper-plane mr-2"></i>Send
+                </button>
+            </div>
+            <div id="error-message" class="mt-2 text-red-600 dark:text-red-400 text-sm hidden"></div>
+        </form>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('message-form');
+    const messageInput = form.querySelector('textarea[name="message"]');
+    const chatMessages = document.getElementById('chat-messages');
+    const errorMessage = document.getElementById('error-message');
+
+    // Scroll to bottom on load
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const message = messageInput.value.trim();
+        if (!message) {
+            return;
+        }
+
+        // Disable form during submission
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+        errorMessage.classList.add('hidden');
+
+        // Add user message to chat immediately
+        addMessageToChat('user', message);
+        messageInput.value = '';
+
+        // Send AJAX request
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({
+                'message': message,
+                'csrfmiddlewaretoken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
+
+            if (data.success) {
+                addMessageToChat('assistant', data.response);
+            } else {
+                errorMessage.textContent = data.error || 'An error occurred';
+                errorMessage.classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send';
+            errorMessage.textContent = 'Network error. Please try again.';
+            errorMessage.classList.remove('hidden');
+            console.error('Error:', error);
+        });
+    });
+
+    function addMessageToChat(role, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'}`;
+        
+        const now = new Date();
+        const timestamp = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + 
+                         now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+            <div class="inline-block max-w-3xl ${role === 'user' ? 'bg-blue-100 dark:bg-blue-900' : 'bg-gray-100 dark:bg-gray-700'} rounded-lg p-4">
+                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    ${role === 'user' ? '<i class="fas fa-user mr-1"></i>You' : '<i class="fas fa-robot mr-1"></i>Assistant'}
+                    <span class="ml-2">${timestamp}</span>
+                </div>
+                <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${escapeHtml(content)}</div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
+{% endblock %}
+
+
+
+

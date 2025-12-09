@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Study Planner</h1>
+        
+        <div class="grid gap-8 lg:grid-cols-3">
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Upcoming 30 Days</h2>
+                <div class="space-y-4">
+                    {% for day in calendar_data %}
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <h3 class="font-semibold mb-2 dark:text-white">{{ day.date|date:"F d, Y" }}</h3>
+                        {% if day.sessions %}
+                        <ul class="space-y-2">
+                            {% for session in day.sessions %}
+                            <li class="text-gray-700 dark:text-gray-300">
+                                {{ session.course.code }} - {{ session.duration_minutes }} minutes
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-500 dark:text-gray-400">No study sessions scheduled</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Ongoing Courses</h2>
+                <div class="space-y-4">
+                    {% for course in courses %}
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <h3 class="font-semibold dark:text-white">{{ course.code }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ course.name }}</p>
+                        <a href="{% url 'study_session_create' course.id %}" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Add Session</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

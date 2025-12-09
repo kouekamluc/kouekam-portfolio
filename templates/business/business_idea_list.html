@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold dark:text-white">Business Ideas</h1>
+            <a href="{% url 'business_idea_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Idea</a>
+        </div>
+        
+        <div class="flex gap-4 mb-6">
+            <a href="{% url 'business_idea_list' %}" class="px-4 py-2 rounded {% if not status_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
+            <a href="?status=idea" class="px-4 py-2 rounded {% if status_filter == 'idea' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Ideas</a>
+            <a href="?status=researching" class="px-4 py-2 rounded {% if status_filter == 'researching' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Researching</a>
+            <a href="?status=active" class="px-4 py-2 rounded {% if status_filter == 'active' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Active</a>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {% for idea in ideas %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">{{ idea.title }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">{{ idea.description|truncatewords:20 }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                        {{ idea.get_status_display }}
+                    </span>
+                    <a href="{% url 'business_idea_detail' idea.id %}" class="text-blue-600 hover:underline">View →</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="col-span-3 text-center text-gray-600 dark:text-gray-400">No business ideas yet. <a href="{% url 'business_idea_create' %}" class="text-blue-600 hover:underline">Create one</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

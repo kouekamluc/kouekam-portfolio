@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Mood & Energy Tracker</h1>
+        
+        <div class="mb-8">
+            <canvas id="moodChart" width="400" height="200"></canvas>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2">
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Mood Distribution</h2>
+                <canvas id="moodPieChart" width="400" height="200"></canvas>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Recent Entries</h2>
+                <div class="space-y-4">
+                    {% for entry in entries|slice:":10" %}
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold dark:text-white">{{ entry.date|date:"M d, Y" }}</span>
+                            {% if entry.mood %}<span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900">{{ entry.get_mood_display }}</span>{% endif %}
+                        </div>
+                        {% if entry.energy_level %}<p class="text-sm text-gray-600 dark:text-gray-400">Energy: {{ entry.get_energy_level_display }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const moodData = {{ mood_data|safe }};
+const moodCounts = {{ mood_counts|safe }};
+
+// Line chart for mood over time
+const moodCtx = document.getElementById('moodChart').getContext('2d');
+new Chart(moodCtx, {
+    type: 'line',
+    data: {
+        labels: moodData.map(d => d.date),
+        datasets: [{
+            label: 'Mood',
+            data: moodData.map(d => {
+                const moods = {'excellent': 5, 'good': 4, 'okay': 3, 'poor': 2, 'terrible': 1};
+                return moods[d.mood] || 0;
+            }),
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 5
+            }
+        }
+    }
+});
+
+// Pie chart for mood distribution
+const pieCtx = document.getElementById('moodPieChart').getContext('2d');
+new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: Object.keys(moodCounts),
+        datasets: [{
+            data: Object.values(moodCounts),
+            backgroundColor: [
+                'rgb(34, 197, 94)',
+                'rgb(59, 130, 246)',
+                'rgb(234, 179, 8)',
+                'rgb(239, 68, 68)',
+                'rgb(107, 114, 128)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+</script>
+{% endblock %}
+
+
+
+

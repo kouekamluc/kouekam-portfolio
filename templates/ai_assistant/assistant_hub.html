@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">AI Assistant Hub</h1>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+            <a href="{% url 'chat_interface' %}" class="bg-blue-50 dark:bg-blue-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">General Chat</h3>
+                <p class="text-gray-600 dark:text-gray-400">Chat with AI assistant</p>
+            </a>
+            <a href="{% url 'study_helper' %}" class="bg-green-50 dark:bg-green-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">Study Helper</h3>
+                <p class="text-gray-600 dark:text-gray-400">Get study assistance</p>
+            </a>
+            <a href="{% url 'code_assistant' %}" class="bg-purple-50 dark:bg-purple-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">Code Assistant</h3>
+                <p class="text-gray-600 dark:text-gray-400">Code review and help</p>
+            </a>
+            <a href="{% url 'writing_assistant' %}" class="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">Writing Assistant</h3>
+                <p class="text-gray-600 dark:text-gray-400">Writing help and review</p>
+            </a>
+            <a href="{% url 'pdf_upload' %}" class="bg-red-50 dark:bg-red-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">PDF Analyzer</h3>
+                <p class="text-gray-600 dark:text-gray-400">Analyze PDF documents</p>
+            </a>
+            <a href="{% url 'course_recommendation' %}" class="bg-indigo-50 dark:bg-indigo-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-xl font-bold mb-2 dark:text-white">Course Recommendations</h3>
+                <p class="text-gray-600 dark:text-gray-400">Get course suggestions</p>
+            </a>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-2">
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Recent Conversations</h2>
+                {% for conversation in conversations %}
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
+                    <a href="{% url 'conversation_detail' conversation.id %}" class="hover:underline">
+                        <h3 class="font-semibold dark:text-white">{{ conversation.title|default:"Untitled" }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ conversation.assistant_type }}</p>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-600 dark:text-gray-400">No conversations yet.</p>
+                {% endfor %}
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Recent PDF Analyses</h2>
+                {% for analysis in recent_analyses %}
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
+                    <a href="{% url 'pdf_analyze' analysis.id %}" class="hover:underline">
+                        <h3 class="font-semibold dark:text-white">{{ analysis.original_filename|default:"PDF Analysis" }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ analysis.date_analyzed|date:"M d, Y" }}</p>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-600 dark:text-gray-400">No PDF analyses yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

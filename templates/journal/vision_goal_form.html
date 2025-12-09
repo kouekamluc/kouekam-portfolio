@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Vision Goal</h1>
+        
+        <form method="post" class="max-w-2xl space-y-6">
+            {% csrf_token %}
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                <input type="text" name="title" value="{% if goal %}{{ goal.title }}{% endif %}" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                <textarea name="description" rows="6" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if goal %}{{ goal.description }}{% endif %}</textarea>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                <select name="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="career" {% if goal and goal.category == 'career' %}selected{% endif %}>Career</option>
+                    <option value="education" {% if goal and goal.category == 'education' %}selected{% endif %}>Education</option>
+                    <option value="business" {% if goal and goal.category == 'business' %}selected{% endif %}>Business</option>
+                    <option value="personal" {% if goal and goal.category == 'personal' %}selected{% endif %}>Personal</option>
+                    <option value="africa" {% if goal and goal.category == 'africa' %}selected{% endif %}>African Impact</option>
+                    <option value="financial" {% if goal and goal.category == 'financial' %}selected{% endif %}>Financial</option>
+                    <option value="health" {% if goal and goal.category == 'health' %}selected{% endif %}>Health</option>
+                    <option value="other" {% if goal and goal.category == 'other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Target Date</label>
+                    <input type="date" name="target_date" value="{% if goal and goal.target_date %}{{ goal.target_date|date:'Y-m-d' }}{% endif %}"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Progress (%)</label>
+                    <input type="number" name="progress" value="{% if goal %}{{ goal.progress }}{% else %}0{% endif %}" min="0" max="100" required
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Save</button>
+            <a href="{% url 'vision_board' %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

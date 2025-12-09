@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Market Research</h1>
+        
+        <div class="space-y-6">
+            {% for item in research %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold dark:text-white">{{ item.business_idea.title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ item.date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h4 class="font-semibold mb-2 dark:text-white">Findings:</h4>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ item.findings }}</p>
+                </div>
+                {% if item.sources %}
+                <div>
+                    <h4 class="font-semibold mb-2 dark:text-white">Sources:</h4>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ item.sources }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-600 dark:text-gray-400">No market research yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+
