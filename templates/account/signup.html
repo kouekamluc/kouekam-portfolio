@@ -4,7 +4,7 @@
 {% block head_title %}{% trans "Sign Up" %}{% endblock %}
 
 {% block content %}
-<div class="w-full max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+<div class="w-full max-w-md mx-auto card">
     <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Create Account
@@ -18,66 +18,89 @@
         {% csrf_token %}
         
         {% if form.non_field_errors %}
-            <div class="p-4 mb-4 text-sm text-red-800 bg-red-50 rounded-lg" role="alert">
+            <div class="p-4 mb-4 text-sm text-red-800 bg-red-50 dark:bg-red-900 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800" role="alert">
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
 
         <div>
             <label for="{{ form.email.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Email <span class="text-red-500">*</span>
+                Email <span class="text-red-500 dark:text-red-400">*</span>
             </label>
             <input 
                 type="email" 
                 name="{{ form.email.name }}"
                 id="{{ form.email.id_for_label }}"
                 {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 {% if form.email.errors %}border-red-500{% endif %}"
+                class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 {% if form.email.errors %}border-red-500 dark:border-red-500{% endif %}"
                 placeholder="name@example.com"
                 required
                 autocomplete="email"
             >
             {% if form.email.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.email.errors }}</p>
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors }}</p>
             {% endif %}
         </div>
 
         <div>
             <label for="{{ form.password1.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Password <span class="text-red-500">*</span>
+                Password <span class="text-red-500 dark:text-red-400">*</span>
             </label>
             <input 
                 type="password" 
                 name="{{ form.password1.name }}"
                 id="{{ form.password1.id_for_label }}"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 {% if form.password1.errors %}border-red-500{% endif %}"
+                class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 {% if form.password1.errors %}border-red-500 dark:border-red-500{% endif %}"
                 placeholder="••••••••"
                 required
                 autocomplete="new-password"
+                oninput="validatePassword(this.value)"
             >
             {% if form.password1.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.password1.errors }}</p>
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors }}</p>
             {% endif %}
-            {% if form.password1.help_text %}
-                <p class="mt-1 text-xs text-gray-500">{{ form.password1.help_text }}</p>
-            {% endif %}
+            <div id="password-requirements" class="mt-2 space-y-1.5 hidden">
+                <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Password requirements:</p>
+                <div class="space-y-1">
+                    <div id="req-length" class="flex items-center text-xs">
+                        <span class="requirement-icon mr-2">○</span>
+                        <span class="text-gray-600 dark:text-gray-400">At least 8 characters</span>
+                    </div>
+                    <div id="req-uppercase" class="flex items-center text-xs">
+                        <span class="requirement-icon mr-2">○</span>
+                        <span class="text-gray-600 dark:text-gray-400">Contains uppercase letter</span>
+                    </div>
+                    <div id="req-lowercase" class="flex items-center text-xs">
+                        <span class="requirement-icon mr-2">○</span>
+                        <span class="text-gray-600 dark:text-gray-400">Contains lowercase letter</span>
+                    </div>
+                    <div id="req-number" class="flex items-center text-xs">
+                        <span class="requirement-icon mr-2">○</span>
+                        <span class="text-gray-600 dark:text-gray-400">Contains number</span>
+                    </div>
+                    <div id="req-special" class="flex items-center text-xs">
+                        <span class="requirement-icon mr-2">○</span>
+                        <span class="text-gray-600 dark:text-gray-400">Contains special character (!@#$%^&*)</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div>
             <label for="{{ form.password2.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Password (again) <span class="text-red-500">*</span>
+                Password (again) <span class="text-red-500 dark:text-red-400">*</span>
             </label>
             <input 
                 type="password" 
                 name="{{ form.password2.name }}"
                 id="{{ form.password2.id_for_label }}"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 {% if form.password2.errors %}border-red-500{% endif %}"
+                class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 {% if form.password2.errors %}border-red-500 dark:border-red-500{% endif %}"
                 placeholder="••••••••"
                 required
                 autocomplete="new-password"
             >
             {% if form.password2.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.password2.errors }}</p>
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password2.errors }}</p>
             {% endif %}
         </div>
 
@@ -87,7 +110,7 @@
 
         <button 
             type="submit" 
-            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="btn-primary w-full"
         >
             Sign up
         </button>
@@ -96,12 +119,68 @@
     <div class="mt-6 text-center">
         <p class="text-sm text-gray-600 dark:text-gray-400">
             Already have an account? 
-            <a href="{% url 'account_login' %}" class="text-blue-600 hover:underline font-medium">
+            <a href="{% url 'account_login' %}" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
                 Sign in
             </a>
         </p>
     </div>
 </div>
+
+<script>
+function validatePassword(password) {
+    const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    // Show requirements div when user starts typing
+    const requirementsDiv = document.getElementById('password-requirements');
+    if (password.length > 0) {
+        requirementsDiv.classList.remove('hidden');
+    } else {
+        requirementsDiv.classList.add('hidden');
+        return;
+    }
+
+    // Update each requirement indicator
+    updateRequirement('req-length', requirements.length);
+    updateRequirement('req-uppercase', requirements.uppercase);
+    updateRequirement('req-lowercase', requirements.lowercase);
+    updateRequirement('req-number', requirements.number);
+    updateRequirement('req-special', requirements.special);
+}
+
+function updateRequirement(id, isValid) {
+    const element = document.getElementById(id);
+    const icon = element.querySelector('.requirement-icon');
+    const text = element.querySelector('span:last-child');
+    
+    if (isValid) {
+        icon.textContent = '✓';
+        icon.className = 'requirement-icon mr-2 text-green-600 dark:text-green-400';
+        text.className = 'text-green-600 dark:text-green-400';
+    } else {
+        icon.textContent = '○';
+        icon.className = 'requirement-icon mr-2 text-gray-400 dark:text-gray-500';
+        text.className = 'text-gray-600 dark:text-gray-400';
+    }
+}
+
+// Show requirements on focus
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
+    if (passwordInput) {
+        passwordInput.addEventListener('focus', function() {
+            if (this.value.length === 0) {
+                document.getElementById('password-requirements').classList.remove('hidden');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
 
 

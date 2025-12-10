@@ -33,10 +33,102 @@
             padding-top: var(--navbar-height-mobile);
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             body {
                 padding-top: var(--navbar-height-desktop);
             }
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background-color: rgb(37 99 235);
+            color: white;
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background-color: rgb(29 78 216);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.5);
+        }
+
+        .btn-secondary {
+            background-color: rgb(229 231 235);
+            color: rgb(17 24 39);
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgb(209 213 219);
+        }
+
+        .dark .btn-secondary {
+            background-color: rgb(55 65 81);
+            color: white;
+        }
+
+        .dark .btn-secondary:hover {
+            background-color: rgb(75 85 99);
+        }
+
+        /* Input styles */
+        .input-field {
+            display: block;
+            width: 100%;
+            border-radius: 0.5rem;
+            border-width: 1px;
+            border-color: rgb(209 213 219);
+            background-color: rgb(249 250 251);
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: rgb(17 24 39);
+            transition: all 0.15s;
+        }
+
+        .input-field:focus {
+            border-color: rgb(59 130 246);
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+
+        .dark .input-field {
+            border-color: rgb(75 85 99);
+            background-color: rgb(55 65 81);
+            color: white;
+        }
+
+        .dark .input-field::placeholder {
+            color: rgb(156 163 175);
+        }
+
+        /* Card styles */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border-width: 1px;
+            border-color: rgb(229 231 235);
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .dark .card {
+            background-color: rgb(31 41 55);
+            border-color: rgb(55 65 81);
         }
     </style>
 </head>
