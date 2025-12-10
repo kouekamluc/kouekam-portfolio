@@ -189,6 +189,7 @@ USE_S3_RAW = os.getenv('USE_S3', 'False').strip().lower()
 USE_S3 = USE_S3_RAW in ('true', '1', 'yes', 'on')
 
 # AWS S3 Storage Configuration (for production)
+# Django 5.2+ uses STORAGES dict, but we also set the old settings for compatibility
 if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     # Use S3 for static and media files
     if not AWS_S3_CUSTOM_DOMAIN:
@@ -210,6 +211,16 @@ if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     # Media files storage - use custom storage class
     DEFAULT_FILE_STORAGE = 'kouekam_hub.storage.MediaStorage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    
+    # Django 5.2+ STORAGES configuration (takes precedence)
+    STORAGES = {
+        'default': {
+            'BACKEND': 'kouekam_hub.storage.MediaStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'kouekam_hub.storage.StaticStorage',
+        },
+    }
 else:
     # Use WhiteNoise for static files in production (if not using S3)
     # WhiteNoise middleware will serve files from STATIC_ROOT
@@ -219,6 +230,24 @@ else:
         # CompressedStaticFilesStorage compresses files and serves them efficiently
         # This ensures Django admin static files are collected and served correctly
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+        STORAGES = {
+            'default': {
+                'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            },
+            'staticfiles': {
+                'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+            },
+        }
+    else:
+        # Development: use default file storage
+        STORAGES = {
+            'default': {
+                'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            },
+            'staticfiles': {
+                'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+            },
+        }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

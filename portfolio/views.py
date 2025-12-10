@@ -83,11 +83,18 @@ def download_cv(request):
         return HttpResponseRedirect('/')
 
 def project_list(request):
-    projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')
-    category = request.GET.get('category')
-    if category:
-        projects = projects.filter(category=category)
-    return render(request, 'portfolio/project_list.html', {'projects': projects, 'active_category': category})
+    try:
+        projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')
+        category = request.GET.get('category')
+        if category:
+            projects = projects.filter(category=category)
+        return render(request, 'portfolio/project_list.html', {'projects': projects, 'active_category': category})
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in project_list view: {e}", exc_info=True)
+        # Return empty projects list on error
+        return render(request, 'portfolio/project_list.html', {'projects': [], 'active_category': None})
 
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
