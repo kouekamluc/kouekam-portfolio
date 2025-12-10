@@ -243,36 +243,24 @@ class ProjectAdminForm(forms.ModelForm):
             pass
     
     def clean_tech_stack_display(self):
-        # Get the value from form data (raw input)
-        # In clean_<fieldname>, we access the raw value from self.data
-        data = ''
-        if hasattr(self, 'data') and self.data:
-            data = self.data.get('tech_stack_display', '')
+        # In clean_<fieldname>, the field's base clean() has already been called
+        # The value should be in cleaned_data, but we'll handle both cases
+        try:
+            # Try to get from cleaned_data first (after field's clean)
+            data = self.cleaned_data.get('tech_stack_display', '')
+        except (KeyError, AttributeError):
+            # If not in cleaned_data yet, get from form data
+            data = self.data.get('tech_stack_display', '') if hasattr(self, 'data') and self.data else ''
         
-        # Handle empty or None values
+        # Handle empty or None values - return empty string, we'll convert to list in save()
         if not data:
-            return []
+            return ''
         
-        # Ensure it's a string
+        # Ensure it's a string and return as-is (we'll parse it in save method)
         if not isinstance(data, str):
             data = str(data) if data else ''
         
-        data = data.strip()
-        if not data:
-            return []
-        
-        # Try to parse as JSON first
-        import json
-        try:
-            parsed = json.loads(data)
-            if isinstance(parsed, list):
-                return [str(item).strip() for item in parsed if item]
-            else:
-                return [str(parsed).strip()] if parsed else []
-        except (json.JSONDecodeError, ValueError, TypeError):
-            # If not JSON, split by comma
-            items = [item.strip() for item in data.split(',') if item.strip()]
-            return items
+        return data.strip()
     
     def clean(self):
         """Validate the form data"""
@@ -292,21 +280,26 @@ class ProjectAdminForm(forms.ModelForm):
                 if base_slug:
                     instance.slug = base_slug
             
-            # Set tech_stack from the cleaned display field
+            # Convert tech_stack_display string to list
             # Only access cleaned_data if form is valid
+            tech_stack_list = []
             if hasattr(self, 'cleaned_data') and self.cleaned_data:
-                tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
-                if not isinstance(tech_stack_list, list):
-                    tech_stack_list = []
-                instance.tech_stack = tech_stack_list
-            else:
-                # If form is not valid, preserve existing tech_stack
-                if instance.pk and hasattr(instance, 'tech_stack'):
-                    # Keep existing tech_stack if available
-                    pass
-                else:
-                    # For new instances, default to empty list
-                    instance.tech_stack = []
+                tech_stack_str = self.cleaned_data.get('tech_stack_display', '')
+                if tech_stack_str:
+                    # Try to parse as JSON first
+                    import json
+                    try:
+                        parsed = json.loads(tech_stack_str)
+                        if isinstance(parsed, list):
+                            tech_stack_list = [str(item).strip() for item in parsed if item]
+                        else:
+                            tech_stack_list = [str(parsed).strip()] if parsed else []
+                    except (json.JSONDecodeError, ValueError, TypeError):
+                        # If not JSON, split by comma
+                        tech_stack_list = [item.strip() for item in tech_stack_str.split(',') if item.strip()]
+            
+            # Set tech_stack on instance
+            instance.tech_stack = tech_stack_list if tech_stack_list else []
             
             if commit:
                 try:
