@@ -243,9 +243,19 @@ class ProjectAdminForm(forms.ModelForm):
             pass
     
     def clean_tech_stack_display(self):
-        data = self.cleaned_data.get('tech_stack_display', '')
-        if not data or not isinstance(data, str):
+        # Get the value from form data (raw input)
+        # In clean_<fieldname>, we access the raw value from self.data
+        data = ''
+        if hasattr(self, 'data') and self.data:
+            data = self.data.get('tech_stack_display', '')
+        
+        # Handle empty or None values
+        if not data:
             return []
+        
+        # Ensure it's a string
+        if not isinstance(data, str):
+            data = str(data) if data else ''
         
         data = data.strip()
         if not data:
