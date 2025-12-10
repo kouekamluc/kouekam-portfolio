@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from .models import BlogPost, CodeSnippet, Tutorial
 
 
@@ -17,6 +18,7 @@ class BlogPostAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     inlines = [CodeSnippetInline]
     date_hierarchy = 'published_date'
+    actions = ['publish_posts', 'unpublish_posts', 'mark_as_featured', 'unmark_as_featured']
     
     fieldsets = (
         ('Post Information', {
@@ -33,6 +35,26 @@ class BlogPostAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    @admin.action(description='Publish selected posts')
+    def publish_posts(self, request, queryset):
+        updated = queryset.update(published_date=timezone.now())
+        self.message_user(request, f'{updated} post(s) published successfully.')
+    
+    @admin.action(description='Unpublish selected posts')
+    def unpublish_posts(self, request, queryset):
+        updated = queryset.update(published_date=None)
+        self.message_user(request, f'{updated} post(s) unpublished successfully.')
+    
+    @admin.action(description='Mark selected posts as featured')
+    def mark_as_featured(self, request, queryset):
+        updated = queryset.update(featured=True)
+        self.message_user(request, f'{updated} post(s) marked as featured.')
+    
+    @admin.action(description='Unmark selected posts as featured')
+    def unmark_as_featured(self, request, queryset):
+        updated = queryset.update(featured=False)
+        self.message_user(request, f'{updated} post(s) unmarked as featured.')
 
 
 @admin.register(CodeSnippet)

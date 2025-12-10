@@ -136,6 +136,7 @@ class ProjectAdmin(admin.ModelAdmin):
     search_fields = ['title', 'description']
     readonly_fields = ['slug', 'created_at']
     inlines = [ProjectImageInline]
+    actions = ['mark_as_active', 'mark_as_completed', 'mark_as_archived']
     
     fieldsets = (
         ('Project Information', {
@@ -152,6 +153,21 @@ class ProjectAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    @admin.action(description='Mark selected projects as active')
+    def mark_as_active(self, request, queryset):
+        updated = queryset.update(status='active')
+        self.message_user(request, f'{updated} project(s) marked as active.')
+    
+    @admin.action(description='Mark selected projects as completed')
+    def mark_as_completed(self, request, queryset):
+        updated = queryset.update(status='completed')
+        self.message_user(request, f'{updated} project(s) marked as completed.')
+    
+    @admin.action(description='Mark selected projects as archived')
+    def mark_as_archived(self, request, queryset):
+        updated = queryset.update(status='archived')
+        self.message_user(request, f'{updated} project(s) marked as archived.')
 
 
 @admin.register(ProjectImage)

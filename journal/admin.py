@@ -50,6 +50,7 @@ class VisionGoalAdmin(admin.ModelAdmin):
     search_fields = ['title', 'description', 'user__email']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'target_date'
+    actions = ['mark_as_complete', 'reset_progress', 'increase_progress_25', 'increase_progress_50']
     
     fieldsets = (
         ('Goal Information', {
@@ -63,6 +64,30 @@ class VisionGoalAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    @admin.action(description='Mark selected vision goals as complete (100%)')
+    def mark_as_complete(self, request, queryset):
+        updated = queryset.update(progress=100)
+        self.message_user(request, f'{updated} vision goal(s) marked as complete.')
+    
+    @admin.action(description='Reset progress to 0%')
+    def reset_progress(self, request, queryset):
+        updated = queryset.update(progress=0)
+        self.message_user(request, f'{updated} vision goal(s) progress reset.')
+    
+    @admin.action(description='Increase progress by 25%')
+    def increase_progress_25(self, request, queryset):
+        for goal in queryset:
+            goal.progress = min(100, goal.progress + 25)
+            goal.save()
+        self.message_user(request, f'{queryset.count()} vision goal(s) progress increased by 25%.')
+    
+    @admin.action(description='Increase progress by 50%')
+    def increase_progress_50(self, request, queryset):
+        for goal in queryset:
+            goal.progress = min(100, goal.progress + 50)
+            goal.save()
+        self.message_user(request, f'{queryset.count()} vision goal(s) progress increased by 50%.')
 
 
 @admin.register(LifeLesson)

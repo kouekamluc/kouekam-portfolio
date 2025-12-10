@@ -27,6 +27,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code', 'user__email', 'user__username']
     readonly_fields = ['created_at', 'updated_at']
     inlines = [NoteInline, FlashcardInline, StudySessionInline]
+    actions = ['mark_as_completed', 'mark_as_ongoing', 'mark_as_dropped']
     
     fieldsets = (
         ('Basic Information', {
@@ -40,6 +41,21 @@ class CourseAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    @admin.action(description='Mark selected courses as completed')
+    def mark_as_completed(self, request, queryset):
+        updated = queryset.update(status='completed')
+        self.message_user(request, f'{updated} course(s) marked as completed.')
+    
+    @admin.action(description='Mark selected courses as ongoing')
+    def mark_as_ongoing(self, request, queryset):
+        updated = queryset.update(status='ongoing')
+        self.message_user(request, f'{updated} course(s) marked as ongoing.')
+    
+    @admin.action(description='Mark selected courses as dropped')
+    def mark_as_dropped(self, request, queryset):
+        updated = queryset.update(status='dropped')
+        self.message_user(request, f'{updated} course(s) marked as dropped.')
 
 
 @admin.register(Note)
