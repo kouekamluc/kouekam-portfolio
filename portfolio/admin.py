@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from .models import Profile, Timeline, Skill, Project, ProjectImage
 
 
@@ -63,8 +64,57 @@ class ProjectImageInline(admin.TabularInline):
     fields = ['image', 'caption']
 
 
+class ProjectAdminForm(forms.ModelForm):
+    """Custom form to handle tech_stack JSONField properly"""
+    tech_stack_input = forms.CharField(
+        required=False,
+        help_text="Enter technologies separated by commas (e.g., Python, Django, React) or as JSON array (e.g., [\"Python\", \"Django\"])",
+        widget=forms.Textarea(attrs={'rows': 3})
+    )
+    
+    class Meta:
+        model = Project
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            # Convert list to comma-separated string for display
+            if isinstance(self.instance.tech_stack, list):
+                self.initial['tech_stack_input'] = ', '.join(self.instance.tech_stack)
+            elif self.instance.tech_stack:
+                self.initial['tech_stack_input'] = str(self.instance.tech_stack)
+    
+    def clean_tech_stack_input(self):
+        data = self.cleaned_data.get('tech_stack_input', '').strip()
+        if not data:
+            return []
+        
+        # Try to parse as JSON first
+        import json
+        try:
+            parsed = json.loads(data)
+            if isinstance(parsed, list):
+                return parsed
+            else:
+                return [str(parsed)]
+        except (json.JSONDecodeError, ValueError):
+            # If not JSON, split by comma
+            items = [item.strip() for item in data.split(',') if item.strip()]
+            return items
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Set tech_stack from the cleaned input
+        instance.tech_stack = self.cleaned_data.get('tech_stack_input', [])
+        if commit:
+            instance.save()
+        return instance
+
+
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectAdminForm
     list_display = ['title', 'category', 'status', 'created_at']
     list_filter = ['category', 'status', 'created_at']
     search_fields = ['title', 'description']
@@ -76,7 +126,7 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('title', 'slug', 'description', 'category', 'status')
         }),
         ('Technical Details', {
-            'fields': ('tech_stack', 'image')
+            'fields': ('tech_stack_input', 'image')
         }),
         ('Links', {
             'fields': ('github_url', 'live_link')
@@ -86,42 +136,6 @@ class ProjectAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
-    def save_model(self, request, obj, form, change):
-        """Override save to handle tech_stack JSON field properly"""
-        try:
-            # Ensure tech_stack is a list if it's a string
-            if isinstance(obj.tech_stack, str):
-                try:
-                    import json
-                    obj.tech_stack = json.loads(obj.tech_stack)
-                except (json.JSONDecodeError, ValueError):
-                    # If it's not valid JSON, split by comma and create a list
-                    obj.tech_stack = [item.strip() for item in obj.tech_stack.split(',') if item.strip()]
-            elif obj.tech_stack is None:
-                obj.tech_stack = []
-            elif not isinstance(obj.tech_stack, list):
-                obj.tech_stack = []
-            
-            # Ensure slug is set before saving
-            if not obj.slug and obj.title:
-                from django.utils.text import slugify
-                base_slug = slugify(obj.title)
-                obj.slug = base_slug
-                # Handle duplicate slugs
-                counter = 1
-                while Project.objects.filter(slug=obj.slug).exclude(pk=obj.pk if obj.pk else None).exists():
-                    obj.slug = f"{base_slug}-{counter}"
-                    counter += 1
-                    if counter > 100:  # Safety limit
-                        break
-            
-            super().save_model(request, obj, form, change)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error saving project in admin: {e}", exc_info=True)
-            raise
 
 
 @admin.register(ProjectImage)
