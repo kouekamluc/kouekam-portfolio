@@ -134,11 +134,29 @@ The following directories are mounted as volumes (persist between container rest
 If you're getting HTTP 400 errors when accessing your site, it's likely because `ALLOWED_HOSTS` doesn't include your domain. 
 
 **Fix**: Set the `ALLOWED_HOSTS` environment variable to include your domain:
+
+**On Railway:**
+1. Go to your project dashboard
+2. Click on your service
+3. Go to the "Variables" tab
+4. Add a new variable:
+   - Key: `ALLOWED_HOSTS`
+   - Value: `kouekamkamgou.uk,www.kouekamkamgou.uk` (replace with your actual domain)
+5. Redeploy your service
+
+**On Heroku:**
+```bash
+heroku config:set ALLOWED_HOSTS=kouekamkamgou.uk,www.kouekamkamgou.uk
+```
+
+**On Docker Compose:**
+Add to your `.env` file:
 ```
 ALLOWED_HOSTS=kouekamkamgou.uk,www.kouekamkamgou.uk
 ```
+Then restart: `docker-compose restart web`
 
-Or if using a platform like Railway, add it in your environment variables settings. The domain must match exactly what's in the Host header of incoming requests.
+**Important**: The domain must match exactly what's in the Host header of incoming requests. Include both `yourdomain.com` and `www.yourdomain.com` if you use both.
 
 ### Port already in use
 If port 8000 or 5432 is already in use, change them in `.env`:

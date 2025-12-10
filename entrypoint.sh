@@ -21,6 +21,14 @@ python create_superuser.py
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
 
+# Check ALLOWED_HOSTS configuration
+if [ -z "$ALLOWED_HOSTS" ] || [ "$ALLOWED_HOSTS" = "localhost,127.0.0.1" ]; then
+    echo "⚠️  WARNING: ALLOWED_HOSTS is not configured for production!"
+    echo "   Set ALLOWED_HOSTS environment variable to include your domain(s)"
+    echo "   Example: ALLOWED_HOSTS=kouekamkamgou.uk,www.kouekamkamgou.uk"
+    echo "   Without this, you will get HTTP 400 errors when accessing your site."
+fi
+
 echo "Starting server..."
 exec "$@"
 
