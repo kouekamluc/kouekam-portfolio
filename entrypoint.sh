@@ -72,7 +72,7 @@ echo "Collecting static files..."
 # Run collectstatic and capture output
 python manage.py collectstatic --noinput --clear
 
-# Verify S3 configuration by checking Django settings
+# Verify S3 configuration and check if files are actually uploaded
 echo "Verifying S3 configuration..."
 python << EOF
 import os
@@ -88,16 +88,28 @@ print(f"STATIC_URL: {getattr(settings, 'STATIC_URL', 'Not set')}")
 print(f"AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Not set')}")
 
 if getattr(settings, 'USE_S3', False):
-    # Try to verify S3 connection
+    # Try to verify S3 connection and check if CSS file exists
     try:
         from kouekam_hub.storage import StaticStorage
         storage = StaticStorage()
-        # Check if we can access the bucket
         print(f"✓ S3 storage initialized")
         print(f"  Bucket: {storage.bucket_name}")
         print(f"  Location: {storage.location}")
+        
+        # Check if CSS file exists in S3
+        css_path = 'static/css/output.css'
+        if storage.exists(css_path):
+            print(f"✓ CSS file found in S3: {css_path}")
+            # Get the URL
+            css_url = storage.url(css_path)
+            print(f"  CSS URL: {css_url}")
+        else:
+            print(f"⚠ WARNING: CSS file NOT found in S3 at {css_path}")
+            print(f"  This means collectstatic didn't upload to S3!")
     except Exception as e:
-        print(f"⚠ Warning: Could not initialize S3 storage: {e}")
+        print(f"⚠ Warning: Could not verify S3 storage: {e}")
+        import traceback
+        traceback.print_exc()
 EOF
 
 # Verify CSS file was properly collected
