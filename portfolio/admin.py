@@ -66,8 +66,9 @@ class ProjectImageInline(admin.TabularInline):
 
 class ProjectAdminForm(forms.ModelForm):
     """Custom form to handle tech_stack JSONField properly"""
-    tech_stack_input = forms.CharField(
+    tech_stack_display = forms.CharField(
         required=False,
+        label='Tech Stack',
         help_text="Enter technologies separated by commas (e.g., Python, Django, React) or as JSON array (e.g., [\"Python\", \"Django\"])",
         widget=forms.Textarea(attrs={'rows': 3})
     )
@@ -75,18 +76,20 @@ class ProjectAdminForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = '__all__'
+        exclude = ['tech_stack']  # Exclude the original field
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            # Convert list to comma-separated string for display
-            if isinstance(self.instance.tech_stack, list):
-                self.initial['tech_stack_input'] = ', '.join(self.instance.tech_stack)
-            elif self.instance.tech_stack:
-                self.initial['tech_stack_input'] = str(self.instance.tech_stack)
+        # Populate tech_stack_display from the instance
+        if self.instance and hasattr(self.instance, 'tech_stack'):
+            tech_stack = self.instance.tech_stack
+            if isinstance(tech_stack, list):
+                self.initial['tech_stack_display'] = ', '.join(str(item) for item in tech_stack)
+            elif tech_stack:
+                self.initial['tech_stack_display'] = str(tech_stack)
     
-    def clean_tech_stack_input(self):
-        data = self.cleaned_data.get('tech_stack_input', '').strip()
+    def clean_tech_stack_display(self):
+        data = self.cleaned_data.get('tech_stack_display', '').strip()
         if not data:
             return []
         
@@ -95,7 +98,7 @@ class ProjectAdminForm(forms.ModelForm):
         try:
             parsed = json.loads(data)
             if isinstance(parsed, list):
-                return parsed
+                return [str(item) for item in parsed]
             else:
                 return [str(parsed)]
         except (json.JSONDecodeError, ValueError):
@@ -105,8 +108,9 @@ class ProjectAdminForm(forms.ModelForm):
     
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # Set tech_stack from the cleaned input
-        instance.tech_stack = self.cleaned_data.get('tech_stack_input', [])
+        # Set tech_stack from the cleaned display field
+        tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
+        instance.tech_stack = tech_stack_list
         if commit:
             instance.save()
         return instance
@@ -126,7 +130,7 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('title', 'slug', 'description', 'category', 'status')
         }),
         ('Technical Details', {
-            'fields': ('tech_stack_input', 'image')
+            'fields': ('tech_stack_display', 'image')
         }),
         ('Links', {
             'fields': ('github_url', 'live_link')
