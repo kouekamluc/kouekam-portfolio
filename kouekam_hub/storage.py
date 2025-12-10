@@ -46,13 +46,24 @@ class StaticStorage(S3Boto3Storage):
         # Get the content type
         content_type = self._get_content_type(name)
         
+        # Ensure object_parameters dict exists
+        if not hasattr(self, 'object_parameters') or self.object_parameters is None:
+            self.object_parameters = {}
+        
         # Temporarily update object_parameters to include ContentType
         original_params = self.object_parameters.copy()
+        self.object_parameters = self.object_parameters.copy()  # Create a copy to avoid modifying shared dict
         self.object_parameters['ContentType'] = content_type
         
         try:
             # Save with correct content type
             result = super()._save(name, content)
+        except Exception as e:
+            # Log the error but don't fail silently
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to save {name} to S3: {e}")
+            raise
         finally:
             # Restore original parameters
             self.object_parameters = original_params

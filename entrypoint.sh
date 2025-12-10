@@ -87,6 +87,13 @@ fi
 echo "Running collectstatic (this will collect Django admin static files)..."
 python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -100
 
+# Always run force upload as fallback for admin files when using S3
+# This ensures admin files are uploaded even if collectstatic has issues
+if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
+    echo "Running force upload for admin files (ensures all files are in S3)..."
+    python force_upload_admin_s3.py 2>&1 | grep -E "(Uploaded|Skipped|Failed|Summary|✓|✗|⚠)" || true
+fi
+
 # Verify admin static files were collected
 echo "Verifying Django admin static files were collected..."
 python << EOF
