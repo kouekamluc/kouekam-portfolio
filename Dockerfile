@@ -41,15 +41,35 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
-COPY . .
-
-# Copy built CSS from node-builder stage
-COPY --from=node-builder /app/static/css/output.css ./static/css/output.css
+# Copy package files and install npm dependencies first
+# This ensures npm is available for CSS building if needed
+COPY package.json package-lock.json ./
+COPY tailwind.config.js postcss.config.js ./
 
 # Install npm dependencies for runtime CSS building (if needed)
 # Note: We need devDependencies for tailwindcss
-RUN npm ci --silent || echo "Note: npm ci failed, will try at runtime if needed"
+RUN npm ci --silent || npm install --silent
+
+# Copy built CSS from node-builder stage (ensures CSS is always available)
+# This is the primary CSS file that will be used
+COPY --from=node-builder /app/static/css/output.css ./static/css/output.css
+
+# Copy project files (excluding node_modules and output.css which are in .dockerignore)
+# This must come after npm install to avoid overwriting node_modules
+COPY . .
+
+# Verify CSS file exists and has content, rebuild if needed
+RUN if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then \
+        echo "⚠ WARNING: CSS file is missing or empty after Docker build!" && \
+        echo "Rebuilding CSS as fallback..." && \
+        npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify || exit 1; \
+    fi && \
+    CSS_SIZE=$(wc -c < static/css/output.css 2>/dev/null || echo "0") && \
+    if [ "$CSS_SIZE" -lt 1000 ]; then \
+        echo "⚠ WARNING: CSS file is too small ($CSS_SIZE bytes), rebuilding..." && \
+        npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify || exit 1; \
+    fi && \
+    echo "✓ CSS file verified and ready ($(wc -c < static/css/output.css) bytes)"
 
 # Create necessary directories
 RUN mkdir -p staticfiles media logs

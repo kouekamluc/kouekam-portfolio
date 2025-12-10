@@ -84,11 +84,31 @@ DJANGO_LOG_LEVEL=INFO  # or 'DEBUG', 'WARNING', 'ERROR'
 
 ## Static Files Configuration
 
-### Option 1: Using WhiteNoise (Recommended for simpler deployments)
+### Important: Build CSS First
 
-WhiteNoise is already configured in settings. Simply collect static files:
+**Before collecting static files, you must build the Tailwind CSS:**
 
 ```bash
+# Build CSS for production
+npm ci
+npm run build:css:prod
+
+# Or use the build script
+chmod +x build.sh
+./build.sh
+```
+
+The CSS file (`static/css/output.css`) is gitignored and must be built during deployment.
+
+### Option 1: Using WhiteNoise (Recommended for simpler deployments)
+
+WhiteNoise is already configured in settings. Build CSS and collect static files:
+
+```bash
+# Build CSS first
+npm ci && npm run build:css:prod
+
+# Then collect static files
 python manage.py collectstatic --noinput
 ```
 
@@ -116,8 +136,12 @@ python manage.py collectstatic --noinput
    AWS_S3_REGION_NAME=us-east-1
    ```
 
-4. **Collect and upload static files**:
+4. **Build CSS and collect static files**:
    ```bash
+   # Build CSS first
+   npm ci && npm run build:css:prod
+   
+   # Then collect and upload static files
    python manage.py collectstatic --noinput
    ```
 
@@ -241,8 +265,11 @@ sudo systemctl reload nginx
 5. **Deploy**:
    ```bash
    git push heroku main
+   # The Procfile release phase will automatically:
+   # - Install npm dependencies
+   # - Build CSS (npm run build:css:prod)
+   # - Collect static files
    heroku run python manage.py migrate
-   heroku run python manage.py collectstatic --noinput
    heroku run python manage.py createsuperuser
    ```
 
@@ -250,7 +277,10 @@ sudo systemctl reload nginx
 
 1. **Connect repository** to DigitalOcean
 2. **Configure environment variables** in App Platform dashboard
-3. **Set build command**: `pip install -r requirements.txt`
+3. **Set build command**: 
+   ```bash
+   npm ci && npm run build:css:prod && pip install -r requirements.txt && python manage.py collectstatic --noinput
+   ```
 4. **Set run command**: `gunicorn -c gunicorn_config.py kouekam_hub.wsgi:application`
 5. **Deploy** via dashboard or git push
 
@@ -355,8 +385,9 @@ tail -f logs/django.log
    python manage.py migrate
    ```
 
-3. **Collect static files**:
+3. **Build CSS and collect static files**:
    ```bash
+   npm ci && npm run build:css:prod
    python manage.py collectstatic --noinput
    ```
 
@@ -374,10 +405,18 @@ Set up automated backups for:
 
 ## Troubleshooting
 
-### Static files not loading
-- Verify `collectstatic` was run
+### Static files not loading / CSS not working
+- **Most common issue**: CSS not built before deployment
+  - Verify CSS was built: `ls -lh static/css/output.css` (should exist and have content)
+  - Build CSS: `npm ci && npm run build:css:prod`
+  - For Heroku: The Procfile release phase should handle this automatically
+  - For Docker: CSS is built in the Dockerfile, but entrypoint.sh also builds it
+- Verify `collectstatic` was run after building CSS
 - Check `STATIC_ROOT` path
 - Verify WhiteNoise middleware or S3 configuration
+- Check browser console for 404 errors on CSS file
+- Verify `static/css/output.css` exists and is not empty
+- For S3: Verify CSS file was uploaded to S3 bucket
 
 ### Database connection errors
 - Check `DATABASE_URL` format
@@ -424,4 +463,7 @@ Set up automated backups for:
 For issues or questions, refer to:
 - Django deployment documentation: https://docs.djangoproject.com/en/stable/howto/deployment/
 - Project documentation: `LLM_CONTEXT.md`
+
+
+
 

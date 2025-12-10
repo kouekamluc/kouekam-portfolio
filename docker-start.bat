@@ -32,3 +32,6 @@ echo 🛑 Stop services with: docker-compose down
 
 pause
 
+
+
+

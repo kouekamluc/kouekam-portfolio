@@ -1,0 +1,24 @@
+[
+    {
+        "AllowedHeaders": [
+            "*"
+        ],
+        "AllowedMethods": [
+            "GET",
+            "HEAD"
+        ],
+        "AllowedOrigins": [
+            "https://kouekamkamgou.uk",
+            "https://www.kouekamkamgou.uk",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000"
+        ],
+        "ExposeHeaders": [
+            "ETag",
+            "Content-Length",
+            "Content-Type"
+        ],
+        "MaxAgeSeconds": 3000
+    }
+]
+

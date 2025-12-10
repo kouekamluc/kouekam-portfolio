@@ -23,30 +23,31 @@ python manage.py migrate --noinput
 echo "Creating superuser (if not exists)..."
 python create_superuser.py
 
-# Build Tailwind CSS if Node.js is available and output.css doesn't exist or is empty
+# Build Tailwind CSS if Node.js is available
+# Always rebuild in production to ensure latest changes are included
 if command -v node &> /dev/null && command -v npm &> /dev/null; then
     echo "Building Tailwind CSS..."
-    # Check if output.css exists and has content
-    if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
-        # Ensure node_modules exists
-        if [ ! -d "node_modules" ]; then
-            echo "Installing Node.js dependencies..."
-            npm ci --silent || npm install --silent
-        fi
-        echo "Compiling Tailwind CSS..."
-        npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
-        if [ -f "static/css/output.css" ] && [ -s "static/css/output.css" ]; then
-            echo "✓ CSS built successfully ($(wc -c < static/css/output.css) bytes)"
-        else
-            echo "⚠ Warning: CSS build may have failed, but continuing..."
-        fi
+    # Ensure node_modules exists
+    if [ ! -d "node_modules" ]; then
+        echo "Installing Node.js dependencies..."
+        npm ci --silent || npm install --silent
+    fi
+    echo "Compiling Tailwind CSS (production build)..."
+    npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
+    if [ -f "static/css/output.css" ] && [ -s "static/css/output.css" ]; then
+        CSS_SIZE=$(wc -c < static/css/output.css)
+        echo "✓ CSS built successfully ($CSS_SIZE bytes)"
     else
-        echo "✓ CSS file already exists ($(wc -c < static/css/output.css) bytes), skipping build"
+        echo "⚠ Warning: CSS build may have failed, but continuing..."
     fi
 else
-    echo "Node.js not available, skipping CSS build (assuming CSS was built during Docker build)"
+    echo "Node.js not available, checking if CSS was built during Docker build..."
     if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
         echo "⚠ Warning: CSS file is missing or empty and Node.js is not available!"
+        echo "   CSS should be built during Docker build stage or release phase"
+    else
+        CSS_SIZE=$(wc -c < static/css/output.css)
+        echo "✓ CSS file found from Docker build ($CSS_SIZE bytes)"
     fi
 fi
 

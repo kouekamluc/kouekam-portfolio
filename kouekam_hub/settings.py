@@ -206,11 +206,10 @@ if USE_S3 and AWS_STORAGE_BUCKET_NAME:
 else:
     # Use WhiteNoise for static files in production (if not using S3)
     # WhiteNoise middleware will serve files from STATIC_ROOT
-    # Use Django's default storage to avoid compression/manifest issues
     if not DEBUG:
-        # Use Django's default static files storage
-        # WhiteNoise middleware (already in MIDDLEWARE) will serve the files
-        STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+        # Use WhiteNoise storage with compression for better performance
+        # CompressedStaticFilesStorage compresses files and serves them efficiently
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

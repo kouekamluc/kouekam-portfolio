@@ -30,3 +30,6 @@ echo "📝 View logs with: docker-compose logs -f"
 echo "🌐 Access application at: http://localhost:8000"
 echo "🛑 Stop services with: docker-compose down"
 
+
+
+

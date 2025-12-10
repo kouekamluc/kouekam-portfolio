@@ -64,3 +64,10 @@ dist/
 build/
 *.egg-info/
 
+# Note: static/css/output.css is built during Docker build
+# It's gitignored but we copy it explicitly from the node-builder stage
+# So we don't need to ignore it here
+
+
+
+
