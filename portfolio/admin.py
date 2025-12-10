@@ -80,13 +80,17 @@ class ProjectAdminForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Populate tech_stack_display from the instance
-        if self.instance and hasattr(self.instance, 'tech_stack'):
-            tech_stack = self.instance.tech_stack
-            if isinstance(tech_stack, list):
-                self.initial['tech_stack_display'] = ', '.join(str(item) for item in tech_stack)
-            elif tech_stack:
-                self.initial['tech_stack_display'] = str(tech_stack)
+        # Populate tech_stack_display from the instance (works for both new and existing)
+        try:
+            if self.instance and hasattr(self.instance, 'tech_stack'):
+                tech_stack = getattr(self.instance, 'tech_stack', None)
+                if isinstance(tech_stack, list):
+                    self.initial['tech_stack_display'] = ', '.join(str(item) for item in tech_stack)
+                elif tech_stack:
+                    self.initial['tech_stack_display'] = str(tech_stack)
+        except Exception:
+            # If there's any error, just leave it empty
+            pass
     
     def clean_tech_stack_display(self):
         data = self.cleaned_data.get('tech_stack_display', '').strip()
@@ -107,13 +111,21 @@ class ProjectAdminForm(forms.ModelForm):
             return items
     
     def save(self, commit=True):
-        instance = super().save(commit=False)
-        # Set tech_stack from the cleaned display field
-        tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
-        instance.tech_stack = tech_stack_list
-        if commit:
-            instance.save()
-        return instance
+        try:
+            instance = super().save(commit=False)
+            # Set tech_stack from the cleaned display field
+            tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
+            if not isinstance(tech_stack_list, list):
+                tech_stack_list = []
+            instance.tech_stack = tech_stack_list
+            if commit:
+                instance.save()
+            return instance
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in ProjectAdminForm.save: {e}", exc_info=True)
+            raise
 
 
 @admin.register(Project)

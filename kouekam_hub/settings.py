@@ -383,6 +383,12 @@ LOGGING = {
         'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
         'level': log_level,
     },
+    # Enable error logging for portfolio app to debug admin issues
+    'portfolio': {
+        'handlers': ['file', 'console'] if not DEBUG else ['console', 'file'],
+        'level': 'ERROR',
+        'propagate': False,
+    },
     'loggers': {
         'django': {
             'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
