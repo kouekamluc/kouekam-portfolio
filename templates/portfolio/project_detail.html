@@ -2,6 +2,12 @@
 
 {% block content %}
 <section class="bg-white dark:bg-gray-900">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6 pt-8">
+        <a href="{% url 'project_list' %}" 
+           class="inline-flex items-center text-sm text-gray-300 hover:text-white mb-4 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Projects
+        </a>
+    </div>
     <!-- Hero Section -->
     <div class="relative bg-gray-900 h-96">
         {% if project.image %}
