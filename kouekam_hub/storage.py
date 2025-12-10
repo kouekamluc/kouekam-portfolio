@@ -35,6 +35,9 @@ class StaticStorage(S3Boto3Storage):
         # Ensure JS files have the correct content type
         elif name.endswith('.js'):
             return 'application/javascript'
+        # Ensure SVG files have the correct content type
+        elif name.endswith('.svg'):
+            return 'image/svg+xml'
         # Default to the guessed type or binary
         return content_type or 'application/octet-stream'
     
