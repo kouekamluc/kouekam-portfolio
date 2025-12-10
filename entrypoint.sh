@@ -165,6 +165,10 @@ if getattr(settings, 'USE_S3', False):
                 content_type = response.get('ContentType', '')
                 print(f"  Current Content-Type: {content_type}")
                 
+                # Check file size
+                file_size = response.get('ContentLength', 0)
+                print(f"  File size: {file_size} bytes")
+                
                 if content_type != 'text/css':
                     print(f"  ⚠ Content-Type is incorrect! Re-uploading with correct type...")
                     # Re-upload with correct Content-Type
@@ -183,6 +187,22 @@ if getattr(settings, 'USE_S3', False):
                         print(f"  ⚠ Local CSS file not found for re-upload")
                 else:
                     print(f"  ✓ Content-Type is correct")
+                
+                # Verify file is not empty and has content
+                if file_size < 1000:
+                    print(f"  ⚠ WARNING: CSS file is very small ({file_size} bytes), might be empty!")
+                    # Try to download and check first few bytes
+                    try:
+                        obj_response = s3_client.get_object(Bucket=storage.bucket_name, Key=full_path)
+                        first_bytes = obj_response['Body'].read(100)
+                        if not first_bytes or len(first_bytes.strip()) == 0:
+                            print(f"  ⚠ ERROR: CSS file appears to be empty!")
+                        else:
+                            print(f"  ✓ CSS file has content (first 100 bytes: {first_bytes[:50]}...)")
+                    except Exception as e:
+                        print(f"  ⚠ Could not verify CSS content: {e}")
+                else:
+                    print(f"  ✓ CSS file size looks good ({file_size} bytes)")
             except Exception as e:
                 print(f"  ⚠ Could not check/fix Content-Type: {e}")
                 import traceback
