@@ -331,10 +331,9 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging Configuration
-# Severely reduced verbosity in production to avoid Railway rate limiting (500 logs/sec)
-# Console logging only shows ERROR in production, all other logs go to file only
+# Completely disable console logging in production to avoid Railway rate limiting (500 logs/sec)
+# All logs go to file only in production
 log_level = os.getenv('DJANGO_LOG_LEVEL', 'INFO' if DEBUG else 'ERROR')
-console_log_level = 'INFO' if DEBUG else 'ERROR'  # ERROR only in production
 
 LOGGING = {
     'version': 1,
@@ -358,7 +357,7 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'simple' if not DEBUG else 'verbose',
-            'level': console_log_level,  # ERROR only in production
+            'level': 'ERROR' if not DEBUG else 'INFO',
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -374,14 +373,18 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'formatter': 'verbose',
         },
+        # Null handler for production - completely silent
+        'null': {
+            'class': 'logging.NullHandler',
+        },
     },
     'root': {
-        'handlers': ['file'] if not DEBUG else ['console', 'file'],  # No console in production
+        'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
         'level': log_level,
     },
     'loggers': {
         'django': {
-            'handlers': ['file'] if not DEBUG else ['console', 'file'],  # No console in production
+            'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
             'level': log_level,
             'propagate': False,
         },
@@ -395,24 +398,40 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        # Reduce verbosity of common noisy loggers - file only
+        # Completely silence noisy loggers in production
         'django.db.backends': {
-            'handlers': ['file'],  # Only log to file, not console
+            'handlers': ['null'] if not DEBUG else ['file'],
             'level': 'WARNING',
             'propagate': False,
         },
         'django.template': {
-            'handlers': ['file'],  # Only log to file, not console
+            'handlers': ['null'] if not DEBUG else ['file'],
             'level': 'WARNING',
             'propagate': False,
         },
         'django.server': {
-            'handlers': ['file'],  # Only log to file, not console
+            'handlers': ['null'] if not DEBUG else ['file'],
             'level': 'WARNING',
             'propagate': False,
         },
         'django.middleware': {
-            'handlers': ['file'],  # Only log to file, not console
+            'handlers': ['null'] if not DEBUG else ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        # Silence all third-party loggers in production
+        'boto3': {
+            'handlers': ['null'] if not DEBUG else ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'botocore': {
+            'handlers': ['null'] if not DEBUG else ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'urllib3': {
+            'handlers': ['null'] if not DEBUG else ['file'],
             'level': 'WARNING',
             'propagate': False,
         },
