@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CSS Test Page{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">CSS Loading Test</h1>
+    
+    <div class="space-y-4">
+        <div class="bg-gray-50 p-4 rounded-lg border-2 border-blue-500">
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">Test 1: bg-gray-50</h2>
+            <p class="text-gray-700">This box should have a light gray background (bg-gray-50)</p>
+            <p id="test1-status" class="mt-2 text-sm"></p>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-2 border-green-500">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Test 2: Dark Mode</h2>
+            <p class="text-gray-700 dark:text-gray-300">This should change in dark mode</p>
+            <p id="test2-status" class="mt-2 text-sm"></p>
+        </div>
+        
+        <div class="flex items-center gap-4 p-4 bg-blue-100 rounded-lg">
+            <div class="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
+            <div class="bg-green-500 text-white px-4 py-2 rounded">Item 2</div>
+            <p id="test3-status" class="text-sm"></p>
+        </div>
+        
+        <div class="p-4 bg-yellow-100 rounded-lg">
+            <h2 class="text-xl font-semibold mb-2">CSS File Info</h2>
+            <div id="css-info" class="text-sm space-y-1"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Test 1: Check bg-gray-50
+    const test1 = document.querySelector('.bg-gray-50');
+    if (test1) {
+        const styles = window.getComputedStyle(test1);
+        const bgColor = styles.backgroundColor;
+        const status1 = document.getElementById('test1-status');
+        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+            status1.innerHTML = `✅ PASS: Background color is ${bgColor}`;
+            status1.className = 'mt-2 text-sm text-green-600';
+        } else {
+            status1.innerHTML = `❌ FAIL: Background color is ${bgColor || 'not set'}`;
+            status1.className = 'mt-2 text-sm text-red-600';
+        }
+    }
+    
+    // Test 2: Check dark mode
+    const test2 = document.querySelector('.dark\\:bg-gray-800');
+    const status2 = document.getElementById('test2-status');
+    if (test2) {
+        status2.innerHTML = '✅ Dark mode class exists';
+        status2.className = 'mt-2 text-sm text-green-600';
+    } else {
+        status2.innerHTML = '❌ Dark mode class not found';
+        status2.className = 'mt-2 text-sm text-red-600';
+    }
+    
+    // Test 3: Check flex
+    const test3 = document.querySelector('.flex');
+    const status3 = document.getElementById('test3-status');
+    if (test3) {
+        const styles = window.getComputedStyle(test3);
+        if (styles.display === 'flex') {
+            status3.innerHTML = '✅ Flex is working';
+            status3.className = 'text-sm text-green-600';
+        } else {
+            status3.innerHTML = `❌ Flex not working (display: ${styles.display})`;
+            status3.className = 'text-sm text-red-600';
+        }
+    }
+    
+    // CSS File Info
+    const link = document.querySelector('link[href*="output.css"]');
+    const cssInfo = document.getElementById('css-info');
+    
+    if (link) {
+        cssInfo.innerHTML += `<p><strong>CSS URL:</strong> ${link.href}</p>`;
+        
+        fetch(link.href)
+            .then(r => {
+                cssInfo.innerHTML += `<p><strong>Status:</strong> ${r.status} ${r.statusText}</p>`;
+                cssInfo.innerHTML += `<p><strong>Content-Type:</strong> ${r.headers.get('Content-Type')}</p>`;
+                return r.text();
+            })
+            .then(css => {
+                cssInfo.innerHTML += `<p><strong>File Size:</strong> ${css.length.toLocaleString()} bytes</p>`;
+                cssInfo.innerHTML += `<p><strong>Has .bg-gray-50:</strong> ${css.includes('.bg-gray-50') ? '✅ Yes' : '❌ No'}</p>`;
+                cssInfo.innerHTML += `<p><strong>Has .flex:</strong> ${css.includes('.flex') ? '✅ Yes' : '❌ No'}</p>`;
+                cssInfo.innerHTML += `<p><strong>Has .text-gray-900:</strong> ${css.includes('.text-gray-900') ? '✅ Yes' : '❌ No'}</p>`;
+            })
+            .catch(e => {
+                cssInfo.innerHTML += `<p class="text-red-600"><strong>Error:</strong> ${e.message}</p>`;
+            });
+    } else {
+        cssInfo.innerHTML = '<p class="text-red-600">❌ CSS link not found in HTML</p>';
+    }
+});
+</script>
+{% endblock %}
+
