@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from .models import Profile, Timeline, Skill, Project, ProjectImage
+from .admin_utils import parse_json_field_string, safe_get_cleaned_data, validate_form_before_save
 
 
 class ProfileAdminForm(forms.ModelForm):
@@ -64,12 +65,12 @@ class ProfileAdminForm(forms.ModelForm):
             instance = super().save(commit=False)
             # Build social_links dict from form fields
             # Only access cleaned_data if form is valid
-            if hasattr(self, 'cleaned_data') and self.cleaned_data:
+            if validate_form_before_save(self):
                 social_links = {}
-                linkedin = self.cleaned_data.get('linkedin', '').strip()
-                github = self.cleaned_data.get('github', '').strip()
-                twitter = self.cleaned_data.get('twitter', '').strip()
-                website = self.cleaned_data.get('website', '').strip()
+                linkedin = safe_get_cleaned_data(self, 'linkedin', '').strip()
+                github = safe_get_cleaned_data(self, 'github', '').strip()
+                twitter = safe_get_cleaned_data(self, 'twitter', '').strip()
+                website = safe_get_cleaned_data(self, 'website', '').strip()
                 
                 if linkedin:
                     social_links['linkedin'] = linkedin
@@ -86,9 +87,18 @@ class ProfileAdminForm(forms.ModelForm):
                 if instance.pk and hasattr(instance, 'social_links'):
                     # Keep existing social_links if available
                     pass
+                else:
+                    instance.social_links = {}
             
             if commit:
-                instance.save()
+                try:
+                    instance.save()
+                except Exception as save_error:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Error saving Profile instance in form: {save_error}", exc_info=True)
+                    raise
+            
             return instance
         except Exception as e:
             import logging
@@ -280,26 +290,19 @@ class ProjectAdminForm(forms.ModelForm):
                 if base_slug:
                     instance.slug = base_slug
             
-            # Convert tech_stack_display string to list
-            # Only access cleaned_data if form is valid
-            tech_stack_list = []
-            if hasattr(self, 'cleaned_data') and self.cleaned_data:
-                tech_stack_str = self.cleaned_data.get('tech_stack_display', '')
-                if tech_stack_str:
-                    # Try to parse as JSON first
-                    import json
-                    try:
-                        parsed = json.loads(tech_stack_str)
-                        if isinstance(parsed, list):
-                            tech_stack_list = [str(item).strip() for item in parsed if item]
-                        else:
-                            tech_stack_list = [str(parsed).strip()] if parsed else []
-                    except (json.JSONDecodeError, ValueError, TypeError):
-                        # If not JSON, split by comma
-                        tech_stack_list = [item.strip() for item in tech_stack_str.split(',') if item.strip()]
+            # Convert tech_stack_display string to list using utility function
+            if validate_form_before_save(self):
+                tech_stack_str = safe_get_cleaned_data(self, 'tech_stack_display', '')
+                tech_stack_list = parse_json_field_string(tech_stack_str, default_value=[], field_type='list')
+            else:
+                # If form is not valid, preserve existing tech_stack or use default
+                if instance.pk and hasattr(instance, 'tech_stack'):
+                    tech_stack_list = instance.tech_stack if instance.tech_stack else []
+                else:
+                    tech_stack_list = []
             
             # Set tech_stack on instance
-            instance.tech_stack = tech_stack_list if tech_stack_list else []
+            instance.tech_stack = tech_stack_list
             
             if commit:
                 try:

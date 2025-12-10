@@ -97,16 +97,41 @@ class BusinessPlanForm(forms.ModelForm):
             self.fields['funding_needed'].initial = financial_data.get('funding_needed', '')
 
     def save(self, commit=True):
-        plan = super().save(commit=False)
-        financial_data = {
-            'revenue_projections': self.cleaned_data.get('revenue_projections', ''),
-            'expense_projections': self.cleaned_data.get('expense_projections', ''),
-            'funding_needed': self.cleaned_data.get('funding_needed', ''),
-        }
-        plan.financial_data = financial_data
-        if commit:
-            plan.save()
-        return plan
+        try:
+            plan = super().save(commit=False)
+            
+            # Build financial_data dict from form fields
+            # Only access cleaned_data if form is valid
+            if hasattr(self, 'cleaned_data') and self.cleaned_data:
+                financial_data = {
+                    'revenue_projections': self.cleaned_data.get('revenue_projections', '').strip(),
+                    'expense_projections': self.cleaned_data.get('expense_projections', '').strip(),
+                    'funding_needed': self.cleaned_data.get('funding_needed', '').strip(),
+                }
+                plan.financial_data = financial_data
+            else:
+                # If form is not valid, preserve existing financial_data
+                if plan.pk and hasattr(plan, 'financial_data') and plan.financial_data:
+                    # Keep existing financial_data if available
+                    pass
+                else:
+                    plan.financial_data = {}
+            
+            if commit:
+                try:
+                    plan.save()
+                except Exception as save_error:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Error saving BusinessPlan instance in form: {save_error}", exc_info=True)
+                    raise
+            
+            return plan
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in BusinessPlanForm.save: {e}", exc_info=True)
+            raise
 
 
 class ImportExportRecordForm(forms.ModelForm):
