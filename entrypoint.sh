@@ -93,11 +93,22 @@ css_dest = 'css/output.css'
 if os.path.exists(css_source):
     try:
         storage = StaticStorage()
+        # Delete old file if it exists at wrong path
+        old_path = 'static/css/output.css'
+        if storage.exists(old_path):
+            storage.delete(old_path)
+            print(f"  Deleted old file at: {old_path}")
+        # Upload to correct path
         with open(css_source, 'rb') as f:
             storage.save(css_dest, f)
         print(f"✓ CSS file manually uploaded to S3: {css_dest}")
         print(f"  Full S3 path: static/{css_dest}")
         print(f"  URL: {storage.url(css_dest)}")
+        # Verify it's accessible
+        if storage.exists(css_dest):
+            print(f"✓ Verified: File exists and is accessible")
+        else:
+            print(f"⚠ Warning: File uploaded but not found when checking")
     except Exception as e:
         print(f"⚠ Failed to manually upload CSS to S3: {e}")
         import traceback
