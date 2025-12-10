@@ -96,8 +96,13 @@ def debug_static_url(request):
     from django.templatetags.static import static as static_tag
     from django.template import Template, Context
     from django.template.loader import render_to_string
+    from django.contrib.staticfiles.storage import staticfiles_storage
     
     css_url = static_tag('css/output.css')
+    
+    # Check what staticfiles_storage actually is
+    storage_type = type(staticfiles_storage).__name__
+    storage_module = type(staticfiles_storage).__module__
     
     # Also check what the storage backend generates
     storage_url = None
@@ -107,8 +112,12 @@ def debug_static_url(request):
         storage = StaticStorage()
         storage_url = storage.url('css/output.css')
         storage_exists = storage.exists('css/output.css')
+        
+        # Also check what staticfiles_storage generates
+        staticfiles_storage_url = staticfiles_storage.url('css/output.css')
     except Exception as e:
         storage_url = f"Error: {e}"
+        staticfiles_storage_url = f"Error: {e}"
     
     # Render the actual template tag to see what it generates
     template = Template('{% load static %}{% static "css/output.css" %}')
@@ -129,10 +138,13 @@ def debug_static_url(request):
         'css_url_from_template': rendered_url,
         'css_url_from_html': html_css_url,
         'css_url_from_storage': storage_url,
+        'css_url_from_staticfiles_storage': staticfiles_storage_url,
         'css_exists_in_s3': storage_exists,
+        'staticfiles_storage_type': storage_type,
+        'staticfiles_storage_module': storage_module,
         'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
         'use_s3': getattr(settings, 'USE_S3', False),
-        'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
+        'staticfiles_storage_setting': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
         'expected_url': 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
         'urls_match': rendered_url == 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
         'note': 'Check if css_url_from_template matches expected_url and css_exists_in_s3 is True',
