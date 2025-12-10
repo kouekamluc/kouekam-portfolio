@@ -93,7 +93,11 @@ def project_detail(request, slug):
 
 def debug_static_url(request):
     """Debug endpoint to check static file URL generation"""
-    css_url = static('css/output.css')
+    from django.templatetags.static import static as static_tag
+    from django.template import Template, Context
+    
+    css_url = static_tag('css/output.css')
+    
     # Also check what the storage backend generates
     storage_url = None
     try:
@@ -103,11 +107,18 @@ def debug_static_url(request):
     except Exception as e:
         storage_url = f"Error: {e}"
     
+    # Render the actual template tag to see what it generates
+    template = Template('{% load static %}{% static "css/output.css" %}')
+    context = Context({})
+    rendered_url = template.render(context)
+    
     return JsonResponse({
         'css_url_from_static_tag': css_url,
+        'css_url_from_template': rendered_url,
         'css_url_from_storage': storage_url,
         'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
         'use_s3': getattr(settings, 'USE_S3', False),
         'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
         'expected_url': 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
+        'note': 'Check if css_url_from_template matches expected_url',
     })
