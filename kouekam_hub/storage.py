@@ -38,12 +38,18 @@ class StaticStorage(S3Boto3Storage):
         # Get the content type
         content_type = self._get_content_type(name)
         
-        # Set content type in the parameters
-        params = self.object_parameters.copy()
-        params['ContentType'] = content_type
+        # Temporarily update object_parameters to include ContentType
+        original_params = self.object_parameters.copy()
+        self.object_parameters['ContentType'] = content_type
         
-        # Save with correct content type
-        return super()._save(name, content)
+        try:
+            # Save with correct content type
+            result = super()._save(name, content)
+        finally:
+            # Restore original parameters
+            self.object_parameters = original_params
+        
+        return result
     
     def url(self, name):
         """Override url method to ensure correct URL generation"""

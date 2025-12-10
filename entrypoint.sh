@@ -71,7 +71,16 @@ fi
 echo "Collecting static files..."
 # Run collectstatic with verbose output to see what's happening
 # When using S3, collectstatic should upload directly to S3
-python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | head -50
+# Check if collectstatic is actually using S3 storage
+python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -50
+
+# Verify collectstatic actually used S3 (not just local filesystem)
+if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
+    if grep -q "Copying" /tmp/collectstatic.log && ! grep -q "Uploading" /tmp/collectstatic.log; then
+        echo "⚠ WARNING: collectstatic appears to be copying locally instead of uploading to S3!"
+        echo "   This might mean STATICFILES_STORAGE is not properly configured."
+    fi
+fi
 
 # If using S3 and collectstatic didn't upload, try manual upload as fallback
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
