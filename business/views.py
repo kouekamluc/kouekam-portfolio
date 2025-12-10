@@ -71,6 +71,17 @@ def business_idea_update(request, idea_id):
         form = BusinessIdeaForm(instance=idea)
     return render(request, 'business/business_idea_form.html', {'form': form, 'idea': idea, 'form_type': 'Update'})
 
+@login_required
+def business_idea_delete(request, idea_id):
+    idea = get_object_or_404(BusinessIdea, id=idea_id, user=request.user)
+    
+    if request.method == 'POST':
+        idea.delete()
+        messages.success(request, 'Business idea deleted!')
+        return redirect('business_idea_list')
+    
+    return render(request, 'business/business_idea_confirm_delete.html', {'idea': idea})
+
 # Market Research Views
 @login_required
 def market_research_create(request, idea_id):
@@ -88,7 +99,35 @@ def market_research_create(request, idea_id):
             return redirect('business_idea_detail', idea_id=idea.id)
     else:
         form = MarketResearchForm(initial={'date': timezone.now().date()})
-    return render(request, 'business/market_research_form.html', {'form': form, 'idea': idea})
+    return render(request, 'business/market_research_form.html', {'form': form, 'idea': idea, 'form_type': 'Create'})
+
+@login_required
+def market_research_update(request, research_id):
+    research = get_object_or_404(MarketResearch, id=research_id, user=request.user)
+    idea = research.business_idea
+    
+    if request.method == 'POST':
+        form = MarketResearchForm(request.POST, instance=research)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Market research updated!')
+            return redirect('business_idea_detail', idea_id=idea.id)
+    else:
+        form = MarketResearchForm(instance=research)
+    
+    return render(request, 'business/market_research_form.html', {'form': form, 'idea': idea, 'research': research, 'form_type': 'Update'})
+
+@login_required
+def market_research_delete(request, research_id):
+    research = get_object_or_404(MarketResearch, id=research_id, user=request.user)
+    idea_id = research.business_idea.id
+    
+    if request.method == 'POST':
+        research.delete()
+        messages.success(request, 'Market research deleted!')
+        return redirect('business_idea_detail', idea_id=idea_id)
+    
+    return render(request, 'business/market_research_confirm_delete.html', {'research': research})
 
 @login_required
 def market_research_list(request):
@@ -106,6 +145,11 @@ def market_research_list(request):
 def business_plan_create(request, idea_id):
     idea = get_object_or_404(BusinessIdea, id=idea_id, user=request.user)
     
+    # Check if plan already exists (OneToOne relationship)
+    if hasattr(idea, 'business_plan'):
+        messages.info(request, 'Business plan already exists. You can update it instead.')
+        return redirect('business_plan_update', plan_id=idea.business_plan.id)
+    
     if request.method == 'POST':
         form = BusinessPlanForm(request.POST)
         if form.is_valid():
@@ -118,7 +162,23 @@ def business_plan_create(request, idea_id):
     else:
         form = BusinessPlanForm()
     
-    return render(request, 'business/business_plan_form.html', {'form': form, 'idea': idea})
+    return render(request, 'business/business_plan_form.html', {'form': form, 'idea': idea, 'form_type': 'Create'})
+
+@login_required
+def business_plan_update(request, plan_id):
+    plan = get_object_or_404(BusinessPlan, id=plan_id, user=request.user)
+    idea = plan.business_idea
+    
+    if request.method == 'POST':
+        form = BusinessPlanForm(request.POST, instance=plan)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Business plan updated!')
+            return redirect('business_plan_detail', plan_id=plan.id)
+    else:
+        form = BusinessPlanForm(instance=plan)
+    
+    return render(request, 'business/business_plan_form.html', {'form': form, 'idea': idea, 'plan': plan, 'form_type': 'Update'})
 
 @login_required
 def business_plan_detail(request, plan_id):
@@ -152,6 +212,32 @@ def import_export_create(request):
     else:
         form = ImportExportRecordForm(initial={'date': timezone.now().date()})
     return render(request, 'business/import_export_form.html', {'form': form, 'form_type': 'Create'})
+
+@login_required
+def import_export_update(request, record_id):
+    record = get_object_or_404(ImportExportRecord, id=record_id, user=request.user)
+    
+    if request.method == 'POST':
+        form = ImportExportRecordForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record updated!')
+            return redirect('import_export_list')
+    else:
+        form = ImportExportRecordForm(instance=record)
+    
+    return render(request, 'business/import_export_form.html', {'form': form, 'record': record, 'form_type': 'Update'})
+
+@login_required
+def import_export_delete(request, record_id):
+    record = get_object_or_404(ImportExportRecord, id=record_id, user=request.user)
+    
+    if request.method == 'POST':
+        record.delete()
+        messages.success(request, 'Record deleted!')
+        return redirect('import_export_list')
+    
+    return render(request, 'business/import_export_confirm_delete.html', {'record': record})
 
 @login_required
 def financial_projections(request, idea_id):

@@ -3,27 +3,47 @@
 {% block content %}
 <section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <a href="{% url 'course_detail' course.id %}" 
+           class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Course
+        </a>
         <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Note</h1>
         <p class="mb-6 text-gray-600 dark:text-gray-400">Course: {{ course.code }} - {{ course.name }}</p>
         
         <form method="post" enctype="multipart/form-data" class="max-w-2xl space-y-6">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
             <div>
-                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-                <input type="text" name="title" value="{% if note %}{{ note.title }}{% endif %}" required
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors }}</p>
+                {% endif %}
             </div>
             <div>
-                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
-                <textarea name="content" rows="10" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{% if note %}{{ note.content }}{% endif %}</textarea>
+                <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Content</label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.content.errors }}</p>
+                {% endif %}
             </div>
             <div>
-                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">File (optional)</label>
-                <input type="file" name="file" accept=".pdf,.doc,.docx"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <label for="file" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">File (optional)</label>
+                {{ form.file }}
+                {% if form.file.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.file.errors }}</p>
+                {% endif %}
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Save</button>
-            <a href="{% url 'course_detail' course.id %}" class="ml-4 text-gray-600 hover:text-gray-800 dark:text-gray-400">Cancel</a>
+            <div class="flex items-center gap-4">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i>Save Note
+                </button>
+                <a href="{% url 'course_detail' course.id %}" class="btn-secondary">Cancel</a>
+            </div>
         </form>
     </div>
 </section>

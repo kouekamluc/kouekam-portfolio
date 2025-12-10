@@ -22,9 +22,18 @@
             </div>
         </div>
 
-        <div class="mb-6">
+        <div class="mb-6 flex flex-wrap gap-4">
             <a href="{% url 'course_create' %}" class="btn-primary inline-flex items-center">
                 <i class="fas fa-plus mr-2"></i>Add New Course
+            </a>
+            <a href="{% url 'course_list' %}" class="btn-secondary inline-flex items-center">
+                <i class="fas fa-list mr-2"></i>View All Courses
+            </a>
+            <a href="{% url 'gpa_calculator' %}" class="btn-secondary inline-flex items-center">
+                <i class="fas fa-calculator mr-2"></i>GPA Calculator
+            </a>
+            <a href="{% url 'study_planner' %}" class="btn-secondary inline-flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>Study Planner
             </a>
         </div>
 
@@ -99,6 +108,34 @@
             </div>
             {% endfor %}
         </div>
+
+        {% if recent_sessions %}
+        <div class="mt-8">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Study Sessions</h3>
+            <div class="card">
+                <div class="space-y-4">
+                    {% for session in recent_sessions %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 dark:text-white">
+                                <a href="{% url 'course_detail' session.course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ session.course.code|default:session.course.name }}
+                                </a>
+                            </h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <i class="fas fa-calendar mr-1"></i>{{ session.date|date:"M d, Y" }}
+                                <span class="ml-4"><i class="fas fa-clock mr-1"></i>{{ session.duration_minutes }} min</span>
+                            </p>
+                            {% if session.topics_covered %}
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 italic">{{ session.topics_covered|truncatewords:15 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

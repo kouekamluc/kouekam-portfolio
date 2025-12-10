@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Track Habit - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <div class="card text-center">
+                <div class="mb-6">
+                    <i class="fas fa-fire text-6xl text-orange-500 mb-4"></i>
+                    <h1 class="text-3xl font-bold dark:text-white mb-2">{{ habit.name }}</h1>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-sync-alt mr-1"></i>{{ habit.get_frequency_display }}
+                    </p>
+                </div>
+                
+                <div class="mb-8 p-6 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-2 border-orange-200 dark:border-orange-800">
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Streak</p>
+                    <p class="text-5xl font-bold text-orange-600 dark:text-orange-400 mb-2">
+                        {{ habit.current_streak }}🔥
+                    </p>
+                    {% if habit.last_completed_date %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Last completed: {{ habit.last_completed_date|date:"F d, Y" }}
+                    </p>
+                    {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Start your streak today!</p>
+                    {% endif %}
+                </div>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors">
+                        <i class="fas fa-check-circle mr-2"></i>Mark as Completed Today
+                    </button>
+                </form>
+                
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{% url 'habit_list' %}" class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Habits
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

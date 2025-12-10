@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Delete Habit - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <div class="card text-center">
+                <div class="mb-6">
+                    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                    <h1 class="text-3xl font-bold dark:text-white mb-2">Delete Habit</h1>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Are you sure you want to delete "{{ habit.name }}"?
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                        This will permanently delete the habit and all tracking data. This action cannot be undone.
+                    </p>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6 text-left">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <strong>Current Streak:</strong> {{ habit.current_streak }}🔥
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <strong>Frequency:</strong> {{ habit.get_frequency_display }}
+                    </p>
+                    {% if habit.last_completed_date %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <strong>Last Completed:</strong> {{ habit.last_completed_date|date:"F d, Y" }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="flex gap-4 justify-center">
+                        <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-semibold">
+                            <i class="fas fa-trash mr-2"></i>Yes, Delete
+                        </button>
+                        <a href="{% url 'habit_list' %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

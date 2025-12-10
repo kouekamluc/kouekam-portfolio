@@ -24,11 +24,12 @@
                         <th class="px-6 py-3">Value</th>
                         <th class="px-6 py-3">Country</th>
                         <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in records %}
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ record.product }}</td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 rounded-full text-sm {% if record.type == 'import' %}bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200{% else %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200{% endif %}">
@@ -39,10 +40,20 @@
                         <td class="px-6 py-4">${{ record.value|floatformat:2 }}</td>
                         <td class="px-6 py-4">{{ record.country }}</td>
                         <td class="px-6 py-4">{{ record.date|date:"M d, Y" }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <a href="{% url 'import_export_update' record.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'import_export_delete' record.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center">No records yet. <a href="{% url 'import_export_create' %}" class="text-blue-600 hover:underline">Add one</a></td>
+                        <td colspan="7" class="px-6 py-4 text-center">No records yet. <a href="{% url 'import_export_create' %}" class="text-blue-600 hover:underline">Add one</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

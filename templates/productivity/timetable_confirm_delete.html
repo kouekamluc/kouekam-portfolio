@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Delete Timetable - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <div class="card text-center">
+                <div class="mb-6">
+                    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                    <h1 class="text-3xl font-bold dark:text-white mb-2">Delete Timetable</h1>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Are you sure you want to delete "{{ timetable.name }}"?
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                        This action cannot be undone.
+                    </p>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6 text-left">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <strong>Status:</strong> 
+                        {% if timetable.active %}
+                        <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded text-xs font-medium">Active</span>
+                        {% else %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 rounded text-xs font-medium">Inactive</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <strong>Created:</strong> {{ timetable.created_at|date:"F d, Y" }}
+                    </p>
+                </div>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="flex gap-4 justify-center">
+                        <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-semibold">
+                            <i class="fas fa-trash mr-2"></i>Yes, Delete
+                        </button>
+                        <a href="{% url 'timetable_list' %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

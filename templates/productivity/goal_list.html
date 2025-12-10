@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Goals - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold dark:text-white">Goals</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Set and track your long-term objectives</p>
+            </div>
+            <a href="{% url 'goal_create' %}" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i>New Goal
+            </a>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            {% for goal in goals %}
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ goal.title }}</h3>
+                </div>
+                
+                {% if goal.description %}
+                <p class="text-gray-600 dark:text-gray-400 mb-4">{{ goal.description }}</p>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                        <span class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ goal.progress }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-700">
+                        <div class="bg-blue-600 h-3 rounded-full transition-all duration-1000" style="width: {{ goal.progress }}%"></div>
+                    </div>
+                </div>
+                
+                {% if goal.target_date %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-calendar mr-1"></i>Target: {{ goal.target_date|date:"F d, Y" }}
+                </p>
+                {% endif %}
+                
+                <div class="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{% url 'goal_update' goal.id %}" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-center transition-colors">
+                        <i class="fas fa-edit mr-1"></i>Edit
+                    </a>
+                    <a href="{% url 'milestone_manage' goal.id %}" class="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-center transition-colors">
+                        <i class="fas fa-flag mr-1"></i>Milestones
+                    </a>
+                    <a href="{% url 'goal_delete' goal.id %}" class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-bullseye text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals set yet</p>
+                <p class="text-gray-500 dark:text-gray-500 text-sm mb-4">Start achieving your dreams by setting your first goal!</p>
+                <a href="{% url 'goal_create' %}" class="btn-primary inline-block">
+                    <i class="fas fa-plus mr-2"></i>Create Your First Goal
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

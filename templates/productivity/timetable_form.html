@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_type }} Timetable - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Timetable</h1>
+            
+            <div class="card">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Timetable Name
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.active.id_for_label }}" class="flex items-center">
+                            {{ form.active }}
+                            <span class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Active</span>
+                        </label>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Only active timetables will be shown in your dashboard
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Schedule JSON (Optional)
+                        </label>
+                        <textarea name="schedule_json" rows="6" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono"
+                            placeholder='{"monday": [{"time": "09:00", "activity": "Work"}], ...}'>{% if timetable %}{{ timetable.schedule_json|safe }}{% endif %}</textarea>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Enter schedule in JSON format, or use the timetable generator for easier creation
+                        </p>
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i>Save Timetable
+                        </button>
+                        <a href="{% url 'timetable_list' %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

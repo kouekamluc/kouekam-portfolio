@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Upload Document - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 dark:text-white">Upload Document</h1>
+            
+            <div class="card">
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Document Title
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.file.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            File
+                        </label>
+                        {{ form.file }}
+                        {% if form.file.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.file.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Upload any document file (PDF, DOC, DOCX, etc.)
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Category (Optional)
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.category.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            e.g., Work, Personal, Study
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.tags.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Tags (Optional)
+                        </label>
+                        {{ form.tags }}
+                        {% if form.tags.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.tags.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Comma-separated tags for easy searching
+                        </p>
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-upload mr-2"></i>Upload Document
+                        </button>
+                        <a href="{% url 'document_list' %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

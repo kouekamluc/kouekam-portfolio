@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Milestones - {{ goal.title }} - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-6">
+            <a href="{% url 'goal_list' %}" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 mb-4 inline-block">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Goals
+            </a>
+            <h1 class="text-4xl font-bold dark:text-white mb-2">{{ goal.title }}</h1>
+            <p class="text-gray-600 dark:text-gray-400">Manage milestones for this goal</p>
+        </div>
+        
+        <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Create Milestone Form -->
+            <div class="card">
+                <h2 class="text-2xl font-bold dark:text-white mb-4">
+                    <i class="fas fa-plus-circle mr-2 text-blue-500"></i>Add Milestone
+                </h2>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="create" value="1">
+                    
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Milestone Title
+                        </label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Description
+                        </label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.due_date.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Due Date
+                        </label>
+                        {{ form.due_date }}
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary">
+                        <i class="fas fa-save mr-2"></i>Create Milestone
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Milestones List -->
+            <div class="card">
+                <h2 class="text-2xl font-bold dark:text-white mb-4">
+                    <i class="fas fa-flag mr-2 text-purple-500"></i>Milestones ({{ milestones.count }})
+                </h2>
+                
+                <div class="space-y-4">
+                    {% for milestone in milestones %}
+                    <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border {% if milestone.completed %}border-green-500{% else %}border-gray-200 dark:border-gray-700{% endif %}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                    {% if milestone.completed %}
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-circle text-gray-400 mr-2"></i>
+                                    {% endif %}
+                                    {{ milestone.title }}
+                                </h3>
+                                {% if milestone.description %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ milestone.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                {% if milestone.due_date %}
+                                <i class="fas fa-calendar mr-1"></i>Due: {{ milestone.due_date|date:"M d, Y" }}
+                                {% endif %}
+                                {% if milestone.completed and milestone.completed_date %}
+                                <span class="ml-2">
+                                    <i class="fas fa-check mr-1"></i>Completed: {{ milestone.completed_date|date:"M d, Y" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if not milestone.completed %}
+                            <form method="post" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="complete" value="1">
+                                <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
+                                <button type="submit" class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                    <i class="fas fa-check mr-1"></i>Mark Complete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-flag text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No milestones yet. Create one to break down your goal!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

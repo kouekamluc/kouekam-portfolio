@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_type }} Transaction - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Transaction</h1>
+            
+            <div class="card">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="{{ form.type.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Type
+                        </label>
+                        {{ form.type }}
+                        {% if form.type.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.type.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.amount.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Amount
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                            {{ form.amount }}
+                        </div>
+                        {% if form.amount.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.amount.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Category
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.category.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.date.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Date
+                        </label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Description (Optional)
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i>Save Transaction
+                        </button>
+                        <a href="{% url 'transaction_list' %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

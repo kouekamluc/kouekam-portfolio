@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Timetables - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold dark:text-white">Timetables</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your weekly schedules</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'timetable_generator' %}" class="btn-primary">
+                    <i class="fas fa-magic mr-2"></i>Generate Timetable
+                </a>
+                <a href="{% url 'timetable_create' %}" class="btn-secondary">
+                    <i class="fas fa-plus mr-2"></i>Create
+                </a>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for timetable in timetables %}
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ timetable.name }}</h3>
+                        <div class="flex items-center gap-2">
+                            {% if timetable.active %}
+                            <span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded text-xs font-medium">
+                                <i class="fas fa-check-circle mr-1"></i>Active
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 rounded text-xs font-medium">
+                                Inactive
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-calendar mr-1"></i>Created: {{ timetable.created_at|date:"M d, Y" }}
+                    </p>
+                    {% if timetable.updated_at %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <i class="fas fa-edit mr-1"></i>Updated: {{ timetable.updated_at|date:"M d, Y" }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Schedule Preview:</p>
+                    <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                        {% for day, activities in timetable.schedule_json.items %}
+                            {% if activities %}
+                            <p><strong>{{ day|title }}:</strong> {{ activities|length }} activity/ies</p>
+                            {% endif %}
+                        {% empty %}
+                        <p class="text-gray-400">No schedule data</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-calendar-alt text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">No timetables yet</p>
+                <p class="text-gray-500 dark:text-gray-500 text-sm mb-4">Create a timetable to organize your weekly schedule!</p>
+                <a href="{% url 'timetable_generator' %}" class="btn-primary inline-block">
+                    <i class="fas fa-magic mr-2"></i>Generate Your First Timetable
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Transactions - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold dark:text-white">Transactions</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Track your income and expenses</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'finance_dashboard' %}" class="btn-secondary">
+                    <i class="fas fa-chart-line mr-2"></i>Dashboard
+                </a>
+                <a href="{% url 'transaction_create' %}" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Add Transaction
+                </a>
+            </div>
+        </div>
+        
+        <div class="flex gap-4 mb-6">
+            <a href="{% url 'transaction_list' %}" 
+                class="px-4 py-2 rounded {% if not type_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200{% endif %}">
+                All
+            </a>
+            <a href="?type=income" 
+                class="px-4 py-2 rounded {% if type_filter == 'income' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200{% endif %}">
+                Income
+            </a>
+            <a href="?type=expense" 
+                class="px-4 py-2 rounded {% if type_filter == 'expense' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200{% endif %}">
+                Expenses
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th class="px-6 py-3">Date</th>
+                            <th class="px-6 py-3">Type</th>
+                            <th class="px-6 py-3">Category</th>
+                            <th class="px-6 py-3">Amount</th>
+                            <th class="px-6 py-3">Description</th>
+                            <th class="px-6 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4 text-gray-900 dark:text-white">{{ transaction.date|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded text-xs font-medium {% if transaction.type == 'income' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300{% endif %}">
+                                    {{ transaction.get_type_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-900 dark:text-white">{{ transaction.get_category_display }}</td>
+                            <td class="px-6 py-4 font-semibold {% if transaction.type == 'income' %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                                {% if transaction.type == 'income' %}+{% else %}-{% endif %}${{ transaction.amount }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 dark:text-gray-400">{{ transaction.description|truncatewords:10 }}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <a href="{% url 'transaction_update' transaction.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'transaction_delete' transaction.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-wallet text-4xl mb-3 block"></i>
+                                No transactions yet. <a href="{% url 'transaction_create' %}" class="text-blue-600 hover:underline">Add your first transaction</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

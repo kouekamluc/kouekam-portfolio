@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Habits - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold dark:text-white">Habit Tracker</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Build consistency and track your daily habits</p>
+            </div>
+            <a href="{% url 'habit_create' %}" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i>New Habit
+            </a>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for habit in habits %}
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ habit.name }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            <i class="fas fa-sync-alt mr-1"></i>{{ habit.get_frequency_display }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Streak</span>
+                        <span class="text-2xl font-bold text-orange-500">
+                            {{ habit.current_streak }}🔥
+                        </span>
+                    </div>
+                    {% if habit.last_completed_date %}
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Last completed: {{ habit.last_completed_date|date:"M d, Y" }}
+                    </p>
+                    {% else %}
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Not started yet</p>
+                    {% endif %}
+                </div>
+                
+                <div class="flex gap-2">
+                    <a href="{% url 'habit_track' habit.id %}" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-center transition-colors">
+                        <i class="fas fa-check mr-1"></i>Track Today
+                    </a>
+                    <a href="{% url 'habit_update' habit.id %}" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'habit_delete' habit.id %}" class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-fire text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">No habits yet</p>
+                <p class="text-gray-500 dark:text-gray-500 text-sm mb-4">Start building good habits today!</p>
+                <a href="{% url 'habit_create' %}" class="btn-primary inline-block">
+                    <i class="fas fa-plus mr-2"></i>Create Your First Habit
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

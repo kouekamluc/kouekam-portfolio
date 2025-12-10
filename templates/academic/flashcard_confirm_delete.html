@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <a href="{% url 'flashcard_list' flashcard.course.id %}" 
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Flashcards
+            </a>
+            <h1 class="text-4xl font-bold mb-8 dark:text-white">Delete Flashcard</h1>
+            <div class="card">
+                <p class="mb-4 text-gray-600 dark:text-gray-400">Are you sure you want to delete this flashcard?</p>
+                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
+                    <p class="font-semibold text-gray-900 dark:text-white mb-2">Question:</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">{{ flashcard.question }}</p>
+                    <p class="font-semibold text-gray-900 dark:text-white mb-2">Answer:</p>
+                    <p class="text-gray-700 dark:text-gray-300">{{ flashcard.answer }}</p>
+                </div>
+                <form method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-flex items-center">
+                        <i class="fas fa-trash mr-2"></i>Yes, Delete
+                    </button>
+                    <a href="{% url 'flashcard_list' flashcard.course.id %}" class="btn-secondary ml-4">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

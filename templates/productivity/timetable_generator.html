@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Generate Timetable - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold dark:text-white mb-2">Timetable Generator</h1>
+            <p class="text-gray-600 dark:text-gray-400">Create your weekly schedule easily</p>
+        </div>
+        
+        <div class="card">
+            <form method="post" id="timetableForm" class="space-y-8">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Timetable Name
+                    </label>
+                    <input type="text" name="name" value="My Weekly Schedule" required
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                
+                {% for day in 'monday,tuesday,wednesday,thursday,friday,saturday,sunday'|make_list|join:','|split:',' %}
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 capitalize">{{ day }}</h3>
+                    <div id="{{ day }}_activities" class="space-y-3">
+                        <div class="flex gap-2 items-end">
+                            <div class="flex-1">
+                                <label class="block mb-1 text-xs text-gray-600 dark:text-gray-400">Time</label>
+                                <input type="time" name="{{ day }}_time" 
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block mb-1 text-xs text-gray-600 dark:text-gray-400">Activity</label>
+                                <input type="text" name="{{ day }}_activity" placeholder="e.g., Morning Workout"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <button type="button" onclick="addActivitySlot('{{ day }}')" 
+                                class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>Generate Timetable
+                    </button>
+                    <a href="{% url 'timetable_list' %}" class="btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+function addActivitySlot(day) {
+    const container = document.getElementById(day + '_activities');
+    const newSlot = document.createElement('div');
+    newSlot.className = 'flex gap-2 items-end';
+    newSlot.innerHTML = `
+        <div class="flex-1">
+            <label class="block mb-1 text-xs text-gray-600 dark:text-gray-400">Time</label>
+            <input type="time" name="${day}_time" 
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <div class="flex-1">
+            <label class="block mb-1 text-xs text-gray-600 dark:text-gray-400">Activity</label>
+            <input type="text" name="${day}_activity" placeholder="e.g., Morning Workout"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" 
+            class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 text-sm">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(newSlot);
+}
+</script>
+{% endblock %}
+

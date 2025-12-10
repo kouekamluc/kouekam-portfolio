@@ -10,7 +10,14 @@
                     {{ idea.get_status_display }}
                 </span>
             </div>
-            <a href="{% url 'business_idea_update' idea.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</a>
+            <div class="flex gap-2">
+                <a href="{% url 'business_idea_update' idea.id %}" class="btn-primary">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a href="{% url 'business_idea_delete' idea.id %}" class="btn-secondary bg-red-600 hover:bg-red-700 text-white">
+                    <i class="fas fa-trash mr-2"></i>Delete
+                </a>
+            </div>
         </div>
         
         <div class="grid gap-8 lg:grid-cols-3">
@@ -35,13 +42,28 @@
                 {% endif %}
                 
                 <div>
-                    <h2 class="text-2xl font-bold mb-4 dark:text-white">Market Research</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold dark:text-white">Market Research</h2>
+                        <a href="{% url 'market_research_create' idea.id %}" class="btn-primary text-sm">
+                            <i class="fas fa-plus mr-2"></i>Add Research
+                        </a>
+                    </div>
                     {% if market_research %}
                     <div class="space-y-4">
                         {% for research in market_research %}
                         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ research.date|date:"M d, Y" }}</p>
-                            <p class="text-gray-700 dark:text-gray-300 mb-2">{{ research.findings }}</p>
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ research.date|date:"M d, Y" }}</p>
+                                <div class="flex gap-2">
+                                    <a href="{% url 'market_research_update' research.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 text-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'market_research_delete' research.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400 text-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 mb-2 whitespace-pre-line">{{ research.findings }}</p>
                             {% if research.sources %}<p class="text-sm text-gray-600 dark:text-gray-400">Sources: {{ research.sources }}</p>{% endif %}
                         </div>
                         {% endfor %}
@@ -49,29 +71,41 @@
                     {% else %}
                     <p class="text-gray-600 dark:text-gray-400">No market research yet.</p>
                     {% endif %}
-                    <a href="{% url 'market_research_create' idea.id %}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Research</a>
                 </div>
                 
-                {% if business_plan %}
                 <div>
                     <h2 class="text-2xl font-bold mb-4 dark:text-white">Business Plan</h2>
-                    <a href="{% url 'business_plan_detail' business_plan.id %}" class="text-blue-600 hover:underline">View Business Plan →</a>
+                    {% if business_plan %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'business_plan_detail' business_plan.id %}" class="btn-primary">
+                            <i class="fas fa-eye mr-2"></i>View Plan
+                        </a>
+                        <a href="{% url 'business_plan_update' business_plan.id %}" class="btn-secondary">
+                            <i class="fas fa-edit mr-2"></i>Edit Plan
+                        </a>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'business_plan_create' idea.id %}" class="btn-primary bg-green-600 hover:bg-green-700">
+                        <i class="fas fa-plus mr-2"></i>Create Business Plan
+                    </a>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div>
-                    <a href="{% url 'business_plan_create' idea.id %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Create Business Plan</a>
-                </div>
-                {% endif %}
             </div>
             
             <div>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-                    <h3 class="text-xl font-bold mb-4 dark:text-white">Actions</h3>
+                    <h3 class="text-xl font-bold mb-4 dark:text-white">Quick Actions</h3>
                     <div class="space-y-3">
-                        <a href="{% url 'market_research_create' idea.id %}" class="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-center">Add Research</a>
-                        <a href="{% url 'financial_projections' idea.id %}" class="block w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-center">Financial Projections</a>
+                        <a href="{% url 'market_research_create' idea.id %}" class="block w-full btn-primary text-center">
+                            <i class="fas fa-chart-line mr-2"></i>Add Research
+                        </a>
+                        <a href="{% url 'financial_projections' idea.id %}" class="block w-full btn-primary bg-green-600 hover:bg-green-700 text-center">
+                            <i class="fas fa-calculator mr-2"></i>Financial Projections
+                        </a>
                         {% if not business_plan %}
-                        <a href="{% url 'business_plan_create' idea.id %}" class="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-center">Create Plan</a>
+                        <a href="{% url 'business_plan_create' idea.id %}" class="block w-full btn-primary bg-purple-600 hover:bg-purple-700 text-center">
+                            <i class="fas fa-file-alt mr-2"></i>Create Plan
+                        </a>
                         {% endif %}
                     </div>
                 </div>

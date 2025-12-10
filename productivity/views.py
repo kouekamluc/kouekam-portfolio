@@ -94,14 +94,24 @@ def habit_track(request, habit_id):
     today = timezone.now().date()
     
     if request.method == 'POST':
-        if habit.last_completed_date == today:
+        # Check if already completed today
+        if habit.last_completed_date and habit.last_completed_date == today:
             messages.info(request, 'Habit already completed today!')
         else:
-            if habit.last_completed_date and (today - habit.last_completed_date).days == 1:
-                habit.current_streak += 1
-            elif habit.last_completed_date and (today - habit.last_completed_date).days > 1:
-                habit.current_streak = 1
+            # Calculate streak
+            if habit.last_completed_date:
+                days_diff = (today - habit.last_completed_date).days
+                if days_diff == 1:
+                    # Consecutive day - increment streak
+                    habit.current_streak += 1
+                elif days_diff > 1:
+                    # Streak broken - reset to 1
+                    habit.current_streak = 1
+                else:
+                    # Same day or future date (shouldn't happen, but handle it)
+                    habit.current_streak = max(habit.current_streak, 1)
             else:
+                # First time tracking - start streak at 1
                 habit.current_streak = 1
             
             habit.last_completed_date = today
@@ -110,6 +120,28 @@ def habit_track(request, habit_id):
         return redirect('habit_list')
     
     return render(request, 'productivity/habit_track.html', {'habit': habit})
+
+@login_required
+def habit_update(request, habit_id):
+    habit = get_object_or_404(Habit, id=habit_id, user=request.user)
+    if request.method == 'POST':
+        form = HabitForm(request.POST, instance=habit)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Habit updated successfully!')
+            return redirect('habit_list')
+    else:
+        form = HabitForm(instance=habit)
+    return render(request, 'productivity/habit_form.html', {'form': form, 'habit': habit, 'form_type': 'Update'})
+
+@login_required
+def habit_delete(request, habit_id):
+    habit = get_object_or_404(Habit, id=habit_id, user=request.user)
+    if request.method == 'POST':
+        habit.delete()
+        messages.success(request, 'Habit deleted successfully!')
+        return redirect('habit_list')
+    return render(request, 'productivity/habit_confirm_delete.html', {'habit': habit})
 
 # Goal Views
 @login_required
@@ -143,6 +175,15 @@ def goal_update(request, goal_id):
     else:
         form = GoalForm(instance=goal)
     return render(request, 'productivity/goal_form.html', {'form': form, 'goal': goal, 'form_type': 'Update'})
+
+@login_required
+def goal_delete(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    if request.method == 'POST':
+        goal.delete()
+        messages.success(request, 'Goal deleted successfully!')
+        return redirect('goal_list')
+    return render(request, 'productivity/goal_confirm_delete.html', {'goal': goal})
 
 @login_required
 def milestone_manage(request, goal_id):
@@ -198,6 +239,34 @@ def timetable_create(request):
     return render(request, 'productivity/timetable_form.html', {'form': form, 'form_type': 'Create'})
 
 @login_required
+def timetable_update(request, timetable_id):
+    timetable = get_object_or_404(Timetable, id=timetable_id, user=request.user)
+    if request.method == 'POST':
+        form = TimetableForm(request.POST, instance=timetable)
+        if form.is_valid():
+            # Handle schedule_json separately if needed
+            schedule_json = request.POST.get('schedule_json', '{}')
+            try:
+                timetable.schedule_json = json.loads(schedule_json) if schedule_json else timetable.schedule_json
+            except json.JSONDecodeError:
+                pass  # Keep existing schedule_json if invalid
+            form.save()
+            messages.success(request, 'Timetable updated successfully!')
+            return redirect('timetable_list')
+    else:
+        form = TimetableForm(instance=timetable)
+    return render(request, 'productivity/timetable_form.html', {'form': form, 'timetable': timetable, 'form_type': 'Update'})
+
+@login_required
+def timetable_delete(request, timetable_id):
+    timetable = get_object_or_404(Timetable, id=timetable_id, user=request.user)
+    if request.method == 'POST':
+        timetable.delete()
+        messages.success(request, 'Timetable deleted successfully!')
+        return redirect('timetable_list')
+    return render(request, 'productivity/timetable_confirm_delete.html', {'timetable': timetable})
+
+@login_required
 def timetable_generator(request):
     if request.method == 'POST':
         schedule_data = {}
@@ -249,12 +318,37 @@ def transaction_create(request):
     return render(request, 'productivity/transaction_form.html', {'form': form, 'form_type': 'Create'})
 
 @login_required
+def transaction_update(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Transaction updated successfully!')
+            return redirect('transaction_list')
+    else:
+        form = TransactionForm(instance=transaction)
+    return render(request, 'productivity/transaction_form.html', {'form': form, 'transaction': transaction, 'form_type': 'Update'})
+
+@login_required
+def transaction_delete(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
+    if request.method == 'POST':
+        transaction.delete()
+        messages.success(request, 'Transaction deleted successfully!')
+        return redirect('transaction_list')
+    return render(request, 'productivity/transaction_confirm_delete.html', {'transaction': transaction})
+
+@login_required
 def finance_dashboard(request):
     transactions = Transaction.objects.filter(user=request.user)
     
-    # Calculate totals
-    total_income = sum(t.amount for t in transactions.filter(type='income'))
-    total_expenses = sum(t.amount for t in transactions.filter(type='expense'))
+    # Calculate totals - handle empty querysets
+    income_transactions = transactions.filter(type='income')
+    expense_transactions = transactions.filter(type='expense')
+    
+    total_income = sum(float(t.amount) for t in income_transactions) if income_transactions.exists() else Decimal('0.00')
+    total_expenses = sum(float(t.amount) for t in expense_transactions) if expense_transactions.exists() else Decimal('0.00')
     balance = total_income - total_expenses
     
     # Category breakdown

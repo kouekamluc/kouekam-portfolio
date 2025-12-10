@@ -13,10 +13,11 @@ from ai_assistant.services import generate_questions
 def dashboard(request):
     courses = Course.objects.filter(user=request.user)
     
-    # Simple GPA Calculation
+    # GPA Calculation - only include completed courses
+    completed_courses = courses.filter(status='completed')
     total_points = 0
     total_credits = 0
-    for course in courses:
+    for course in completed_courses:
         if course.grade and course.credits:
             total_points += (course.grade * course.credits)
             total_credits += course.credits
@@ -153,10 +154,40 @@ def flashcard_create(request, course_id):
     return render(request, 'academic/flashcard_form.html', {'form': form, 'course': course})
 
 @login_required
+def flashcard_update(request, flashcard_id):
+    flashcard = get_object_or_404(Flashcard, id=flashcard_id, course__user=request.user)
+    if request.method == 'POST':
+        form = FlashcardForm(request.POST, instance=flashcard)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Flashcard updated successfully!')
+            return redirect('flashcard_list', course_id=flashcard.course.id)
+    else:
+        form = FlashcardForm(instance=flashcard)
+    return render(request, 'academic/flashcard_form.html', {'form': form, 'course': flashcard.course, 'flashcard': flashcard})
+
+@login_required
+def flashcard_delete(request, flashcard_id):
+    flashcard = get_object_or_404(Flashcard, id=flashcard_id, course__user=request.user)
+    course_id = flashcard.course.id
+    if request.method == 'POST':
+        flashcard.delete()
+        messages.success(request, 'Flashcard deleted successfully!')
+        return redirect('flashcard_list', course_id=course_id)
+    return render(request, 'academic/flashcard_confirm_delete.html', {'flashcard': flashcard})
+
+@login_required
 def flashcard_study(request, course_id):
     course = get_object_or_404(Course, id=course_id, user=request.user)
-    flashcards = list(course.flashcards.all())
-    return render(request, 'academic/flashcard_study.html', {'course': course, 'flashcards': flashcards})
+    flashcards = course.flashcards.all()
+    # Serialize flashcards to JSON for JavaScript
+    flashcards_json = [{'question': card.question, 'answer': card.answer} for card in flashcards]
+    import json
+    return render(request, 'academic/flashcard_study.html', {
+        'course': course, 
+        'flashcards': flashcards,
+        'flashcards_json': json.dumps(flashcards_json)
+    })
 
 @login_required
 def study_session_create(request, course_id):
@@ -176,6 +207,29 @@ def study_session_create(request, course_id):
     return render(request, 'academic/study_session_form.html', {'form': form, 'course': course})
 
 @login_required
+def study_session_update(request, session_id):
+    session = get_object_or_404(StudySession, id=session_id, course__user=request.user)
+    if request.method == 'POST':
+        form = StudySessionForm(request.POST, instance=session)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Study session updated successfully!')
+            return redirect('course_detail', course_id=session.course.id)
+    else:
+        form = StudySessionForm(instance=session)
+    return render(request, 'academic/study_session_form.html', {'form': form, 'course': session.course, 'session': session})
+
+@login_required
+def study_session_delete(request, session_id):
+    session = get_object_or_404(StudySession, id=session_id, course__user=request.user)
+    course_id = session.course.id
+    if request.method == 'POST':
+        session.delete()
+        messages.success(request, 'Study session deleted successfully!')
+        return redirect('course_detail', course_id=course_id)
+    return render(request, 'academic/study_session_confirm_delete.html', {'session': session})
+
+@login_required
 def gpa_calculator(request):
     courses = Course.objects.filter(user=request.user, status='completed')
     
@@ -190,7 +244,7 @@ def gpa_calculator(request):
         
         gpa = total_points / total_credits if total_credits > 0 else 0.0
         
-        return JsonResponse({'gpa': round(gpa, 2), 'total_credits': total_credits})
+        return JsonResponse({'gpa': round(gpa, 2), 'total_credits': float(total_credits)})
     
     # Calculate current GPA
     total_points = 0

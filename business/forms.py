@@ -55,14 +55,14 @@ class MarketResearchForm(forms.ModelForm):
 class BusinessPlanForm(forms.ModelForm):
     executive_summary = forms.CharField(
         widget=forms.Textarea(attrs={
-            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
+            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
             'rows': 8
         })
     )
     revenue_projections = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
-            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
+            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
             'rows': 4,
             'placeholder': 'Revenue projections...'
         })
@@ -70,7 +70,7 @@ class BusinessPlanForm(forms.ModelForm):
     expense_projections = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
-            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
+            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
             'rows': 4,
             'placeholder': 'Expense projections...'
         })
@@ -78,7 +78,7 @@ class BusinessPlanForm(forms.ModelForm):
     funding_needed = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
+            'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white',
             'placeholder': 'Amount needed'
         })
     )
@@ -86,6 +86,15 @@ class BusinessPlanForm(forms.ModelForm):
     class Meta:
         model = BusinessPlan
         fields = ['executive_summary']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If updating an existing plan, populate fields from financial_data
+        if self.instance and self.instance.pk and self.instance.financial_data:
+            financial_data = self.instance.financial_data
+            self.fields['revenue_projections'].initial = financial_data.get('revenue_projections', '')
+            self.fields['expense_projections'].initial = financial_data.get('expense_projections', '')
+            self.fields['funding_needed'].initial = financial_data.get('funding_needed', '')
 
     def save(self, commit=True):
         plan = super().save(commit=False)
