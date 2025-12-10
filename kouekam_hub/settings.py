@@ -83,6 +83,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "kouekam_hub.context_processors.profile_context",
             ],
             "debug": DEBUG,
         },
@@ -301,6 +302,11 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging Configuration
+# Reduced verbosity in production to avoid Railway rate limiting (500 logs/sec)
+# Console logging only shows WARNING and above in production, INFO only goes to file
+log_level = os.getenv('DJANGO_LOG_LEVEL', 'INFO' if DEBUG else 'WARNING')
+console_log_level = 'INFO' if DEBUG else 'WARNING'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -322,7 +328,8 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple' if not DEBUG else 'verbose',
+            'level': console_log_level,  # Only WARNING+ in production
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -330,6 +337,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 15,  # 15MB
             'backupCount': 10,
             'formatter': 'verbose',
+            'level': 'INFO',  # File can still have INFO logs
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -339,13 +347,13 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
+        'handlers': ['console', 'file'],
+        'level': log_level,
     },
     'loggers': {
         'django': {
             'handlers': ['console', 'file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': log_level,
             'propagate': False,
         },
         'django.request': {
@@ -356,6 +364,17 @@ LOGGING = {
         'django.security': {
             'handlers': ['mail_admins', 'file'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+        # Reduce verbosity of common noisy loggers
+        'django.db.backends': {
+            'handlers': ['file'],  # Only log to file, not console
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['file'],  # Only log to file, not console
+            'level': 'WARNING',
             'propagate': False,
         },
     },
