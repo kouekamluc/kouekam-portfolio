@@ -23,40 +23,7 @@ python manage.py migrate --noinput
 echo "Creating superuser (if not exists)..."
 python create_superuser.py
 
-# Build Tailwind CSS if Node.js is available
-# Always rebuild in production to ensure latest changes are included
-if command -v node &> /dev/null && command -v npm &> /dev/null; then
-    echo "Building Tailwind CSS..."
-    # Ensure node_modules exists
-    if [ ! -d "node_modules" ]; then
-        echo "Installing Node.js dependencies..."
-        npm ci --silent || npm install --silent
-    fi
-    echo "Compiling Tailwind CSS (production build)..."
-    npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
-    if [ -f "static/css/output.css" ] && [ -s "static/css/output.css" ]; then
-        CSS_SIZE=$(wc -c < static/css/output.css)
-        echo "✓ CSS built successfully ($CSS_SIZE bytes)"
-    else
-        echo "⚠ Warning: CSS build may have failed, but continuing..."
-    fi
-else
-    echo "Node.js not available, checking if CSS was built during Docker build..."
-    if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
-        echo "⚠ Warning: CSS file is missing or empty and Node.js is not available!"
-        echo "   CSS should be built during Docker build stage or release phase"
-    else
-        CSS_SIZE=$(wc -c < static/css/output.css)
-        echo "✓ CSS file found from Docker build ($CSS_SIZE bytes)"
-    fi
-fi
-
-# Verify CSS file exists and has content before collecting static files
-if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
-    echo "❌ ERROR: CSS file is missing or empty after build attempt!"
-    echo "   This will cause a blank page. Please check the build logs above."
-    exit 1
-fi
+echo "✓ Using Tailwind CSS CDN (no build step needed)"
 
 # Check if using S3 (case-insensitive check)
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
