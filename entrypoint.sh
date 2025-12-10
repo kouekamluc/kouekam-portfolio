@@ -151,6 +151,42 @@ if getattr(settings, 'USE_S3', False):
             # Get the URL
             css_url = storage.url(css_path)
             print(f"  CSS URL: {css_url}")
+            
+            # Check Content-Type and fix if needed
+            try:
+                import boto3
+                s3_client = boto3.client('s3',
+                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                    region_name=settings.AWS_S3_REGION_NAME
+                )
+                full_path = f"{storage.location}/{css_path}"
+                response = s3_client.head_object(Bucket=storage.bucket_name, Key=full_path)
+                content_type = response.get('ContentType', '')
+                print(f"  Current Content-Type: {content_type}")
+                
+                if content_type != 'text/css':
+                    print(f"  ⚠ Content-Type is incorrect! Re-uploading with correct type...")
+                    # Re-upload with correct Content-Type
+                    local_css = 'static/css/output.css'
+                    if os.path.exists(local_css):
+                        with open(local_css, 'rb') as f:
+                            s3_client.put_object(
+                                Bucket=storage.bucket_name,
+                                Key=full_path,
+                                Body=f,
+                                ContentType='text/css',
+                                CacheControl='max-age=86400'
+                            )
+                        print(f"  ✓ Re-uploaded with correct Content-Type: text/css")
+                    else:
+                        print(f"  ⚠ Local CSS file not found for re-upload")
+                else:
+                    print(f"  ✓ Content-Type is correct")
+            except Exception as e:
+                print(f"  ⚠ Could not check/fix Content-Type: {e}")
+                import traceback
+                traceback.print_exc()
         else:
             # Try the full path as fallback (in case it was saved differently)
             css_path_full = 'static/css/output.css'
