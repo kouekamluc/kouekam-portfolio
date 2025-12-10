@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">PDF Analysis</h1>
+                <p class="text-gray-600 dark:text-gray-400">{{ analysis.original_filename|default:analysis.file.name }}</p>
+            </div>
+            <a href="{% url 'pdf_upload' %}" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Upload
+            </a>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Summary Section -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">
+                        <i class="fas fa-file-alt mr-2"></i>Summary
+                    </h2>
+                    <div class="prose dark:prose-invert max-w-none">
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                            {{ analysis.summary|default:"No summary available." }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Key Points Section -->
+                {% if analysis.key_points %}
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4 dark:text-white">
+                        <i class="fas fa-list-ul mr-2"></i>Key Points
+                    </h2>
+                    <ul class="space-y-3">
+                        {% for point in analysis.key_points %}
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                            <span class="text-gray-700 dark:text-gray-300">{{ point }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- File Info -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <h3 class="text-lg font-bold mb-4 dark:text-white">File Information</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-400">Filename:</span>
+                            <p class="text-gray-900 dark:text-white font-medium">{{ analysis.original_filename|default:analysis.file.name }}</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-400">Analyzed:</span>
+                            <p class="text-gray-900 dark:text-white font-medium">{{ analysis.date_analyzed|date:"M d, Y H:i" }}</p>
+                        </div>
+                        {% if analysis.file %}
+                        <div>
+                            <a href="{{ analysis.file.url }}" target="_blank" class="btn-primary text-sm inline-block">
+                                <i class="fas fa-download mr-2"></i>Download PDF
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <h3 class="text-lg font-bold mb-4 dark:text-white">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <a href="{% url 'pdf_upload' %}" class="btn-secondary w-full text-sm">
+                            <i class="fas fa-plus mr-2"></i>Analyze Another PDF
+                        </a>
+                        <a href="{% url 'assistant_hub' %}" class="btn-secondary w-full text-sm">
+                            <i class="fas fa-home mr-2"></i>Back to Hub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

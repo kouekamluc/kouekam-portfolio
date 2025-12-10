@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Create New Conversation</h1>
+            <p class="text-gray-600 dark:text-gray-400">Start a new conversation with your AI assistant</p>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-6">
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Conversation Title
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Leave blank to auto-generate from first message</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="{{ form.assistant_type.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Assistant Type
+                        </label>
+                        {{ form.assistant_type }}
+                        {% if form.assistant_type.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.assistant_type.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Choose the type of assistant for this conversation</p>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check mr-2"></i>Create Conversation
+                        </button>
+                        <a href="{% url 'conversation_list' %}" class="btn-secondary">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Writing Assistant</h1>
+            <p class="text-gray-600 dark:text-gray-400">Get AI-powered writing feedback, editing, and improvement suggestions</p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+            <!-- Form Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Submit Your Text</h2>
+                
+                <form method="POST" action="{% url 'writing_assistant' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="request_type" class="block text-sm font-medium mb-2 dark:text-white">
+                            Request Type
+                        </label>
+                        <select name="request_type" id="request_type" class="input-field w-full">
+                            <option value="review" {% if request_type == 'review' %}selected{% endif %}>General Review</option>
+                            <option value="grammar" {% if request_type == 'grammar' %}selected{% endif %}>Grammar Check</option>
+                            <option value="style" {% if request_type == 'style' %}selected{% endif %}>Style Improvement</option>
+                            <option value="clarity" {% if request_type == 'clarity' %}selected{% endif %}>Clarity & Conciseness</option>
+                            <option value="tone" {% if request_type == 'tone' %}selected{% endif %}>Tone Adjustment</option>
+                            <option value="structure" {% if request_type == 'structure' %}selected{% endif %}>Structure & Organization</option>
+                            <option value="proofread" {% if request_type == 'proofread' %}selected{% endif %}>Proofreading</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="text" class="block text-sm font-medium mb-2 dark:text-white">
+                            Your Text *
+                        </label>
+                        <textarea name="text" id="text" rows="12" 
+                                  placeholder="Paste or type your text here..."
+                                  class="input-field w-full" required>{% if text %}{{ text }}{% endif %}</textarea>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            Character count: <span id="char-count">0</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 text-lg font-semibold">
+                        <i class="fas fa-pen-fancy mr-2"></i>Get Writing Assistance
+                    </button>
+                </form>
+            </div>
+
+            <!-- Response Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">AI Response</h2>
+                
+                {% if response %}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    {% if request_type %}
+                    <div class="mb-2">
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Request Type:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2 capitalize">
+                            {{ request_type|title }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="prose dark:prose-invert max-w-none">
+                    <div class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {{ response }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-pen-fancy text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Paste your text and select a request type to get AI-powered writing assistance.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Tips Section -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">
+                <i class="fas fa-info-circle mr-2"></i>What Can Writing Assistant Do?
+            </h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Review:</strong> General feedback on your writing</li>
+                <li><strong>Grammar Check:</strong> Identify and fix grammatical errors</li>
+                <li><strong>Style Improvement:</strong> Enhance writing style and flow</li>
+                <li><strong>Clarity & Conciseness:</strong> Make your writing clearer and more concise</li>
+                <li><strong>Tone Adjustment:</strong> Adjust the tone to match your audience</li>
+                <li><strong>Structure & Organization:</strong> Improve paragraph and overall structure</li>
+                <li><strong>Proofreading:</strong> Final check for errors and typos</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textArea = document.getElementById('text');
+    const charCount = document.getElementById('char-count');
+    
+    function updateCharCount() {
+        charCount.textContent = textArea.value.length;
+    }
+    
+    textArea.addEventListener('input', updateCharCount);
+    updateCharCount();
+});
+</script>
+{% endblock %}
+

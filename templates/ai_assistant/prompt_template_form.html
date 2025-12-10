@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Create Prompt Template</h1>
+            <p class="text-gray-600 dark:text-gray-400">Create a reusable prompt template for your AI conversations</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-6">
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Template Name *
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Category *
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.category.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Description
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Brief description of what this template does</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="{{ form.template_text.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Template Text *
+                        </label>
+                        {{ form.template_text }}
+                        {% if form.template_text.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.template_text.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            Use {variables} for dynamic content. Example: "Explain {topic} in simple terms"
+                        </p>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check mr-2"></i>Create Template
+                        </button>
+                        <a href="{% url 'prompt_template_list' %}" class="btn-secondary">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Section -->
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 dark:text-white">
+                    <i class="fas fa-lightbulb mr-2"></i>Template Tips
+                </h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                    <li>Use curly braces for variables: {variable_name}</li>
+                    <li>Be specific about what you want the AI to do</li>
+                    <li>Include context and examples when helpful</li>
+                    <li>Test your template before saving</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

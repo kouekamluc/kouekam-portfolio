@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Course Recommendations</h1>
+            <p class="text-gray-600 dark:text-gray-400">Get AI-powered course recommendations based on your interests</p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+            <!-- Form Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Tell Us About Yourself</h2>
+                
+                <form method="POST" action="{% url 'course_recommendation' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="interests" class="block text-sm font-medium mb-2 dark:text-white">
+                            Your Interests *
+                        </label>
+                        <textarea name="interests" id="interests" rows="4" 
+                                  placeholder="Enter your interests separated by commas (e.g., Machine Learning, Web Development, Data Science, Python, JavaScript)"
+                                  class="input-field w-full" required>{% if interests %}{{ interests }}{% endif %}</textarea>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            List topics, technologies, or fields you're interested in learning
+                        </p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="current_courses" class="block text-sm font-medium mb-2 dark:text-white">
+                            Current Courses (Optional)
+                        </label>
+                        <textarea name="current_courses" id="current_courses" rows="3" 
+                                  placeholder="List courses you're currently taking or have completed (e.g., Introduction to Python, Web Development 101)"
+                                  class="input-field w-full">{% if current_courses %}{{ current_courses }}{% endif %}</textarea>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            This helps us recommend courses that build on what you already know
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 text-lg font-semibold">
+                        <i class="fas fa-graduation-cap mr-2"></i>Get Recommendations
+                    </button>
+                </form>
+            </div>
+
+            <!-- Response Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">AI Recommendations</h2>
+                
+                {% if response %}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    {% if interests %}
+                    <div class="mb-2">
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Interests:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2">{{ interests }}</span>
+                    </div>
+                    {% endif %}
+                    {% if current_courses %}
+                    <div>
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Current Courses:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2">{{ current_courses }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="prose dark:prose-invert max-w-none">
+                    <div class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {{ response }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-graduation-cap text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Enter your interests to get personalized course recommendations.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Tips Section -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">
+                <i class="fas fa-info-circle mr-2"></i>Tips for Better Recommendations
+            </h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>Be specific about your interests - mention technologies, topics, or skills you want to learn</li>
+                <li>Include your current level of knowledge if relevant (beginner, intermediate, advanced)</li>
+                <li>List any courses you've already taken to avoid duplicates and get advanced recommendations</li>
+                <li>Mention your goals - are you learning for a career change, personal interest, or academic purposes?</li>
+                <li>The more information you provide, the more personalized the recommendations will be</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

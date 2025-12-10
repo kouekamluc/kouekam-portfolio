@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 dark:text-white">Conversations</h1>
+                <p class="text-gray-600 dark:text-gray-400">View and manage your AI conversations</p>
+            </div>
+            <div class="flex gap-4">
+                <a href="{% url 'assistant_hub' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Hub
+                </a>
+                <a href="{% url 'conversation_create' %}" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>New Conversation
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="mb-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <form method="GET" class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label for="type" class="block text-sm font-medium mb-2 dark:text-white">
+                        Filter by Type
+                    </label>
+                    <select name="type" id="type" class="input-field">
+                        <option value="">All Types</option>
+                        <option value="general" {% if assistant_type == 'general' %}selected{% endif %}>General Assistant</option>
+                        <option value="study" {% if assistant_type == 'study' %}selected{% endif %}>Study Helper</option>
+                        <option value="code" {% if assistant_type == 'code' %}selected{% endif %}>Code Assistant</option>
+                        <option value="writing" {% if assistant_type == 'writing' %}selected{% endif %}>Writing Assistant</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-filter mr-2"></i>Filter
+                </button>
+                {% if assistant_type %}
+                <a href="{% url 'conversation_list' %}" class="btn-secondary">
+                    <i class="fas fa-times mr-2"></i>Clear
+                </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Conversations List -->
+        <div class="grid gap-4">
+            {% for conversation in conversations %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <a href="{% url 'conversation_detail' conversation.id %}" class="hover:underline">
+                            <h3 class="text-xl font-bold mb-2 dark:text-white">
+                                {{ conversation.title|default:"Untitled Conversation" }}
+                            </h3>
+                        </a>
+                        <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="capitalize">
+                                <i class="fas fa-tag mr-1"></i>{{ conversation.get_assistant_type_display }}
+                            </span>
+                            <span>
+                                <i class="fas fa-calendar mr-1"></i>{{ conversation.updated_date|date:"M d, Y H:i" }}
+                            </span>
+                            <span>
+                                <i class="fas fa-comments mr-1"></i>{{ conversation.messages.count }} messages
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{% url 'conversation_detail' conversation.id %}" class="btn-primary">
+                        <i class="fas fa-arrow-right mr-2"></i>Open
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+                <i class="fas fa-comments text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">No conversations found.</p>
+                <a href="{% url 'conversation_create' %}" class="btn-primary inline-block">
+                    <i class="fas fa-plus mr-2"></i>Create Your First Conversation
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

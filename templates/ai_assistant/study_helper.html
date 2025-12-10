@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Study Helper</h1>
+            <p class="text-gray-600 dark:text-gray-400">Get AI-powered study assistance for your courses</p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+            <!-- Form Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Ask a Question</h2>
+                
+                <form method="POST" action="{% url 'study_helper' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="course_id" class="block text-sm font-medium mb-2 dark:text-white">
+                            Select Course
+                        </label>
+                        <select name="course_id" id="course_id" 
+                                class="input-field w-full" required>
+                            <option value="">-- Select a course --</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}" 
+                                    {% if selected_course and selected_course.id == course.id %}selected{% endif %}>
+                                {{ course.code }} - {{ course.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if not courses %}
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                            No courses found. <a href="{% url 'course_list' %}" class="text-blue-600 dark:text-blue-400 hover:underline">Add a course</a> first.
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="topic" class="block text-sm font-medium mb-2 dark:text-white">
+                            Topic (Optional)
+                        </label>
+                        <input type="text" name="topic" id="topic" 
+                               value="{% if topic %}{{ topic }}{% endif %}"
+                               placeholder="e.g., Linear Algebra, Calculus, etc."
+                               class="input-field w-full">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="question" class="block text-sm font-medium mb-2 dark:text-white">
+                            Your Question
+                        </label>
+                        <textarea name="question" id="question" rows="6" 
+                                  placeholder="Ask your study question here..."
+                                  class="input-field w-full" required>{% if question %}{{ question }}{% endif %}</textarea>
+                    </div>
+
+                    <button type="submit" 
+                            class="btn-primary w-full py-3 text-lg font-semibold">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Get Study Help
+                    </button>
+                </form>
+            </div>
+
+            <!-- Response Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">AI Response</h2>
+                
+                {% if response %}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    {% if selected_course %}
+                    <div class="mb-3">
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Course:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2">
+                            {{ selected_course.code }} - {{ selected_course.name }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if topic %}
+                    <div class="mb-3">
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Topic:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2">{{ topic }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="prose dark:prose-invert max-w-none">
+                    <div class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {{ response }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-lightbulb text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Select a course and ask a question to get AI-powered study assistance.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Tips Section -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">
+                <i class="fas fa-info-circle mr-2"></i>
+                Tips for Better Results
+            </h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>Be specific with your questions - the more detail you provide, the better the response</li>
+                <li>Include relevant context about what you're studying or what you're struggling with</li>
+                <li>You can ask for explanations, examples, practice problems, or study strategies</li>
+                <li>If you're working on a specific topic, include it in the topic field</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

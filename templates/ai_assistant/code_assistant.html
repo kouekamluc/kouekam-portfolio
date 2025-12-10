@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">Code Assistant</h1>
+            <p class="text-gray-600 dark:text-gray-400">Get AI-powered code review, debugging, and programming help</p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+            <!-- Form Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Submit Your Code</h2>
+                
+                <form method="POST" action="{% url 'code_assistant' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="language" class="block text-sm font-medium mb-2 dark:text-white">
+                            Programming Language
+                        </label>
+                        <select name="language" id="language" class="input-field w-full">
+                            <option value="python" {% if language == 'python' %}selected{% endif %}>Python</option>
+                            <option value="javascript" {% if language == 'javascript' %}selected{% endif %}>JavaScript</option>
+                            <option value="java" {% if language == 'java' %}selected{% endif %}>Java</option>
+                            <option value="cpp" {% if language == 'cpp' %}selected{% endif %}>C++</option>
+                            <option value="c" {% if language == 'c' %}selected{% endif %}>C</option>
+                            <option value="csharp" {% if language == 'csharp' %}selected{% endif %}>C#</option>
+                            <option value="go" {% if language == 'go' %}selected{% endif %}>Go</option>
+                            <option value="rust" {% if language == 'rust' %}selected{% endif %}>Rust</option>
+                            <option value="php" {% if language == 'php' %}selected{% endif %}>PHP</option>
+                            <option value="ruby" {% if language == 'ruby' %}selected{% endif %}>Ruby</option>
+                            <option value="swift" {% if language == 'swift' %}selected{% endif %}>Swift</option>
+                            <option value="kotlin" {% if language == 'kotlin' %}selected{% endif %}>Kotlin</option>
+                            <option value="typescript" {% if language == 'typescript' %}selected{% endif %}>TypeScript</option>
+                            <option value="other" {% if language == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="code" class="block text-sm font-medium mb-2 dark:text-white">
+                            Your Code *
+                        </label>
+                        <textarea name="code" id="code" rows="12" 
+                                  placeholder="Paste your code here..."
+                                  class="input-field w-full font-mono text-sm" required>{% if code %}{{ code }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="question" class="block text-sm font-medium mb-2 dark:text-white">
+                            Question or Request (Optional)
+                        </label>
+                        <textarea name="question" id="question" rows="3" 
+                                  placeholder="What would you like help with? (e.g., 'Review this code', 'Find bugs', 'Optimize this', etc.)"
+                                  class="input-field w-full">{% if question %}{{ question }}{% endif %}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 text-lg font-semibold">
+                        <i class="fas fa-code mr-2"></i>Get Code Assistance
+                    </button>
+                </form>
+            </div>
+
+            <!-- Response Section -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">AI Response</h2>
+                
+                {% if response %}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    {% if language %}
+                    <div class="mb-2">
+                        <span class="text-sm font-semibold text-green-800 dark:text-green-200">Language:</span>
+                        <span class="text-sm text-green-700 dark:text-green-300 ml-2 capitalize">{{ language }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="prose dark:prose-invert max-w-none">
+                    <div class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {{ response }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-code text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Paste your code and ask a question to get AI-powered assistance.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Tips Section -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">
+                <i class="fas fa-info-circle mr-2"></i>What Can Code Assistant Do?
+            </h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>Review your code for bugs and potential issues</li>
+                <li>Suggest optimizations and best practices</li>
+                <li>Explain how code works</li>
+                <li>Help debug errors and exceptions</li>
+                <li>Provide code examples and alternatives</li>
+                <li>Suggest improvements for readability and performance</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

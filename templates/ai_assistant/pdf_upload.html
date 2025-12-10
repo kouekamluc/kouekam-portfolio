@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 dark:text-white">PDF Analyzer</h1>
+            <p class="text-gray-600 dark:text-gray-400">Upload a PDF document for AI-powered analysis</p>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-6">
+                        <label for="{{ form.file.id_for_label }}" class="block text-sm font-medium mb-2 dark:text-white">
+                            Select PDF File
+                        </label>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="{{ form.file.id_for_label }}" 
+                                   class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-600 hover:bg-gray-100 dark:border-gray-500 dark:hover:border-gray-400">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-file-pdf text-4xl text-gray-400 dark:text-gray-500 mb-2"></i>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PDF files only</p>
+                                </div>
+                                {{ form.file }}
+                            </label>
+                        </div>
+                        {% if form.file.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ form.file.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fas fa-upload mr-2"></i>Upload and Analyze
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Section -->
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 dark:text-white">
+                    <i class="fas fa-info-circle mr-2"></i>What can PDF Analyzer do?
+                </h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                    <li>Extract key information and summarize content</li>
+                    <li>Identify important points and concepts</li>
+                    <li>Help you understand complex documents</li>
+                    <li>Generate study notes from PDFs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
