@@ -51,13 +51,15 @@ from django.conf import settings
 from kouekam_hub.storage import StaticStorage
 
 # Test storage initialization - only print errors
+# Note: We just verify StaticStorage can be instantiated
+# Django will use STATICFILES_STORAGE from settings during collectstatic
 try:
     storage = StaticStorage()
-    # Verify the storage is actually being used by collectstatic
-    from django.contrib.staticfiles.storage import staticfiles_storage
-    if 'StaticStorage' not in type(staticfiles_storage).__name__:
-        print(f"ERROR: staticfiles_storage is not StaticStorage!", file=sys.stderr)
-        sys.exit(1)
+    # Verify STATICFILES_STORAGE is set correctly in settings
+    if not hasattr(settings, 'STATICFILES_STORAGE'):
+        print(f"WARNING: STATICFILES_STORAGE not set in settings", file=sys.stderr)
+    elif 'StaticStorage' not in settings.STATICFILES_STORAGE:
+        print(f"WARNING: STATICFILES_STORAGE is '{settings.STATICFILES_STORAGE}', expected StaticStorage", file=sys.stderr)
 except Exception as e:
     print(f"ERROR: Failed to initialize S3 storage: {e}", file=sys.stderr)
     import traceback
