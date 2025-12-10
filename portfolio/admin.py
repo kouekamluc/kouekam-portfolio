@@ -69,7 +69,6 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ['category', 'status', 'created_at']
     search_fields = ['title', 'description', 'tech_stack']
     readonly_fields = ['slug', 'created_at']
-    prepopulated_fields = {'slug': ('title',)}
     inlines = [ProjectImageInline]
     
     fieldsets = (

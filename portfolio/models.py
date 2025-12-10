@@ -59,7 +59,7 @@ class Project(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100, choices=[('ai', 'AI & Machine Learning'), ('electronics', 'Electronics & IoT'), ('web', 'Web Development'), ('other', 'Other')])
     tech_stack = models.JSONField(default=list, help_text="List of technologies used e.g. ['Python', 'Django']")
-    image = models.ImageField(upload_to='projects/', help_text="Main cover image")
+    image = models.ImageField(upload_to='projects/', help_text="Main cover image", blank=True, null=True)
     github_url = models.URLField(blank=True)
     live_link = models.URLField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
