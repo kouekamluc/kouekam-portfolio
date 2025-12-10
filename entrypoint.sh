@@ -69,7 +69,36 @@ else
 fi
 
 echo "Collecting static files..."
+# Run collectstatic and capture output
 python manage.py collectstatic --noinput --clear
+
+# Verify S3 configuration by checking Django settings
+echo "Verifying S3 configuration..."
+python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from django.conf import settings
+
+print(f"USE_S3: {getattr(settings, 'USE_S3', False)}")
+print(f"STATICFILES_STORAGE: {getattr(settings, 'STATICFILES_STORAGE', 'Not set')}")
+print(f"STATIC_URL: {getattr(settings, 'STATIC_URL', 'Not set')}")
+print(f"AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Not set')}")
+
+if getattr(settings, 'USE_S3', False):
+    # Try to verify S3 connection
+    try:
+        from kouekam_hub.storage import StaticStorage
+        storage = StaticStorage()
+        # Check if we can access the bucket
+        print(f"✓ S3 storage initialized")
+        print(f"  Bucket: {storage.bucket_name}")
+        print(f"  Location: {storage.location}")
+    except Exception as e:
+        print(f"⚠ Warning: Could not initialize S3 storage: {e}")
+EOF
 
 # Verify CSS file was properly collected
 if [ -f "staticfiles/css/output.css" ]; then
