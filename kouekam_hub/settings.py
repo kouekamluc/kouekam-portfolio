@@ -28,7 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-h$+#bnfje2#6663qlvaktl1zr@j%8(8(%=3&_e!2@k30!gg9ia")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+# Force DEBUG=False in production (Railway sets DEBUG=False by default)
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
 
 # Parse ALLOWED_HOSTS from environment variable
 # Strip whitespace and filter out empty strings
