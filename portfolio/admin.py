@@ -255,7 +255,12 @@ class ProjectAdminForm(forms.ModelForm):
     def clean_tech_stack_display(self):
         # In clean_<fieldname>, just return the string value
         # Parsing will happen in save() method for better reliability
-        data = safe_get_cleaned_data(self, 'tech_stack_display', '')
+        # Get the value - in clean_<fieldname>, we can access it from cleaned_data after base clean
+        try:
+            data = self.cleaned_data.get('tech_stack_display', '')
+        except (KeyError, AttributeError):
+            # Fallback to form data if cleaned_data not available yet
+            data = self.data.get('tech_stack_display', '') if hasattr(self, 'data') and self.data else ''
         
         # Handle empty or None values - return empty string, we'll convert to list in save()
         if not data:
