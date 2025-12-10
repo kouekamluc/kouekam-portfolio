@@ -9,4 +9,5 @@ urlpatterns = [
     path('download-cv/', views.download_cv, name='download_cv'),
     path('projects/', views.project_list, name='project_list'),
     path('projects/<slug:slug>/', views.project_detail, name='project_detail'),
+    path('debug/static-url/', views.debug_static_url, name='debug_static_url'),
 ]

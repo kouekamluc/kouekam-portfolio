@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from django.templatetags.static import static
 from .models import Profile, Timeline, Skill, Project
 
 def home(request):
@@ -89,3 +90,24 @@ def project_list(request):
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
     return render(request, 'portfolio/project_detail.html', {'project': project})
+
+def debug_static_url(request):
+    """Debug endpoint to check static file URL generation"""
+    css_url = static('css/output.css')
+    return JsonResponse({
+        'css_url': css_url,
+        'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
+        'use_s3': getattr(settings, 'USE_S3', False),
+        'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
+    })
+
+def debug_static_url(request):
+    """Debug endpoint to check static file URL generation"""
+    from django.templatetags.static import static
+    css_url = static('css/output.css')
+    return JsonResponse({
+        'css_url': css_url,
+        'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
+        'use_s3': getattr(settings, 'USE_S3', False),
+        'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
+    })
