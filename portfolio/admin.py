@@ -253,14 +253,9 @@ class ProjectAdminForm(forms.ModelForm):
             pass
     
     def clean_tech_stack_display(self):
-        # In clean_<fieldname>, the field's base clean() has already been called
-        # The value should be in cleaned_data, but we'll handle both cases
-        try:
-            # Try to get from cleaned_data first (after field's clean)
-            data = self.cleaned_data.get('tech_stack_display', '')
-        except (KeyError, AttributeError):
-            # If not in cleaned_data yet, get from form data
-            data = self.data.get('tech_stack_display', '') if hasattr(self, 'data') and self.data else ''
+        # In clean_<fieldname>, just return the string value
+        # Parsing will happen in save() method for better reliability
+        data = safe_get_cleaned_data(self, 'tech_stack_display', '')
         
         # Handle empty or None values - return empty string, we'll convert to list in save()
         if not data:
