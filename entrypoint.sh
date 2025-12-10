@@ -43,37 +43,26 @@ if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "y
     python << EOF
 import os
 import django
+import sys
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
 django.setup()
 
 from django.conf import settings
-from django.core.management import call_command
 from kouekam_hub.storage import StaticStorage
 
-print(f"STATICFILES_STORAGE: {getattr(settings, 'STATICFILES_STORAGE', 'Not set')}")
-print(f"AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Not set')}")
-print(f"AWS_ACCESS_KEY_ID: {'Set' if getattr(settings, 'AWS_ACCESS_KEY_ID', '') else 'Not set'}")
-
-# Test storage initialization
+# Test storage initialization - only print errors
 try:
     storage = StaticStorage()
-    print(f"✓ S3 storage initialized successfully")
-    print(f"  Bucket: {storage.bucket_name}")
-    print(f"  Location: {storage.location}")
-    
     # Verify the storage is actually being used by collectstatic
     from django.contrib.staticfiles.storage import staticfiles_storage
-    print(f"  Django staticfiles_storage type: {type(staticfiles_storage).__name__}")
-    print(f"  Django staticfiles_storage module: {type(staticfiles_storage).__module__}")
-    
     if 'StaticStorage' not in type(staticfiles_storage).__name__:
-        print(f"  ⚠ WARNING: staticfiles_storage is not StaticStorage!")
-        print(f"     This means collectstatic will not use S3!")
+        print(f"ERROR: staticfiles_storage is not StaticStorage!", file=sys.stderr)
+        sys.exit(1)
 except Exception as e:
-    print(f"❌ ERROR: Failed to initialize S3 storage: {e}")
+    print(f"ERROR: Failed to initialize S3 storage: {e}", file=sys.stderr)
     import traceback
     traceback.print_exc()
-    exit(1)
+    sys.exit(1)
 EOF
     if [ $? -ne 0 ]; then
         echo "❌ ERROR: S3 storage initialization failed!"
@@ -81,25 +70,26 @@ EOF
     fi
 fi
 
-# Run collectstatic with verbose output
+# Run collectstatic with minimal output in production
 # When using S3, collectstatic should upload directly to S3
 # Note: "Copying" messages are normal - they mean copying from source to storage backend
-echo "Running collectstatic (this will collect Django admin static files)..."
-python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -100
+echo "Running collectstatic..."
+# Use verbosity 0 in production to reduce log volume (Railway rate limit: 500 logs/sec)
+COLLECTSTATIC_VERBOSITY=${COLLECTSTATIC_VERBOSITY:-0}
+python manage.py collectstatic --noinput --clear --verbosity $COLLECTSTATIC_VERBOSITY 2>&1 | head -20 || true
 
 # Always run force upload as fallback for admin files when using S3
 # This ensures admin files are uploaded even if collectstatic has issues
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
-    echo "Running force upload for admin files (ensures all files are in S3)..."
-    python force_upload_admin_s3.py 2>&1 | grep -E "(Uploaded|Skipped|Failed|Summary|✓|✗|⚠)" || true
+    echo "Running force upload for admin files..."
+    python force_upload_admin_s3.py >/dev/null 2>&1 || true
     
     # Upload favicon to S3 (ensures it's available in production)
     echo "Uploading favicon to S3..."
-    python upload_favicon_to_s3.py 2>&1 | grep -E "(Uploaded|Skipped|Failed|✓|✗|⚠|ERROR|WARNING)" || true
+    python upload_favicon_to_s3.py >/dev/null 2>&1 || true
     
-    # Verify favicon was uploaded
-    echo "Verifying favicon in S3..."
-    python << EOF
+    # Verify favicon was uploaded (silently)
+    python << EOF >/dev/null 2>&1
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
@@ -109,13 +99,9 @@ from kouekam_hub.storage import StaticStorage
 
 storage = StaticStorage()
 favicon_path = 'favicon.svg'
-
-if storage.exists(favicon_path):
-    favicon_url = storage.url(favicon_path)
-    print(f"✓ Favicon found in S3: {favicon_url}")
-else:
-    print(f"⚠ WARNING: Favicon NOT found in S3 at: {favicon_path}")
-    print(f"   The favicon may not appear in browser tabs!")
+if not storage.exists(favicon_path):
+    import sys
+    print(f"WARNING: Favicon NOT found in S3", file=sys.stderr)
 EOF
 else
     # For WhiteNoise, verify favicon is in staticfiles
@@ -135,9 +121,8 @@ else
     fi
 fi
 
-# Verify admin static files were collected
-echo "Verifying Django admin static files were collected..."
-python << EOF
+# Verify admin static files were collected (minimal output)
+python << EOF >/dev/null 2>&1
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
@@ -243,12 +228,12 @@ else:
         print("  This will cause Django admin JavaScript to not work!")
 EOF
 
-# After collectstatic, verify files were uploaded to S3 (not just copied locally)
+# After collectstatic, verify files were uploaded to S3 (silently)
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
-    echo "Verifying files were uploaded to S3..."
-    python << EOF
+    python << EOF >/dev/null 2>&1
 import os
 import django
+import sys
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
 django.setup()
 
@@ -256,20 +241,15 @@ from kouekam_hub.storage import StaticStorage
 
 storage = StaticStorage()
 css_path = 'css/output.css'
-
-if storage.exists(css_path):
-    print(f"✓ CSS file exists in S3: static/{css_path}")
-else:
-    print(f"⚠ WARNING: CSS file NOT found in S3 after collectstatic!")
-    print(f"   This means collectstatic did not upload to S3.")
+if not storage.exists(css_path):
+    print(f"WARNING: CSS file NOT found in S3 after collectstatic!", file=sys.stderr)
 EOF
 fi
 
-# If using S3 and collectstatic didn't upload, try manual upload as fallback
+# If using S3 and collectstatic didn't upload, try manual upload as fallback (silently)
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
-    echo "Attempting to manually upload CSS to S3 as fallback..."
-    python << EOF
+    python << EOF >/dev/null 2>&1
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
@@ -289,168 +269,62 @@ if os.path.exists(css_source):
         old_path = 'static/css/output.css'
         if storage.exists(old_path):
             storage.delete(old_path)
-            print(f"  Deleted old file at: {old_path}")
         # Upload to correct path
         with open(css_source, 'rb') as f:
             storage.save(css_dest, f)
-        print(f"✓ CSS file manually uploaded to S3: {css_dest}")
-        print(f"  Full S3 path: static/{css_dest}")
-        print(f"  URL: {storage.url(css_dest)}")
-        # Verify it's accessible
-        if storage.exists(css_dest):
-            print(f"✓ Verified: File exists and is accessible")
-        else:
-            print(f"⚠ Warning: File uploaded but not found when checking")
     except Exception as e:
-        print(f"⚠ Failed to manually upload CSS to S3: {e}")
+        import sys
+        print(f"ERROR: Failed to manually upload CSS to S3: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
-else:
-    print(f"⚠ CSS source file not found: {css_source}")
 EOF
 fi
 
-# Verify S3 configuration and check if files are actually uploaded
-echo "Verifying S3 configuration..."
-python << EOF
+# Verify S3 configuration (silently, only errors to stderr)
+python << EOF >/dev/null 2>&1
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
 django.setup()
 
 from django.conf import settings
-
-print(f"USE_S3: {getattr(settings, 'USE_S3', False)}")
-print(f"STATICFILES_STORAGE: {getattr(settings, 'STATICFILES_STORAGE', 'Not set')}")
-print(f"STATIC_URL: {getattr(settings, 'STATIC_URL', 'Not set')}")
-print(f"AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Not set')}")
+import sys
 
 if getattr(settings, 'USE_S3', False):
     # Try to verify S3 connection and check if CSS file exists
     try:
         from kouekam_hub.storage import StaticStorage
         storage = StaticStorage()
-        print(f"✓ S3 storage initialized")
-        print(f"  Bucket: {storage.bucket_name}")
-        print(f"  Location: {storage.location}")
         
         # Check if CSS file exists in S3
-        # Storage location is 'static', so we check with 'css/output.css'
-        # The full S3 path will be 'static/css/output.css'
         css_path = 'css/output.css'
-        if storage.exists(css_path):
-            print(f"✓ CSS file found in S3: static/{css_path}")
-            # Get the URL
-            css_url = storage.url(css_path)
-            print(f"  CSS URL: {css_url}")
-            
-            # Check Content-Type and fix if needed
-            try:
-                import boto3
-                s3_client = boto3.client('s3',
-                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                    region_name=settings.AWS_S3_REGION_NAME
-                )
-                full_path = f"{storage.location}/{css_path}"
-                response = s3_client.head_object(Bucket=storage.bucket_name, Key=full_path)
-                content_type = response.get('ContentType', '')
-                print(f"  Current Content-Type: {content_type}")
-                
-                # Check file size
-                file_size = response.get('ContentLength', 0)
-                print(f"  File size: {file_size} bytes")
-                
-                if content_type != 'text/css':
-                    print(f"  ⚠ Content-Type is incorrect! Re-uploading with correct type...")
-                    # Re-upload with correct Content-Type
-                    local_css = 'static/css/output.css'
-                    if os.path.exists(local_css):
-                        with open(local_css, 'rb') as f:
-                            s3_client.put_object(
-                                Bucket=storage.bucket_name,
-                                Key=full_path,
-                                Body=f,
-                                ContentType='text/css',
-                                CacheControl='max-age=86400'
-                            )
-                        print(f"  ✓ Re-uploaded with correct Content-Type: text/css")
-                    else:
-                        print(f"  ⚠ Local CSS file not found for re-upload")
-                else:
-                    print(f"  ✓ Content-Type is correct")
-                
-                # Verify file is not empty and has content
-                if file_size < 1000:
-                    print(f"  ⚠ WARNING: CSS file is very small ({file_size} bytes), might be empty!")
-                    # Try to download and check first few bytes
-                    try:
-                        obj_response = s3_client.get_object(Bucket=storage.bucket_name, Key=full_path)
-                        first_bytes = obj_response['Body'].read(100)
-                        if not first_bytes or len(first_bytes.strip()) == 0:
-                            print(f"  ⚠ ERROR: CSS file appears to be empty!")
-                        else:
-                            print(f"  ✓ CSS file has content (first 100 bytes: {first_bytes[:50]}...)")
-                    except Exception as e:
-                        print(f"  ⚠ Could not verify CSS content: {e}")
-                else:
-                    print(f"  ✓ CSS file size looks good ({file_size} bytes)")
-            except Exception as e:
-                print(f"  ⚠ Could not check/fix Content-Type: {e}")
-                import traceback
-                traceback.print_exc()
-        else:
-            # Try the full path as fallback (in case it was saved differently)
-            css_path_full = 'static/css/output.css'
-            if storage.exists(css_path_full):
-                print(f"✓ CSS file found in S3: {css_path_full}")
-                css_url = storage.url(css_path_full)
-                print(f"  CSS URL: {css_url}")
-            else:
-                print(f"⚠ WARNING: CSS file NOT found in S3")
-                print(f"  Tried: {css_path} and {css_path_full}")
-                print(f"  This means collectstatic didn't upload to S3!")
+        css_path_full = 'static/css/output.css'
+        
+        if not storage.exists(css_path) and not storage.exists(css_path_full):
+            print(f"WARNING: CSS file NOT found in S3", file=sys.stderr)
     except Exception as e:
-        print(f"⚠ Warning: Could not verify S3 storage: {e}")
+        print(f"ERROR: Could not verify S3 storage: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
 EOF
 
-# Verify CSS file was properly collected
+# Verify CSS file was properly collected (only show errors)
 if [ -f "staticfiles/css/output.css" ]; then
-    CSS_SIZE=$(wc -c < staticfiles/css/output.css)
-    echo "✓ CSS collected to staticfiles ($CSS_SIZE bytes)"
+    CSS_SIZE=$(wc -c < staticfiles/css/output.css 2>/dev/null || echo 0)
     if [ "$CSS_SIZE" -eq 0 ]; then
-        echo "⚠ WARNING: Collected CSS file is empty! This will cause a blank page."
-        echo "   Checking source file..."
+        echo "WARNING: Collected CSS file is empty!" >&2
         if [ -f "static/css/output.css" ]; then
             SOURCE_SIZE=$(wc -c < static/css/output.css)
-            echo "   Source CSS file size: $SOURCE_SIZE bytes"
             if [ "$SOURCE_SIZE" -gt 0 ]; then
-                echo "   Attempting to manually copy CSS file..."
                 mkdir -p staticfiles/css
-                cp static/css/output.css staticfiles/css/output.css
-                echo "   CSS file manually copied ($(wc -c < staticfiles/css/output.css) bytes)"
+                cp static/css/output.css staticfiles/css/output.css >/dev/null 2>&1
             fi
-        fi
-    else
-        # Verify file is readable and has content
-        FIRST_LINE=$(head -c 100 staticfiles/css/output.css)
-        if [ -z "$FIRST_LINE" ]; then
-            echo "⚠ WARNING: CSS file exists but appears to be empty or unreadable"
-        else
-            echo "✓ CSS file verified and readable"
         fi
     fi
 else
-    echo "⚠ WARNING: CSS file not found in staticfiles directory"
-    echo "   Listing staticfiles/css directory:"
-    ls -la staticfiles/css/ 2>/dev/null || echo "   Directory does not exist"
-    echo "   Attempting to manually copy CSS file..."
     if [ -f "static/css/output.css" ]; then
         mkdir -p staticfiles/css
-        cp static/css/output.css staticfiles/css/output.css
-        echo "   CSS file manually copied ($(wc -c < staticfiles/css/output.css) bytes)"
+        cp static/css/output.css staticfiles/css/output.css >/dev/null 2>&1
     fi
 fi
 

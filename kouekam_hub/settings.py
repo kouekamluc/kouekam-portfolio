@@ -302,10 +302,10 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging Configuration
-# Reduced verbosity in production to avoid Railway rate limiting (500 logs/sec)
-# Console logging only shows WARNING and above in production, INFO only goes to file
-log_level = os.getenv('DJANGO_LOG_LEVEL', 'INFO' if DEBUG else 'WARNING')
-console_log_level = 'INFO' if DEBUG else 'WARNING'
+# Severely reduced verbosity in production to avoid Railway rate limiting (500 logs/sec)
+# Console logging only shows ERROR in production, all other logs go to file only
+log_level = os.getenv('DJANGO_LOG_LEVEL', 'INFO' if DEBUG else 'ERROR')
+console_log_level = 'INFO' if DEBUG else 'ERROR'  # ERROR only in production
 
 LOGGING = {
     'version': 1,
@@ -329,7 +329,7 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'simple' if not DEBUG else 'verbose',
-            'level': console_log_level,  # Only WARNING+ in production
+            'level': console_log_level,  # ERROR only in production
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -347,12 +347,12 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['file'] if not DEBUG else ['console', 'file'],  # No console in production
         'level': log_level,
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'] if not DEBUG else ['console', 'file'],  # No console in production
             'level': log_level,
             'propagate': False,
         },
@@ -366,13 +366,23 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        # Reduce verbosity of common noisy loggers
+        # Reduce verbosity of common noisy loggers - file only
         'django.db.backends': {
             'handlers': ['file'],  # Only log to file, not console
             'level': 'WARNING',
             'propagate': False,
         },
         'django.template': {
+            'handlers': ['file'],  # Only log to file, not console
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file'],  # Only log to file, not console
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.middleware': {
             'handlers': ['file'],  # Only log to file, not console
             'level': 'WARNING',
             'propagate': False,
