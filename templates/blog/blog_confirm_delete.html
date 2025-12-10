@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Delete Blog Post - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <a href="{% url 'blog_detail' post.slug %}" 
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Post
+            </a>
+            
+            <div class="card">
+                <h1 class="text-3xl font-bold mb-4 dark:text-white">Delete Blog Post</h1>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    Are you sure you want to delete "<strong>{{ post.title }}</strong>"? This action cannot be undone.
+                </p>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="flex items-center gap-4">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Yes, Delete
+                        </button>
+                        <a href="{% url 'blog_detail' post.slug %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

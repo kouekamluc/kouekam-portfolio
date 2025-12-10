@@ -9,7 +9,7 @@
             </a>
             
             <!-- Desktop: Navigation Menu + User Info -->
-            <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+            <div class="hidden lg:flex items-center space-x-6 lg:space-x-8">
                 <!-- Navigation Menu -->
                 <div class="flex items-center">
                     <ul class="flex items-center space-x-3 lg:space-x-4 font-medium">
@@ -99,7 +99,7 @@
             
             <!-- Mobile Menu Button -->
             <button data-collapse-toggle="navbar-sticky" type="button"
-                class="inline-flex items-center p-2.5 w-11 h-11 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
+                class="inline-flex items-center p-2.5 w-11 h-11 justify-center text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors"
                 aria-controls="navbar-sticky" aria-expanded="false">
                 <span class="sr-only">Open main menu</span>
                 <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
@@ -109,18 +109,18 @@
         </div>
         
         <!-- Mobile Navigation Menu -->
-        <div class="hidden w-full md:hidden" id="navbar-sticky">
-            <ul class="flex flex-col p-5 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2 dark:border-gray-700">
+        <div class="hidden w-full lg:hidden" id="navbar-sticky">
+            <ul class="flex flex-col p-4 md:p-5 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-1 md:space-y-2 dark:border-gray-700">
                 <li>
                     <a href="{% url 'home' %}"
-                        class="flex items-center py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors {% if request.resolver_match.url_name == 'home' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}"
+                        class="flex items-center py-3 md:py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 transition-colors touch-manipulation {% if request.resolver_match.url_name == 'home' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}"
                         aria-current="page">
                         <i class="fas fa-home mr-2"></i>Home
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project_list' %}"
-                        class="flex items-center py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'project_' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}">
+                        class="flex items-center py-3 md:py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 transition-colors touch-manipulation {% if request.resolver_match.url_name|slice:':8' == 'project_' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}">
                         <i class="fas fa-briefcase mr-2"></i>Projects
                     </a>
                 </li>

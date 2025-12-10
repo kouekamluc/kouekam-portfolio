@@ -84,7 +84,50 @@ fi
 # Run collectstatic with verbose output
 # When using S3, collectstatic should upload directly to S3
 # Note: "Copying" messages are normal - they mean copying from source to storage backend
+echo "Running collectstatic (this will collect Django admin static files)..."
 python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -100
+
+# Verify admin static files were collected
+echo "Verifying Django admin static files were collected..."
+python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from django.conf import settings
+
+admin_css = os.path.join(settings.STATIC_ROOT, 'admin', 'css', 'base.css')
+admin_js = os.path.join(settings.STATIC_ROOT, 'admin', 'js', 'core.js')
+
+if getattr(settings, 'USE_S3', False):
+    # For S3, check if files exist in storage
+    from kouekam_hub.storage import StaticStorage
+    storage = StaticStorage()
+    if storage.exists('admin/css/base.css'):
+        print("✓ Admin CSS found in S3")
+    else:
+        print("✗ Admin CSS NOT found in S3 - collectstatic may have failed")
+    if storage.exists('admin/js/core.js'):
+        print("✓ Admin JS found in S3")
+    else:
+        print("✗ Admin JS NOT found in S3 - collectstatic may have failed")
+else:
+    # For WhiteNoise, check STATIC_ROOT
+    if os.path.exists(admin_css):
+        size = os.path.getsize(admin_css)
+        print(f"✓ Admin CSS collected: {admin_css} ({size} bytes)")
+    else:
+        print(f"✗ Admin CSS NOT collected: {admin_css}")
+        print("  This will cause Django admin to be unstyled!")
+    
+    if os.path.exists(admin_js):
+        size = os.path.getsize(admin_js)
+        print(f"✓ Admin JS collected: {admin_js} ({size} bytes)")
+    else:
+        print(f"✗ Admin JS NOT collected: {admin_js}")
+        print("  This will cause Django admin JavaScript to not work!")
+EOF
 
 # After collectstatic, verify files were uploaded to S3 (not just copied locally)
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then

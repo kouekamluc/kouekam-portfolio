@@ -164,6 +164,12 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Static files finders - ensure Django admin files are found
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
 # Media files (User uploads)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -206,9 +212,11 @@ if USE_S3 and AWS_STORAGE_BUCKET_NAME:
 else:
     # Use WhiteNoise for static files in production (if not using S3)
     # WhiteNoise middleware will serve files from STATIC_ROOT
+    # The middleware is configured in MIDDLEWARE list above
     if not DEBUG:
         # Use WhiteNoise storage with compression for better performance
         # CompressedStaticFilesStorage compresses files and serves them efficiently
+        # This ensures Django admin static files are collected and served correctly
         STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type

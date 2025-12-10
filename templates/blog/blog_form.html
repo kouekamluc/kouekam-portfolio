@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}{{ form_type }} Blog Post - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-4xl mx-auto">
+            <a href="{% if post %}{% url 'blog_detail' post.slug %}{% else %}{% url 'blog_list' %}{% endif %}" 
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+            </a>
+            <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Blog Post</h1>
+            
+            <div class="card">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div>
+                        <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Title <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Content <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.content.errors }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">You can use Markdown formatting</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Category
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.category.errors }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="published_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Published Date
+                            </label>
+                            {{ form.published_date }}
+                            {% if form.published_date.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.published_date.errors }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave empty to save as draft</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        {{ form.featured }}
+                        <label for="id_featured" class="ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Featured Post
+                        </label>
+                        {% if form.featured.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.featured.errors }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit" name="publish" class="btn-primary">
+                            <i class="fas fa-paper-plane mr-2"></i>Publish
+                        </button>
+                        <button type="submit" class="btn-secondary">
+                            <i class="fas fa-save mr-2"></i>Save Draft
+                        </button>
+                        <a href="{% if post %}{% url 'blog_detail' post.slug %}{% else %}{% url 'blog_list' %}{% endif %}" 
+                           class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
