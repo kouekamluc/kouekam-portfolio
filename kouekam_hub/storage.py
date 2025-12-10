@@ -9,7 +9,8 @@ from storages.backends.s3boto3 import S3Boto3Storage
 class StaticStorage(S3Boto3Storage):
     """Storage backend for static files (CSS, JS, images)"""
     location = 'static'
-    default_acl = 'public-read'
+    # Don't use ACLs - use bucket policy instead for public access
+    default_acl = None
     file_overwrite = False
     querystring_auth = False
     
@@ -23,7 +24,8 @@ class StaticStorage(S3Boto3Storage):
 class MediaStorage(S3Boto3Storage):
     """Storage backend for media files (user uploads)"""
     location = 'media'
-    default_acl = 'public-read'
+    # Don't use ACLs - use bucket policy instead for public access
+    default_acl = None
     file_overwrite = True
     querystring_auth = False
     

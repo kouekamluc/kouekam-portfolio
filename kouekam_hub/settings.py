@@ -190,7 +190,9 @@ if USE_S3 and AWS_STORAGE_BUCKET_NAME:
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
     
     # AWS S3 settings (used by both static and media storage)
-    AWS_DEFAULT_ACL = 'public-read'
+    # Note: Don't use ACLs - newer S3 buckets don't support them
+    # Use bucket policies instead for public access
+    AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = False  # Don't overwrite existing files
     
