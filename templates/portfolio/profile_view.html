@@ -98,54 +98,62 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {% if profile.social_links.linkedin %}
                                 <a href="{{ profile.social_links.linkedin }}" target="_blank" rel="noopener noreferrer" 
-                                   class="group flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
-                                    <div class="p-3 bg-blue-600 rounded-lg group-hover:scale-110 transition-transform">
+                                   class="group flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
+                                    <div class="flex-shrink-0 p-3 bg-blue-600 rounded-lg group-hover:scale-110 transition-transform">
                                         <i class="fab fa-linkedin text-white text-xl"></i>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-white">LinkedIn</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ profile.social_links.linkedin }}</p>
+                                    <div class="flex-1 min-w-0 overflow-hidden">
+                                        <p class="font-semibold text-gray-900 dark:text-white mb-1">LinkedIn</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate break-all">{{ profile.social_links.linkedin }}</p>
                                     </div>
-                                    <i class="fas fa-external-link-alt text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-external-link-alt text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 text-sm"></i>
+                                    </div>
                                 </a>
                             {% endif %}
                             {% if profile.social_links.github %}
                                 <a href="{{ profile.social_links.github }}" target="_blank" rel="noopener noreferrer" 
-                                   class="group flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/20 dark:to-gray-700/20 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
-                                    <div class="p-3 bg-gray-800 dark:bg-gray-700 rounded-lg group-hover:scale-110 transition-transform">
+                                   class="group flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/20 dark:to-gray-700/20 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
+                                    <div class="flex-shrink-0 p-3 bg-gray-800 dark:bg-gray-700 rounded-lg group-hover:scale-110 transition-transform">
                                         <i class="fab fa-github text-white text-xl"></i>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-white">GitHub</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ profile.social_links.github }}</p>
+                                    <div class="flex-1 min-w-0 overflow-hidden">
+                                        <p class="font-semibold text-gray-900 dark:text-white mb-1">GitHub</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate break-all">{{ profile.social_links.github }}</p>
                                     </div>
-                                    <i class="fas fa-external-link-alt text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-400"></i>
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-external-link-alt text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-400 text-sm"></i>
+                                    </div>
                                 </a>
                             {% endif %}
                             {% if profile.social_links.twitter %}
                                 <a href="{{ profile.social_links.twitter }}" target="_blank" rel="noopener noreferrer" 
-                                   class="group flex items-center gap-4 p-4 bg-gradient-to-r from-sky-50 to-sky-100 dark:from-sky-900/20 dark:to-sky-800/20 rounded-xl border border-sky-200 dark:border-sky-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
-                                    <div class="p-3 bg-sky-500 rounded-lg group-hover:scale-110 transition-transform">
+                                   class="group flex items-center gap-3 p-4 bg-gradient-to-r from-sky-50 to-sky-100 dark:from-sky-900/20 dark:to-sky-800/20 rounded-xl border border-sky-200 dark:border-sky-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
+                                    <div class="flex-shrink-0 p-3 bg-sky-500 rounded-lg group-hover:scale-110 transition-transform">
                                         <i class="fab fa-twitter text-white text-xl"></i>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-white">Twitter</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ profile.social_links.twitter }}</p>
+                                    <div class="flex-1 min-w-0 overflow-hidden">
+                                        <p class="font-semibold text-gray-900 dark:text-white mb-1">Twitter</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate break-all">{{ profile.social_links.twitter }}</p>
                                     </div>
-                                    <i class="fas fa-external-link-alt text-gray-400 group-hover:text-sky-600 dark:group-hover:text-sky-400"></i>
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-external-link-alt text-gray-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 text-sm"></i>
+                                    </div>
                                 </a>
                             {% endif %}
                             {% if profile.social_links.website %}
                                 <a href="{{ profile.social_links.website }}" target="_blank" rel="noopener noreferrer" 
-                                   class="group flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
-                                    <div class="p-3 bg-green-600 rounded-lg group-hover:scale-110 transition-transform">
+                                   class="group flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-700 hover:shadow-lg hover:scale-105 transition-all duration-200">
+                                    <div class="flex-shrink-0 p-3 bg-green-600 rounded-lg group-hover:scale-110 transition-transform">
                                         <i class="fas fa-globe text-white text-xl"></i>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-white">Website</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ profile.social_links.website }}</p>
+                                    <div class="flex-1 min-w-0 overflow-hidden">
+                                        <p class="font-semibold text-gray-900 dark:text-white mb-1">Website</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 truncate break-all">{{ profile.social_links.website }}</p>
                                     </div>
-                                    <i class="fas fa-external-link-alt text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400"></i>
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-external-link-alt text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 text-sm"></i>
+                                    </div>
                                 </a>
                             {% endif %}
                         </div>
