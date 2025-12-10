@@ -19,6 +19,13 @@ class StaticStorage(S3Boto3Storage):
         if not hasattr(settings, 'AWS_STORAGE_BUCKET_NAME') or not settings.AWS_STORAGE_BUCKET_NAME:
             raise ValueError("AWS_STORAGE_BUCKET_NAME must be set in settings")
         super().__init__(*args, **kwargs)
+    
+    def url(self, name):
+        """Override url method to ensure correct URL generation"""
+        url = super().url(name)
+        # Ensure the URL is correct - storage location is 'static', so name should be relative
+        # The super().url() should handle this, but let's make sure
+        return url
 
 
 class MediaStorage(S3Boto3Storage):

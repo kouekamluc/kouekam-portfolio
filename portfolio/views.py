@@ -94,20 +94,20 @@ def project_detail(request, slug):
 def debug_static_url(request):
     """Debug endpoint to check static file URL generation"""
     css_url = static('css/output.css')
+    # Also check what the storage backend generates
+    storage_url = None
+    try:
+        from kouekam_hub.storage import StaticStorage
+        storage = StaticStorage()
+        storage_url = storage.url('css/output.css')
+    except Exception as e:
+        storage_url = f"Error: {e}"
+    
     return JsonResponse({
-        'css_url': css_url,
+        'css_url_from_static_tag': css_url,
+        'css_url_from_storage': storage_url,
         'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
         'use_s3': getattr(settings, 'USE_S3', False),
         'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
-    })
-
-def debug_static_url(request):
-    """Debug endpoint to check static file URL generation"""
-    from django.templatetags.static import static
-    css_url = static('css/output.css')
-    return JsonResponse({
-        'css_url': css_url,
-        'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
-        'use_s3': getattr(settings, 'USE_S3', False),
-        'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
+        'expected_url': 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
     })
