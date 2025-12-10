@@ -26,17 +26,28 @@
         /* Ensure navbar doesn't overlap content */
         :root {
             --navbar-height-mobile: 5rem;  /* 80px */
-            --navbar-height-desktop: 6rem; /* 96px */
+            --navbar-height-desktop: 5rem; /* 80px - reduced for more compact navbar */
         }
         
         body {
             padding-top: var(--navbar-height-mobile);
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
         
         @media (min-width: 1024px) {
             body {
                 padding-top: var(--navbar-height-desktop);
             }
+        }
+
+        /* Hide scrollbar for navbar overflow */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         /* Button styles */

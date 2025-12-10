@@ -1,93 +1,93 @@
-<nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm">
-    <div class="max-w-screen-2xl mx-auto px-6 py-4 lg:px-8 lg:py-5">
-        <div class="flex items-center justify-between">
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm overflow-x-hidden">
+    <div class="w-full px-4 py-3 lg:px-6 lg:py-4 max-w-full">
+        <div class="flex items-center justify-between gap-2 lg:gap-4 max-w-full">
             <!-- Logo -->
-            <a href="{% url 'home' %}" class="flex items-center space-x-2 rtl:space-x-reverse group">
-                <span class="self-center text-2xl lg:text-3xl font-bold whitespace-nowrap dark:text-white transition-colors">
+            <a href="{% url 'home' %}" class="flex items-center space-x-2 rtl:space-x-reverse group flex-shrink-0">
+                <span class="self-center text-xl lg:text-2xl font-bold whitespace-nowrap dark:text-white transition-colors">
                     Kouekam<span class="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">.Hub</span>
                 </span>
             </a>
             
             <!-- Desktop: Navigation Menu + User Info -->
-            <div class="hidden lg:flex items-center space-x-6 lg:space-x-8">
+            <div class="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 min-w-0">
                 <!-- Navigation Menu -->
-                <div class="flex items-center">
-                    <ul class="flex items-center space-x-3 lg:space-x-4 font-medium">
+                <div class="flex items-center flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+                    <ul class="flex items-center gap-1.5 xl:gap-2 font-medium">
                         <li>
                             <a href="{% url 'home' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name == 'home' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}"
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name == 'home' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}"
                                 aria-current="page">
-                                <i class="fas fa-home mr-2"></i>Home
+                                <i class="fas fa-home mr-1.5 text-xs"></i>Home
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'project_list' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'project_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-briefcase mr-2"></i>Projects
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':8' == 'project_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-briefcase mr-1.5 text-xs"></i>Projects
                             </a>
                         </li>
                         {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'academic_dashboard' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':9' == 'academic_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-graduation-cap mr-2"></i>Academic
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':9' == 'academic_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-graduation-cap mr-1.5 text-xs"></i>Academic
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'productivity_dashboard' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':13' == 'productivity_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-tasks mr-2"></i>Productivity
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':13' == 'productivity_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-tasks mr-1.5 text-xs"></i>Productivity
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'assistant_hub' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if 'assistant' in request.resolver_match.url_name or 'conversation' in request.resolver_match.url_name or 'chat' in request.resolver_match.url_name or 'pdf' in request.resolver_match.url_name or 'prompt' in request.resolver_match.url_name or 'study_helper' in request.resolver_match.url_name or 'code_assistant' in request.resolver_match.url_name or 'writing_assistant' in request.resolver_match.url_name or 'course_recommendation' in request.resolver_match.url_name %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-robot mr-2"></i>AI Assistant
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if 'assistant' in request.resolver_match.url_name or 'conversation' in request.resolver_match.url_name or 'chat' in request.resolver_match.url_name or 'pdf' in request.resolver_match.url_name or 'prompt' in request.resolver_match.url_name or 'study_helper' in request.resolver_match.url_name or 'code_assistant' in request.resolver_match.url_name or 'writing_assistant' in request.resolver_match.url_name or 'course_recommendation' in request.resolver_match.url_name %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-robot mr-1.5 text-xs"></i>AI Assistant
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'business_dashboard' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'business_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-briefcase mr-2"></i>Business
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':8' == 'business_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-briefcase mr-1.5 text-xs"></i>Business
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'journal_dashboard' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'journal_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-book mr-2"></i>Journal
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':8' == 'journal_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-book mr-1.5 text-xs"></i>Journal
                             </a>
                         </li>
                         {% endif %}
                         <li>
                             <a href="{% url 'blog_list' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':5' == 'blog_' or request.resolver_match.url_name|slice:':9' == 'tutorial_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-blog mr-2"></i>Blog
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':5' == 'blog_' or request.resolver_match.url_name|slice:':9' == 'tutorial_' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-blog mr-1.5 text-xs"></i>Blog
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'contact' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name == 'contact' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-envelope mr-2"></i>Contact
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name == 'contact' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-envelope mr-1.5 text-xs"></i>Contact
                             </a>
                         </li>
                         {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'view_profile' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'profile_' or request.resolver_match.url_name == 'view_profile' or request.resolver_match.url_name == 'edit_profile' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
-                                <i class="fas fa-user-circle mr-2"></i>Profile
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap {% if request.resolver_match.url_name|slice:':8' == 'profile_' or request.resolver_match.url_name == 'view_profile' or request.resolver_match.url_name == 'edit_profile' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-user-circle mr-1.5 text-xs"></i>Profile
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'account_logout' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-red-600 dark:text-white dark:hover:bg-transparent dark:hover:text-red-400 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-red-600 dark:text-white dark:hover:bg-transparent dark:hover:text-red-400 transition-colors whitespace-nowrap">
+                                <i class="fas fa-sign-out-alt mr-1.5 text-xs"></i>Logout
                             </a>
                         </li>
                         {% else %}
                         <li>
                             <a href="{% url 'account_login' %}"
-                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors">
-                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                                class="flex items-center py-1.5 px-2.5 text-sm text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+                                <i class="fas fa-sign-in-alt mr-1.5 text-xs"></i>Login
                             </a>
                         </li>
                         {% endif %}
@@ -96,11 +96,11 @@
                 
                 <!-- User Info (Desktop Only) -->
                 {% if user.is_authenticated %}
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center flex-shrink-0 ml-2">
                     <a href="{% url 'view_profile' %}" 
-                       class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-user-circle text-lg"></i>
-                        <span class="font-medium">{{ user.username }}</span>
+                       class="flex items-center space-x-1.5 text-xs xl:text-sm text-gray-600 dark:text-gray-400 px-2.5 xl:px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
+                        <i class="fas fa-user-circle text-sm"></i>
+                        <span class="font-medium hidden xl:inline">{{ user.username }}</span>
                     </a>
                 </div>
                 {% endif %}
