@@ -79,6 +79,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
 django.setup()
 
 from django.conf import settings
+from django.core.management import call_command
 from kouekam_hub.storage import StaticStorage
 
 print(f"STATICFILES_STORAGE: {getattr(settings, 'STATICFILES_STORAGE', 'Not set')}")
@@ -91,6 +92,15 @@ try:
     print(f"✓ S3 storage initialized successfully")
     print(f"  Bucket: {storage.bucket_name}")
     print(f"  Location: {storage.location}")
+    
+    # Verify the storage is actually being used by collectstatic
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    print(f"  Django staticfiles_storage type: {type(staticfiles_storage).__name__}")
+    print(f"  Django staticfiles_storage module: {type(staticfiles_storage).__module__}")
+    
+    if 'StaticStorage' not in type(staticfiles_storage).__name__:
+        print(f"  ⚠ WARNING: staticfiles_storage is not StaticStorage!")
+        print(f"     This means collectstatic will not use S3!")
 except Exception as e:
     print(f"❌ ERROR: Failed to initialize S3 storage: {e}")
     import traceback
@@ -107,6 +117,28 @@ fi
 # When using S3, collectstatic should upload directly to S3
 # Note: "Copying" messages are normal - they mean copying from source to storage backend
 python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -100
+
+# After collectstatic, verify files were uploaded to S3 (not just copied locally)
+if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
+    echo "Verifying files were uploaded to S3..."
+    python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from kouekam_hub.storage import StaticStorage
+
+storage = StaticStorage()
+css_path = 'css/output.css'
+
+if storage.exists(css_path):
+    print(f"✓ CSS file exists in S3: static/{css_path}")
+else:
+    print(f"⚠ WARNING: CSS file NOT found in S3 after collectstatic!")
+    print(f"   This means collectstatic did not upload to S3.")
+EOF
+fi
 
 # If using S3 and collectstatic didn't upload, try manual upload as fallback
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
