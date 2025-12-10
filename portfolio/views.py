@@ -95,15 +95,18 @@ def debug_static_url(request):
     """Debug endpoint to check static file URL generation"""
     from django.templatetags.static import static as static_tag
     from django.template import Template, Context
+    from django.template.loader import render_to_string
     
     css_url = static_tag('css/output.css')
     
     # Also check what the storage backend generates
     storage_url = None
+    storage_exists = False
     try:
         from kouekam_hub.storage import StaticStorage
         storage = StaticStorage()
         storage_url = storage.url('css/output.css')
+        storage_exists = storage.exists('css/output.css')
     except Exception as e:
         storage_url = f"Error: {e}"
     
@@ -112,13 +115,25 @@ def debug_static_url(request):
     context = Context({})
     rendered_url = template.render(context)
     
+    # Check what the actual HTML template generates
+    try:
+        html_snippet = render_to_string('base.html', {})
+        import re
+        css_link_match = re.search(r'<link[^>]*href=["\']([^"\']*output\.css[^"\']*)["\']', html_snippet)
+        html_css_url = css_link_match.group(1) if css_link_match else 'Not found in HTML'
+    except Exception as e:
+        html_css_url = f"Error: {e}"
+    
     return JsonResponse({
         'css_url_from_static_tag': css_url,
         'css_url_from_template': rendered_url,
+        'css_url_from_html': html_css_url,
         'css_url_from_storage': storage_url,
+        'css_exists_in_s3': storage_exists,
         'static_url_setting': getattr(settings, 'STATIC_URL', 'Not set'),
         'use_s3': getattr(settings, 'USE_S3', False),
         'staticfiles_storage': getattr(settings, 'STATICFILES_STORAGE', 'Not set'),
         'expected_url': 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
-        'note': 'Check if css_url_from_template matches expected_url',
+        'urls_match': rendered_url == 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
+        'note': 'Check if css_url_from_template matches expected_url and css_exists_in_s3 is True',
     })

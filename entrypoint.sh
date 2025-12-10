@@ -69,18 +69,44 @@ else
 fi
 
 echo "Collecting static files..."
-# Run collectstatic with verbose output to see what's happening
-# When using S3, collectstatic should upload directly to S3
-# Check if collectstatic is actually using S3 storage
-python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -50
-
-# Verify collectstatic actually used S3 (not just local filesystem)
+# Verify S3 storage is properly configured before collectstatic
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
-    if grep -q "Copying" /tmp/collectstatic.log && ! grep -q "Uploading" /tmp/collectstatic.log; then
-        echo "⚠ WARNING: collectstatic appears to be copying locally instead of uploading to S3!"
-        echo "   This might mean STATICFILES_STORAGE is not properly configured."
+    echo "Verifying S3 storage configuration before collectstatic..."
+    python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from django.conf import settings
+from kouekam_hub.storage import StaticStorage
+
+print(f"STATICFILES_STORAGE: {getattr(settings, 'STATICFILES_STORAGE', 'Not set')}")
+print(f"AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Not set')}")
+print(f"AWS_ACCESS_KEY_ID: {'Set' if getattr(settings, 'AWS_ACCESS_KEY_ID', '') else 'Not set'}")
+
+# Test storage initialization
+try:
+    storage = StaticStorage()
+    print(f"✓ S3 storage initialized successfully")
+    print(f"  Bucket: {storage.bucket_name}")
+    print(f"  Location: {storage.location}")
+except Exception as e:
+    print(f"❌ ERROR: Failed to initialize S3 storage: {e}")
+    import traceback
+    traceback.print_exc()
+    exit(1)
+EOF
+    if [ $? -ne 0 ]; then
+        echo "❌ ERROR: S3 storage initialization failed!"
+        exit 1
     fi
 fi
+
+# Run collectstatic with verbose output
+# When using S3, collectstatic should upload directly to S3
+# Note: "Copying" messages are normal - they mean copying from source to storage backend
+python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/collectstatic.log | head -100
 
 # If using S3 and collectstatic didn't upload, try manual upload as fallback
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')

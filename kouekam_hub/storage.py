@@ -19,6 +19,11 @@ class StaticStorage(S3Boto3Storage):
         # Ensure bucket name is set
         if not hasattr(settings, 'AWS_STORAGE_BUCKET_NAME') or not settings.AWS_STORAGE_BUCKET_NAME:
             raise ValueError("AWS_STORAGE_BUCKET_NAME must be set in settings")
+        # Ensure AWS credentials are set
+        if not hasattr(settings, 'AWS_ACCESS_KEY_ID') or not settings.AWS_ACCESS_KEY_ID:
+            raise ValueError("AWS_ACCESS_KEY_ID must be set in settings")
+        if not hasattr(settings, 'AWS_SECRET_ACCESS_KEY') or not settings.AWS_SECRET_ACCESS_KEY:
+            raise ValueError("AWS_SECRET_ACCESS_KEY must be set in settings")
         super().__init__(*args, **kwargs)
     
     def _get_content_type(self, name):
