@@ -69,8 +69,41 @@ else
 fi
 
 echo "Collecting static files..."
-# Run collectstatic and capture output
-python manage.py collectstatic --noinput --clear
+# Run collectstatic with verbose output to see what's happening
+# When using S3, collectstatic should upload directly to S3
+python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | head -50
+
+# If using S3 and collectstatic didn't upload, try manual upload as fallback
+USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
+if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
+    echo "Attempting to manually upload CSS to S3 as fallback..."
+    python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from kouekam_hub.storage import StaticStorage
+import os.path
+
+css_source = 'static/css/output.css'
+css_dest = 'static/css/output.css'
+
+if os.path.exists(css_source):
+    try:
+        storage = StaticStorage()
+        with open(css_source, 'rb') as f:
+            storage.save(css_dest, f)
+        print(f"✓ CSS file manually uploaded to S3: {css_dest}")
+        print(f"  URL: {storage.url(css_dest)}")
+    except Exception as e:
+        print(f"⚠ Failed to manually upload CSS to S3: {e}")
+        import traceback
+        traceback.print_exc()
+else:
+    print(f"⚠ CSS source file not found: {css_source}")
+EOF
+fi
 
 # Verify S3 configuration and check if files are actually uploaded
 echo "Verifying S3 configuration..."
