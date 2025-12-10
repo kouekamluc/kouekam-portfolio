@@ -12,7 +12,10 @@
             <a href="{% url 'business_idea_list' %}" class="px-4 py-2 rounded {% if not status_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
             <a href="?status=idea" class="px-4 py-2 rounded {% if status_filter == 'idea' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Ideas</a>
             <a href="?status=researching" class="px-4 py-2 rounded {% if status_filter == 'researching' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Researching</a>
+            <a href="?status=planning" class="px-4 py-2 rounded {% if status_filter == 'planning' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Planning</a>
             <a href="?status=active" class="px-4 py-2 rounded {% if status_filter == 'active' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Active</a>
+            <a href="?status=paused" class="px-4 py-2 rounded {% if status_filter == 'paused' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Paused</a>
+            <a href="?status=abandoned" class="px-4 py-2 rounded {% if status_filter == 'abandoned' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Abandoned</a>
         </div>
         
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

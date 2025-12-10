@@ -53,6 +53,7 @@
                         <option value="planning" {% if idea and idea.status == 'planning' %}selected{% endif %}>Planning</option>
                         <option value="active" {% if idea and idea.status == 'active' %}selected{% endif %}>Active</option>
                         <option value="paused" {% if idea and idea.status == 'paused' %}selected{% endif %}>Paused</option>
+                        <option value="abandoned" {% if idea and idea.status == 'abandoned' %}selected{% endif %}>Abandoned</option>
                     </select>
                     {% if form.status.errors %}
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.status.errors }}</p>

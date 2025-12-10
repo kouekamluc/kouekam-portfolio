@@ -135,7 +135,8 @@ class DocumentForm(forms.ModelForm):
 class MilestoneForm(forms.ModelForm):
     class Meta:
         model = Milestone
-        fields = ['title', 'description', 'due_date', 'completed']
+        fields = ['title', 'description', 'due_date']
+        # Note: 'completed' is handled by the completion action, not the form
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500'
