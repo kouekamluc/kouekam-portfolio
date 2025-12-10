@@ -55,6 +55,7 @@
                 required
                 autocomplete="new-password"
                 oninput="validatePassword(this.value)"
+                data-password-field="true"
             >
             {% if form.password1.errors %}
                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors }}</p>
@@ -171,7 +172,7 @@ function updateRequirement(id, isValid) {
 
 // Show requirements on focus
 document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
+    const passwordInput = document.querySelector('input[data-password-field="true"]');
     if (passwordInput) {
         passwordInput.addEventListener('focus', function() {
             if (this.value.length === 0) {
