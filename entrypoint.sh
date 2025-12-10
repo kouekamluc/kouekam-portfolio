@@ -92,6 +92,47 @@ python manage.py collectstatic --noinput --clear --verbosity 2 2>&1 | tee /tmp/c
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
     echo "Running force upload for admin files (ensures all files are in S3)..."
     python force_upload_admin_s3.py 2>&1 | grep -E "(Uploaded|Skipped|Failed|Summary|✓|✗|⚠)" || true
+    
+    # Upload favicon to S3 (ensures it's available in production)
+    echo "Uploading favicon to S3..."
+    python upload_favicon_to_s3.py 2>&1 | grep -E "(Uploaded|Skipped|Failed|✓|✗|⚠|ERROR|WARNING)" || true
+    
+    # Verify favicon was uploaded
+    echo "Verifying favicon in S3..."
+    python << EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
+django.setup()
+
+from kouekam_hub.storage import StaticStorage
+
+storage = StaticStorage()
+favicon_path = 'favicon.svg'
+
+if storage.exists(favicon_path):
+    favicon_url = storage.url(favicon_path)
+    print(f"✓ Favicon found in S3: {favicon_url}")
+else:
+    print(f"⚠ WARNING: Favicon NOT found in S3 at: {favicon_path}")
+    print(f"   The favicon may not appear in browser tabs!")
+EOF
+else
+    # For WhiteNoise, verify favicon is in staticfiles
+    echo "Verifying favicon for WhiteNoise..."
+    if [ -f "staticfiles/favicon.svg" ]; then
+        FAVICON_SIZE=$(wc -c < staticfiles/favicon.svg)
+        echo "✓ Favicon collected to staticfiles ($FAVICON_SIZE bytes)"
+    else
+        echo "⚠ WARNING: Favicon not found in staticfiles directory"
+        echo "   Attempting to copy favicon..."
+        if [ -f "static/favicon.svg" ]; then
+            cp static/favicon.svg staticfiles/favicon.svg
+            echo "   ✓ Favicon copied to staticfiles"
+        else
+            echo "   ✗ ERROR: Source favicon not found at static/favicon.svg"
+        fi
+    fi
 fi
 
 # Verify admin static files were collected
