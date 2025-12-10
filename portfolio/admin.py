@@ -229,18 +229,25 @@ class ProjectAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Populate tech_stack_display from the instance (works for both new and existing)
         try:
-            if self.instance and hasattr(self.instance, 'tech_stack'):
+            if self.instance and self.instance.pk and hasattr(self.instance, 'tech_stack'):
                 tech_stack = getattr(self.instance, 'tech_stack', None)
                 if isinstance(tech_stack, list):
                     self.initial['tech_stack_display'] = ', '.join(str(item) for item in tech_stack)
                 elif tech_stack:
                     self.initial['tech_stack_display'] = str(tech_stack)
-        except Exception:
+        except (AttributeError, TypeError, KeyError) as e:
             # If there's any error, just leave it empty
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Error populating tech_stack_display in ProjectAdminForm.__init__: {e}")
             pass
     
     def clean_tech_stack_display(self):
-        data = self.cleaned_data.get('tech_stack_display', '').strip()
+        data = self.cleaned_data.get('tech_stack_display', '')
+        if not data or not isinstance(data, str):
+            return []
+        
+        data = data.strip()
         if not data:
             return []
         
@@ -249,22 +256,39 @@ class ProjectAdminForm(forms.ModelForm):
         try:
             parsed = json.loads(data)
             if isinstance(parsed, list):
-                return [str(item) for item in parsed]
+                return [str(item).strip() for item in parsed if item]
             else:
-                return [str(parsed)]
-        except (json.JSONDecodeError, ValueError):
+                return [str(parsed).strip()] if parsed else []
+        except (json.JSONDecodeError, ValueError, TypeError):
             # If not JSON, split by comma
             items = [item.strip() for item in data.split(',') if item.strip()]
             return items
+    
+    def clean(self):
+        """Validate the form data"""
+        cleaned_data = super().clean()
+        # Additional validation can be added here if needed
+        return cleaned_data
     
     def save(self, commit=True):
         try:
             instance = super().save(commit=False)
             # Set tech_stack from the cleaned display field
-            tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
-            if not isinstance(tech_stack_list, list):
-                tech_stack_list = []
-            instance.tech_stack = tech_stack_list
+            # Only access cleaned_data if form is valid
+            if hasattr(self, 'cleaned_data') and self.cleaned_data:
+                tech_stack_list = self.cleaned_data.get('tech_stack_display', [])
+                if not isinstance(tech_stack_list, list):
+                    tech_stack_list = []
+                instance.tech_stack = tech_stack_list
+            else:
+                # If form is not valid, preserve existing tech_stack
+                if instance.pk and hasattr(instance, 'tech_stack'):
+                    # Keep existing tech_stack if available
+                    pass
+                else:
+                    # For new instances, default to empty list
+                    instance.tech_stack = []
+            
             if commit:
                 instance.save()
             return instance
@@ -272,6 +296,7 @@ class ProjectAdminForm(forms.ModelForm):
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Error in ProjectAdminForm.save: {e}", exc_info=True)
+            # Re-raise the exception so admin can handle it
             raise
 
 
