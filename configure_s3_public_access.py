@@ -67,19 +67,26 @@ def configure_cors(s3_client):
         return False
 
 def configure_bucket_policy(s3_client):
-    """Configure bucket policy for public read access to static files"""
+    """Configure bucket policy for public read access to static and media files"""
     print(f"🔧 Configuring bucket policy for public read access...")
     
-    # Bucket policy that allows public read access to static files
+    # Bucket policy that allows public read access to static and media files
     bucket_policy = {
         "Version": "2012-10-17",
         "Statement": [
             {
-                "Sid": "PublicReadGetObject",
+                "Sid": "PublicReadGetObjectStatic",
                 "Effect": "Allow",
                 "Principal": "*",
                 "Action": "s3:GetObject",
                 "Resource": f"arn:aws:s3:::{BUCKET_NAME}/static/*"
+            },
+            {
+                "Sid": "PublicReadGetObjectMedia",
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": f"arn:aws:s3:::{BUCKET_NAME}/media/*"
             }
         ]
     }

@@ -100,4 +100,65 @@ class MediaStorage(S3Boto3Storage):
         if not hasattr(settings, 'AWS_STORAGE_BUCKET_NAME') or not settings.AWS_STORAGE_BUCKET_NAME:
             raise ValueError("AWS_STORAGE_BUCKET_NAME must be set in settings")
         super().__init__(*args, **kwargs)
+    
+    def _get_content_type(self, name):
+        """Get the correct Content-Type for the file"""
+        content_type, _ = mimetypes.guess_type(name)
+        # Ensure images have correct content types
+        if name.endswith('.jpg') or name.endswith('.jpeg'):
+            return 'image/jpeg'
+        elif name.endswith('.png'):
+            return 'image/png'
+        elif name.endswith('.gif'):
+            return 'image/gif'
+        elif name.endswith('.webp'):
+            return 'image/webp'
+        elif name.endswith('.svg'):
+            return 'image/svg+xml'
+        # Default to the guessed type or binary
+        return content_type or 'application/octet-stream'
+    
+    def _save(self, name, content):
+        """Override save to set correct Content-Type for images"""
+        # Get the content type
+        content_type = self._get_content_type(name)
+        
+        # Ensure object_parameters dict exists
+        if not hasattr(self, 'object_parameters') or self.object_parameters is None:
+            self.object_parameters = {}
+        
+        # Temporarily update object_parameters to include ContentType
+        original_params = self.object_parameters.copy()
+        self.object_parameters = self.object_parameters.copy()
+        self.object_parameters['ContentType'] = content_type
+        
+        try:
+            # Save with correct content type
+            result = super()._save(name, content)
+        except Exception as e:
+            # Log the error but don't fail silently
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to save {name} to S3: {e}")
+            raise
+        finally:
+            # Restore original parameters
+            self.object_parameters = original_params
+        
+        return result
+    
+    def url(self, name):
+        """Override url method to ensure correct URL generation"""
+        # Ensure name doesn't include the location prefix (it's already in self.location)
+        # The storage location is 'media', so if name starts with 'media/', remove it
+        if name.startswith('media/'):
+            name = name[len('media/'):]
+        elif name.startswith('/media/'):
+            name = name[len('/media/'):]
+        
+        # Get the URL from the parent class
+        url = super().url(name)
+        
+        # Ensure the URL is correct - should be https://bucket.s3.region.amazonaws.com/media/name
+        return url
 

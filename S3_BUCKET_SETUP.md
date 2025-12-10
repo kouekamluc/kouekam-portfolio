@@ -60,11 +60,18 @@ If your CSS is not loading from S3, it's likely because the bucket is not config
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "PublicReadGetObject",
+            "Sid": "PublicReadGetObjectStatic",
             "Effect": "Allow",
             "Principal": "*",
             "Action": "s3:GetObject",
             "Resource": "arn:aws:s3:::kouekam-hub-assets/static/*"
+        },
+        {
+            "Sid": "PublicReadGetObjectMedia",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::kouekam-hub-assets/media/*"
         }
     ]
 }
