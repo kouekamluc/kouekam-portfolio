@@ -67,7 +67,7 @@ class ProjectImageInline(admin.TabularInline):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'status', 'created_at']
     list_filter = ['category', 'status', 'created_at']
-    search_fields = ['title', 'description', 'tech_stack']
+    search_fields = ['title', 'description']
     readonly_fields = ['slug', 'created_at']
     inlines = [ProjectImageInline]
     
@@ -86,6 +86,20 @@ class ProjectAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def save_model(self, request, obj, form, change):
+        """Override save to handle tech_stack JSON field properly"""
+        # Ensure tech_stack is a list if it's a string
+        if isinstance(obj.tech_stack, str):
+            try:
+                import json
+                obj.tech_stack = json.loads(obj.tech_stack)
+            except (json.JSONDecodeError, ValueError):
+                # If it's not valid JSON, split by comma and create a list
+                obj.tech_stack = [item.strip() for item in obj.tech_stack.split(',') if item.strip()]
+        elif not isinstance(obj.tech_stack, list):
+            obj.tech_stack = []
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(ProjectImage)
