@@ -183,25 +183,27 @@ USE_S3 = os.getenv('USE_S3', 'False') == 'True'
 if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     # Use S3 for static and media files
     if not AWS_S3_CUSTOM_DOMAIN:
-        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
     
-    AWS_LOCATION = 'static'
+    # AWS S3 settings (used by both static and media storage)
     AWS_DEFAULT_ACL = 'public-read'
     AWS_QUERYSTRING_AUTH = False
     
-    # Static files storage
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    # Static files storage - use custom storage class
+    STATICFILES_STORAGE = 'kouekam_hub.storage.StaticStorage'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
     
-    # Media files storage
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    # Media files storage - use custom storage class
+    DEFAULT_FILE_STORAGE = 'kouekam_hub.storage.MediaStorage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 else:
     # Use WhiteNoise for static files in production (if not using S3)
-    # Using CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
-    # to avoid manifest issues with CSS files
+    # WhiteNoise middleware will serve files from STATIC_ROOT
+    # Use Django's default storage to avoid compression/manifest issues
     if not DEBUG:
-        STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+        # Use Django's default static files storage
+        # WhiteNoise middleware (already in MIDDLEWARE) will serve the files
+        STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

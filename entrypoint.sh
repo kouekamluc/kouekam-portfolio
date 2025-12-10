@@ -57,6 +57,13 @@ if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
     exit 1
 fi
 
+# Check if using S3
+if [ -n "$USE_S3" ] && [ "$USE_S3" = "True" ]; then
+    echo "Using AWS S3 for static files..."
+    echo "  Bucket: ${AWS_STORAGE_BUCKET_NAME:-not set}"
+    echo "  Region: ${AWS_S3_REGION_NAME:-us-east-1}"
+fi
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
 
@@ -74,12 +81,28 @@ if [ -f "staticfiles/css/output.css" ]; then
                 echo "   Attempting to manually copy CSS file..."
                 mkdir -p staticfiles/css
                 cp static/css/output.css staticfiles/css/output.css
-                echo "   CSS file manually copied"
+                echo "   CSS file manually copied ($(wc -c < staticfiles/css/output.css) bytes)"
             fi
+        fi
+    else
+        # Verify file is readable and has content
+        FIRST_LINE=$(head -c 100 staticfiles/css/output.css)
+        if [ -z "$FIRST_LINE" ]; then
+            echo "⚠ WARNING: CSS file exists but appears to be empty or unreadable"
+        else
+            echo "✓ CSS file verified and readable"
         fi
     fi
 else
     echo "⚠ WARNING: CSS file not found in staticfiles directory"
+    echo "   Listing staticfiles/css directory:"
+    ls -la staticfiles/css/ 2>/dev/null || echo "   Directory does not exist"
+    echo "   Attempting to manually copy CSS file..."
+    if [ -f "static/css/output.css" ]; then
+        mkdir -p staticfiles/css
+        cp static/css/output.css staticfiles/css/output.css
+        echo "   CSS file manually copied ($(wc -c < staticfiles/css/output.css) bytes)"
+    fi
 fi
 
 # Check ALLOWED_HOSTS configuration
