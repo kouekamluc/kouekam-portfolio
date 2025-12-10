@@ -96,22 +96,73 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kouekam_hub.settings')
 django.setup()
 
 from django.conf import settings
+import time
 
 admin_css = os.path.join(settings.STATIC_ROOT, 'admin', 'css', 'base.css')
 admin_js = os.path.join(settings.STATIC_ROOT, 'admin', 'js', 'core.js')
 
 if getattr(settings, 'USE_S3', False):
     # For S3, check if files exist in storage
+    # Give S3 a moment for uploads to complete
+    time.sleep(2)
+    
     from kouekam_hub.storage import StaticStorage
     storage = StaticStorage()
-    if storage.exists('admin/css/base.css'):
-        print("✓ Admin CSS found in S3")
-    else:
-        print("✗ Admin CSS NOT found in S3 - collectstatic may have failed")
-    if storage.exists('admin/js/core.js'):
-        print("✓ Admin JS found in S3")
-    else:
-        print("✗ Admin JS NOT found in S3 - collectstatic may have failed")
+    
+    # Check multiple possible paths (with and without static/ prefix)
+    css_paths = ['admin/css/base.css', 'static/admin/css/base.css']
+    js_paths = ['admin/js/core.js', 'static/admin/js/core.js']
+    
+    css_found = False
+    for path in css_paths:
+        if storage.exists(path):
+            css_url = storage.url(path)
+            print(f"✓ Admin CSS found in S3: {path}")
+            print(f"  URL: {css_url}")
+            css_found = True
+            break
+    
+    if not css_found:
+        print("✗ Admin CSS NOT found in S3")
+        print("  Tried paths: " + ", ".join(css_paths))
+        print("  Note: Files may still be uploading. Check S3 console to verify.")
+    
+    js_found = False
+    for path in js_paths:
+        if storage.exists(path):
+            js_url = storage.url(path)
+            print(f"✓ Admin JS found in S3: {path}")
+            print(f"  URL: {js_url}")
+            js_found = True
+            break
+    
+    if not js_found:
+        print("✗ Admin JS NOT found in S3")
+        print("  Tried paths: " + ", ".join(js_paths))
+        print("  Note: Files may still be uploading. Check S3 console to verify.")
+    
+    # Also check using boto3 directly to list files
+    try:
+        import boto3
+        s3_client = boto3.client('s3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+        # List objects in static/admin/css/ prefix
+        response = s3_client.list_objects_v2(
+            Bucket=storage.bucket_name,
+            Prefix='static/admin/css/',
+            MaxKeys=5
+        )
+        if 'Contents' in response and len(response['Contents']) > 0:
+            print(f"✓ Found {len(response['Contents'])} admin CSS files in S3")
+            for obj in response['Contents'][:3]:
+                print(f"  - {obj['Key']}")
+        else:
+            print("⚠ No admin CSS files found in S3 bucket (may still be uploading)")
+    except Exception as e:
+        print(f"⚠ Could not verify S3 files directly: {e}")
 else:
     # For WhiteNoise, check STATIC_ROOT
     if os.path.exists(admin_css):
