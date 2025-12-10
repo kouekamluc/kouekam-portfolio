@@ -57,11 +57,15 @@ if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
     exit 1
 fi
 
-# Check if using S3
-if [ -n "$USE_S3" ] && [ "$USE_S3" = "True" ]; then
-    echo "Using AWS S3 for static files..."
+# Check if using S3 (case-insensitive check)
+USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
+if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then
+    echo "✓ AWS S3 enabled for static files"
     echo "  Bucket: ${AWS_STORAGE_BUCKET_NAME:-not set}"
     echo "  Region: ${AWS_S3_REGION_NAME:-us-east-1}"
+    echo "  Static URL will be: https://${AWS_STORAGE_BUCKET_NAME:-bucket}.s3.${AWS_S3_REGION_NAME:-us-east-1}.amazonaws.com/static/"
+else
+    echo "Using local static files (WhiteNoise)"
 fi
 
 echo "Collecting static files..."

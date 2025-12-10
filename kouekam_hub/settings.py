@@ -177,17 +177,22 @@ AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN', '')
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-USE_S3 = os.getenv('USE_S3', 'False') == 'True'
+# Check USE_S3 - handle case-insensitive values
+USE_S3_RAW = os.getenv('USE_S3', 'False').strip().lower()
+USE_S3 = USE_S3_RAW in ('true', '1', 'yes', 'on')
 
 # AWS S3 Storage Configuration (for production)
 if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     # Use S3 for static and media files
     if not AWS_S3_CUSTOM_DOMAIN:
+        # Construct S3 domain based on region
+        # For eu-north-1 and other regions, use the regional endpoint format
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
     
     # AWS S3 settings (used by both static and media storage)
     AWS_DEFAULT_ACL = 'public-read'
     AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False  # Don't overwrite existing files
     
     # Static files storage - use custom storage class
     STATICFILES_STORAGE = 'kouekam_hub.storage.StaticStorage'
