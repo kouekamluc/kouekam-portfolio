@@ -5,6 +5,18 @@ module.exports = {
     './**/templates/**/*.html',
     './node_modules/flowbite/**/*.js'
   ],
+  safelist: [
+    'bg-gray-50',
+    'text-gray-900',
+    'text-gray-700',
+    'text-gray-800',
+    'bg-gray-100',
+    'bg-white',
+    'dark:bg-gray-800',
+    'dark:bg-gray-900',
+    'dark:text-white',
+    'dark:text-gray-300',
+  ],
   theme: {
     extend: {
       colors: {
