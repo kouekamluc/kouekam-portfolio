@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-8 lg:py-12">
+    <div class="px-4 mx-auto max-w-4xl lg:px-6">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                        Edit Profile
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-400">Update your profile information</p>
+                </div>
+                <a href="{% url 'view_profile' %}" class="btn-secondary flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <form method="POST" enctype="multipart/form-data" class="card-hover space-y-8">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900/30 dark:text-red-200 rounded-xl border border-red-200 dark:border-red-800">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Profile Photo Section -->
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <i class="fas fa-image text-2xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Profile Photo</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-start gap-6">
+                    {% if profile.photo %}
+                        <div class="flex-shrink-0">
+                            <img src="{{ profile.photo.url }}" alt="Current Photo" 
+                                 class="w-32 h-32 rounded-2xl object-cover ring-4 ring-gray-200 dark:ring-gray-700 shadow-lg">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">Current photo</p>
+                        </div>
+                    {% else %}
+                        <div class="flex-shrink-0">
+                            <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center ring-4 ring-gray-200 dark:ring-gray-700">
+                                <i class="fas fa-user text-5xl text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">No photo</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="flex-1">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Upload New Photo
+                        </label>
+                        <div class="relative">
+                            {{ form.photo }}
+                            <div class="mt-2 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 dark:text-gray-500 mb-2"></i>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Click to browse or drag and drop</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB)</p>
+                            </div>
+                        </div>
+                        {% if form.photo.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.photo.errors }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic Information Section -->
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
+                        <i class="fas fa-info-circle text-2xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Basic Information</h2>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Tagline -->
+                    <div>
+                        <label for="{{ form.tagline.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            Tagline
+                            <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(Optional)</span>
+                        </label>
+                        {{ form.tagline }}
+                        {% if form.tagline.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.tagline.errors }}
+                            </p>
+                        {% endif %}
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fas fa-lightbulb"></i>
+                            A short, catchy description about yourself
+                        </p>
+                    </div>
+
+                    <!-- Bio -->
+                    <div>
+                        <label for="{{ form.bio.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            Bio
+                            <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(Optional)</span>
+                        </label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.bio.errors }}
+                            </p>
+                        {% endif %}
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fas fa-info-circle"></i>
+                            Tell us about yourself, your interests, and your goals
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV Section -->
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+                        <i class="fas fa-file-pdf text-2xl text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Resume / CV</h2>
+                </div>
+                
+                {% if profile.cv_file %}
+                    <div class="mb-4 p-4 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-red-600 rounded-lg">
+                                <i class="fas fa-file-pdf text-white text-xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ profile.cv_file.name|slice:"13:" }}</p>
+                                <a href="{{ profile.cv_file.url }}" target="_blank" class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    View current file
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <label class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                        {% if profile.cv_file %}Replace CV{% else %}Upload CV{% endif %}
+                        <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(Optional)</span>
+                    </label>
+                    <div class="relative">
+                        {{ form.cv_file }}
+                        <div class="mt-2 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-center">
+                            <i class="fas fa-file-pdf text-3xl text-gray-400 dark:text-gray-500 mb-2"></i>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Click to browse or drag and drop</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">PDF, DOC, DOCX (Max 10MB)</p>
+                        </div>
+                    </div>
+                    {% if form.cv_file.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.cv_file.errors }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Social Links Section -->
+            <div>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                        <i class="fas fa-share-alt text-2xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Social Links</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- LinkedIn -->
+                    <div>
+                        <label for="{{ form.linkedin.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fab fa-linkedin mr-2 text-blue-600"></i>LinkedIn
+                        </label>
+                        {{ form.linkedin }}
+                        {% if form.linkedin.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.linkedin.errors }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- GitHub -->
+                    <div>
+                        <label for="{{ form.github.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fab fa-github mr-2 text-gray-800 dark:text-gray-200"></i>GitHub
+                        </label>
+                        {{ form.github }}
+                        {% if form.github.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.github.errors }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Twitter -->
+                    <div>
+                        <label for="{{ form.twitter.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fab fa-twitter mr-2 text-sky-500"></i>Twitter
+                        </label>
+                        {{ form.twitter }}
+                        {% if form.twitter.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.twitter.errors }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Website -->
+                    <div>
+                        <label for="{{ form.website.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-globe mr-2 text-green-600"></i>Website
+                        </label>
+                        {{ form.website }}
+                        {% if form.website.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.website.errors }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'view_profile' %}" class="w-full sm:w-auto btn-secondary text-center">
+                    Cancel
+                </a>
+                <button type="submit" class="w-full sm:w-auto btn-primary flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

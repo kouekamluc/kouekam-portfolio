@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 from django.templatetags.static import static
 from .models import Profile, Timeline, Skill, Project
+from .forms import ProfileForm
 
 def home(request):
     profile = Profile.objects.first() # Simplification for single-user portfolio
@@ -90,6 +92,32 @@ def project_list(request):
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
     return render(request, 'portfolio/project_detail.html', {'project': project})
+
+@login_required
+def view_profile(request):
+    """View user's own profile"""
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'portfolio/profile_view.html', {'profile': profile})
+
+
+@login_required
+def edit_profile(request):
+    """Edit user's own profile"""
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('view_profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProfileForm(instance=profile)
+    
+    return render(request, 'portfolio/profile_edit.html', {'form': form, 'profile': profile})
+
 
 def debug_static_url(request):
     """Debug endpoint to check static file URL generation"""

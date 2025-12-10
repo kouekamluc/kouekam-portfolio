@@ -72,6 +72,12 @@
                         </li>
                         {% if user.is_authenticated %}
                         <li>
+                            <a href="{% url 'view_profile' %}"
+                                class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:text-white dark:hover:bg-transparent dark:hover:text-blue-400 transition-colors {% if request.resolver_match.url_name|slice:':8' == 'profile_' or request.resolver_match.url_name == 'view_profile' or request.resolver_match.url_name == 'edit_profile' %}text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30{% endif %}">
+                                <i class="fas fa-user-circle mr-2"></i>Profile
+                            </a>
+                        </li>
+                        <li>
                             <a href="{% url 'account_logout' %}"
                                 class="flex items-center py-2 px-4 text-gray-900 rounded-lg hover:bg-gray-100 hover:text-red-600 dark:text-white dark:hover:bg-transparent dark:hover:text-red-400 transition-colors">
                                 <i class="fas fa-sign-out-alt mr-2"></i>Logout
@@ -90,9 +96,12 @@
                 
                 <!-- User Info (Desktop Only) -->
                 {% if user.is_authenticated %}
-                <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 ml-2">
-                    <i class="fas fa-user-circle text-lg"></i>
-                    <span class="font-medium">{{ user.username }}</span>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'view_profile' %}" 
+                       class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-user-circle text-lg"></i>
+                        <span class="font-medium">{{ user.username }}</span>
+                    </a>
                 </div>
                 {% endif %}
             </div>
@@ -169,6 +178,12 @@
                     </a>
                 </li>
                 {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'view_profile' %}"
+                        class="flex items-center py-3 md:py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 transition-colors touch-manipulation {% if request.resolver_match.url_name|slice:':8' == 'profile_' or request.resolver_match.url_name == 'view_profile' or request.resolver_match.url_name == 'edit_profile' %}bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %}">
+                        <i class="fas fa-user-circle mr-2"></i>Profile
+                    </a>
+                </li>
                 <li>
                     <a href="{% url 'account_logout' %}"
                         class="flex items-center py-3 md:py-2.5 px-4 text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 transition-colors touch-manipulation">

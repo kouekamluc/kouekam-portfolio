@@ -3,30 +3,70 @@ from .models import Profile, Project, Skill, Timeline, ProjectImage
 
 
 class ProfileForm(forms.ModelForm):
+    linkedin = forms.URLField(required=False, widget=forms.URLInput(attrs={
+        'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+        'placeholder': 'https://linkedin.com/in/yourprofile'
+    }))
+    github = forms.URLField(required=False, widget=forms.URLInput(attrs={
+        'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+        'placeholder': 'https://github.com/yourusername'
+    }))
+    twitter = forms.URLField(required=False, widget=forms.URLInput(attrs={
+        'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+        'placeholder': 'https://twitter.com/yourusername'
+    }))
+    website = forms.URLField(required=False, widget=forms.URLInput(attrs={
+        'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+        'placeholder': 'https://yourwebsite.com'
+    }))
+    
     class Meta:
         model = Profile
-        fields = ['bio', 'photo', 'tagline', 'cv_file', 'social_links']
+        fields = ['bio', 'photo', 'tagline', 'cv_file']
         widgets = {
             'bio': forms.Textarea(attrs={
-                'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
-                'rows': 4
+                'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+                'rows': 4,
+                'placeholder': 'Tell us about yourself...'
             }),
             'photo': forms.FileInput(attrs={
-                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
+                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none',
                 'accept': 'image/*'
             }),
             'tagline': forms.TextInput(attrs={
-                'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+                'class': 'input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400',
+                'placeholder': 'A short tagline about yourself'
             }),
             'cv_file': forms.FileInput(attrs={
-                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
+                'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none',
                 'accept': '.pdf,.doc,.docx'
             }),
-            'social_links': forms.TextInput(attrs={
-                'class': 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500',
-                'placeholder': '{"linkedin": "url", "github": "url"}'
-            }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            social_links = self.instance.social_links or {}
+            self.fields['linkedin'].initial = social_links.get('linkedin', '')
+            self.fields['github'].initial = social_links.get('github', '')
+            self.fields['twitter'].initial = social_links.get('twitter', '')
+            self.fields['website'].initial = social_links.get('website', '')
+    
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        social_links = {}
+        if self.cleaned_data.get('linkedin'):
+            social_links['linkedin'] = self.cleaned_data['linkedin']
+        if self.cleaned_data.get('github'):
+            social_links['github'] = self.cleaned_data['github']
+        if self.cleaned_data.get('twitter'):
+            social_links['twitter'] = self.cleaned_data['twitter']
+        if self.cleaned_data.get('website'):
+            social_links['website'] = self.cleaned_data['website']
+        profile.social_links = social_links
+        if commit:
+            profile.save()
+        return profile
 
 
 class ProjectForm(forms.ModelForm):
