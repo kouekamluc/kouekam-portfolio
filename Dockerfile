@@ -23,12 +23,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies (including netcat for health checks)
+# Install system dependencies (including netcat for health checks and Node.js for CSS building)
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     build-essential \
     libpq-dev \
     netcat-traditional \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Set work directory
@@ -43,6 +46,10 @@ COPY . .
 
 # Copy built CSS from node-builder stage
 COPY --from=node-builder /app/static/css/output.css ./static/css/output.css
+
+# Install npm dependencies for runtime CSS building (if needed)
+# Note: We need devDependencies for tailwindcss
+RUN npm ci --silent || echo "Note: npm ci failed, will try at runtime if needed"
 
 # Create necessary directories
 RUN mkdir -p staticfiles media logs
