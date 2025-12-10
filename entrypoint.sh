@@ -160,7 +160,22 @@ if getattr(settings, 'USE_S3', False):
             for obj in response['Contents'][:3]:
                 print(f"  - {obj['Key']}")
         else:
-            print("⚠ No admin CSS files found in S3 bucket (may still be uploading)")
+            print("⚠ No admin CSS files found in S3 bucket")
+            print("  → Attempting to force upload admin files...")
+            # Try force upload as fallback
+            try:
+                import subprocess
+                result = subprocess.run(['python', 'force_upload_admin_s3.py'], 
+                                      capture_output=True, text=True, timeout=300)
+                print(result.stdout)
+                if result.stderr:
+                    print("Errors:", result.stderr)
+                if result.returncode == 0:
+                    print("✓ Force upload completed")
+                else:
+                    print("⚠ Force upload had issues, but continuing...")
+            except Exception as e:
+                print(f"⚠ Could not run force upload: {e}")
     except Exception as e:
         print(f"⚠ Could not verify S3 files directly: {e}")
 else:
