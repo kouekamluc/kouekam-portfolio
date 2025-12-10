@@ -71,16 +71,26 @@ class Project(models.Model):
         verbose_name_plural = 'Projects'
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            from django.utils.text import slugify
-            base_slug = slugify(self.title)
-            self.slug = base_slug
-            # Handle duplicate slugs
-            counter = 1
-            while Project.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-                self.slug = f"{base_slug}-{counter}"
-                counter += 1
-        super().save(*args, **kwargs)
+        try:
+            if not self.slug and self.title:
+                from django.utils.text import slugify
+                base_slug = slugify(self.title)
+                if not base_slug:  # If title doesn't produce a valid slug
+                    base_slug = f"project-{self.id or 'new'}"
+                self.slug = base_slug
+                # Handle duplicate slugs
+                counter = 1
+                while Project.objects.filter(slug=self.slug).exclude(pk=self.pk if self.pk else None).exists():
+                    self.slug = f"{base_slug}-{counter}"
+                    counter += 1
+                    if counter > 100:  # Safety limit
+                        break
+            super().save(*args, **kwargs)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error saving project: {e}", exc_info=True)
+            raise
 
     def __str__(self):
         return self.title

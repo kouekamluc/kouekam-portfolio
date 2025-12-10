@@ -89,17 +89,39 @@ class ProjectAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         """Override save to handle tech_stack JSON field properly"""
-        # Ensure tech_stack is a list if it's a string
-        if isinstance(obj.tech_stack, str):
-            try:
-                import json
-                obj.tech_stack = json.loads(obj.tech_stack)
-            except (json.JSONDecodeError, ValueError):
-                # If it's not valid JSON, split by comma and create a list
-                obj.tech_stack = [item.strip() for item in obj.tech_stack.split(',') if item.strip()]
-        elif not isinstance(obj.tech_stack, list):
-            obj.tech_stack = []
-        super().save_model(request, obj, form, change)
+        try:
+            # Ensure tech_stack is a list if it's a string
+            if isinstance(obj.tech_stack, str):
+                try:
+                    import json
+                    obj.tech_stack = json.loads(obj.tech_stack)
+                except (json.JSONDecodeError, ValueError):
+                    # If it's not valid JSON, split by comma and create a list
+                    obj.tech_stack = [item.strip() for item in obj.tech_stack.split(',') if item.strip()]
+            elif obj.tech_stack is None:
+                obj.tech_stack = []
+            elif not isinstance(obj.tech_stack, list):
+                obj.tech_stack = []
+            
+            # Ensure slug is set before saving
+            if not obj.slug and obj.title:
+                from django.utils.text import slugify
+                base_slug = slugify(obj.title)
+                obj.slug = base_slug
+                # Handle duplicate slugs
+                counter = 1
+                while Project.objects.filter(slug=obj.slug).exclude(pk=obj.pk if obj.pk else None).exists():
+                    obj.slug = f"{base_slug}-{counter}"
+                    counter += 1
+                    if counter > 100:  # Safety limit
+                        break
+            
+            super().save_model(request, obj, form, change)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error saving project in admin: {e}", exc_info=True)
+            raise
 
 
 @admin.register(ProjectImage)
