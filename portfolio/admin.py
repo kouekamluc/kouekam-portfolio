@@ -273,6 +273,15 @@ class ProjectAdminForm(forms.ModelForm):
     def save(self, commit=True):
         try:
             instance = super().save(commit=False)
+            
+            # Ensure slug is generated before saving (model's save method will handle this)
+            # But we need to make sure title exists for slug generation
+            if not instance.slug and instance.title:
+                from django.utils.text import slugify
+                base_slug = slugify(instance.title)
+                if base_slug:
+                    instance.slug = base_slug
+            
             # Set tech_stack from the cleaned display field
             # Only access cleaned_data if form is valid
             if hasattr(self, 'cleaned_data') and self.cleaned_data:
@@ -290,7 +299,15 @@ class ProjectAdminForm(forms.ModelForm):
                     instance.tech_stack = []
             
             if commit:
-                instance.save()
+                try:
+                    instance.save()
+                except Exception as save_error:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Error saving Project instance in form: {save_error}", exc_info=True)
+                    # Re-raise to show error in admin
+                    raise
+            
             return instance
         except Exception as e:
             import logging

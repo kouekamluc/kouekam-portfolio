@@ -72,20 +72,42 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         try:
+            # Generate slug if not provided and title exists
             if not self.slug and self.title:
                 from django.utils.text import slugify
+                import uuid
+                
                 base_slug = slugify(self.title)
                 if not base_slug:  # If title doesn't produce a valid slug
-                    base_slug = f"project-{self.id or 'new'}"
-                self.slug = base_slug
-                # Handle duplicate slugs
+                    # Use a UUID-based slug as fallback
+                    base_slug = f"project-{uuid.uuid4().hex[:8]}"
+                
+                # Ensure slug is unique
+                original_slug = base_slug
                 counter = 1
-                while Project.objects.filter(slug=self.slug).exclude(pk=self.pk if self.pk else None).exists():
-                    self.slug = f"{base_slug}-{counter}"
+                # Check for duplicates, excluding current instance
+                while Project.objects.filter(slug=base_slug).exclude(pk=self.pk if self.pk else None).exists():
+                    base_slug = f"{original_slug}-{counter}"
                     counter += 1
-                    if counter > 100:  # Safety limit
+                    if counter > 1000:  # Safety limit
+                        # If we hit the limit, use UUID as last resort
+                        base_slug = f"{original_slug}-{uuid.uuid4().hex[:8]}"
                         break
+                
+                self.slug = base_slug
+            
+            # Call parent save
             super().save(*args, **kwargs)
+            
+            # If slug was still not set after save (shouldn't happen, but safety check)
+            if not self.slug and self.pk:
+                from django.utils.text import slugify
+                import uuid
+                base_slug = slugify(self.title) if self.title else f"project-{uuid.uuid4().hex[:8]}"
+                # Update slug directly in database to avoid recursion
+                Project.objects.filter(pk=self.pk).update(slug=base_slug)
+                self.slug = base_slug
+                
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
