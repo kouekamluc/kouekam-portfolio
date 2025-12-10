@@ -2,14 +2,19 @@
 set -e
 
 # Wait for PostgreSQL if DB_HOST is set (Docker Compose sets this)
+# Railway uses DATABASE_URL, so check for that too
 if [ -n "$DB_HOST" ]; then
     echo "Waiting for PostgreSQL at ${DB_HOST}:${DB_PORT:-5432}..."
     while ! nc -z ${DB_HOST} ${DB_PORT:-5432}; do
         sleep 0.1
     done
     echo "PostgreSQL started"
+elif [ -n "$DATABASE_URL" ]; then
+    echo "DATABASE_URL detected, using PostgreSQL (Railway/Heroku style)"
+    # Extract host from DATABASE_URL if needed for health check
+    # For Railway, the database is usually already available
 else
-    echo "No DB_HOST set, using SQLite database"
+    echo "No database configuration detected, using SQLite database"
 fi
 
 echo "Running migrations..."
@@ -54,6 +59,28 @@ fi
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
+
+# Verify CSS file was properly collected
+if [ -f "staticfiles/css/output.css" ]; then
+    CSS_SIZE=$(wc -c < staticfiles/css/output.css)
+    echo "✓ CSS collected to staticfiles ($CSS_SIZE bytes)"
+    if [ "$CSS_SIZE" -eq 0 ]; then
+        echo "⚠ WARNING: Collected CSS file is empty! This will cause a blank page."
+        echo "   Checking source file..."
+        if [ -f "static/css/output.css" ]; then
+            SOURCE_SIZE=$(wc -c < static/css/output.css)
+            echo "   Source CSS file size: $SOURCE_SIZE bytes"
+            if [ "$SOURCE_SIZE" -gt 0 ]; then
+                echo "   Attempting to manually copy CSS file..."
+                mkdir -p staticfiles/css
+                cp static/css/output.css staticfiles/css/output.css
+                echo "   CSS file manually copied"
+            fi
+        fi
+    fi
+else
+    echo "⚠ WARNING: CSS file not found in staticfiles directory"
+fi
 
 # Check ALLOWED_HOSTS configuration
 if [ -z "$ALLOWED_HOSTS" ] || [ "$ALLOWED_HOSTS" = "localhost,127.0.0.1" ]; then

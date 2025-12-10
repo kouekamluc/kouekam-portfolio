@@ -198,8 +198,10 @@ if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 else:
     # Use WhiteNoise for static files in production (if not using S3)
+    # Using CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
+    # to avoid manifest issues with CSS files
     if not DEBUG:
-        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
