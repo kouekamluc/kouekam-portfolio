@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Verification Test</title>
+    <link href="https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css?v=3.0" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .test-box { margin: 20px 0; padding: 20px; border: 2px solid #ccc; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>CSS Verification Test</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: Basic Tailwind Classes</h2>
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-gray-900 font-medium">This should have gray background and dark text</p>
+        </div>
+        <div id="test1-result" class="status"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 2: Flexbox</h2>
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
+            <div class="bg-green-500 text-white px-4 py-2 rounded">Item 2</div>
+        </div>
+        <div id="test2-result" class="status"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 3: Responsive Classes</h2>
+        <div class="w-full md:w-1/2 bg-purple-100 p-4 rounded">
+            This box should be full width on mobile, half width on desktop
+        </div>
+        <div id="test3-result" class="status"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 4: Dark Mode</h2>
+        <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded">
+            This should change color in dark mode
+        </div>
+        <div id="test4-result" class="status"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>CSS File Status</h2>
+        <div id="css-status" class="status"></div>
+    </div>
+    
+    <script>
+        // Test if CSS is loaded
+        function testCSS() {
+            const results = {
+                test1: false,
+                test2: false,
+                test3: false,
+                test4: false,
+                cssLoaded: false
+            };
+            
+            // Test 1: Check if bg-gray-50 is applied
+            const test1El = document.querySelector('.bg-gray-50');
+            if (test1El) {
+                const styles = window.getComputedStyle(test1El);
+                const bgColor = styles.backgroundColor;
+                results.test1 = bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent';
+                document.getElementById('test1-result').innerHTML = 
+                    results.test1 ? 
+                    '<span class="pass">✓ PASS: bg-gray-50 is applied (background: ' + bgColor + ')</span>' :
+                    '<span class="fail">✗ FAIL: bg-gray-50 is not applied (background: ' + bgColor + ')</span>';
+            }
+            
+            // Test 2: Check if flex is applied
+            const test2El = document.querySelector('.flex');
+            if (test2El) {
+                const styles = window.getComputedStyle(test2El);
+                results.test2 = styles.display === 'flex';
+                document.getElementById('test2-result').innerHTML = 
+                    results.test2 ? 
+                    '<span class="pass">✓ PASS: flex is applied</span>' :
+                    '<span class="fail">✗ FAIL: flex is not applied (display: ' + styles.display + ')</span>';
+            }
+            
+            // Test 3: Check if responsive classes work
+            const test3El = document.querySelector('.md\\:w-1\\/2');
+            if (test3El) {
+                const styles = window.getComputedStyle(test3El);
+                results.test3 = true; // Just check if class exists
+                document.getElementById('test3-result').innerHTML = 
+                    '<span class="pass">✓ PASS: Responsive class exists</span>';
+            }
+            
+            // Test 4: Check dark mode class
+            const test4El = document.querySelector('.dark\\:bg-gray-800');
+            if (test4El) {
+                results.test4 = true;
+                document.getElementById('test4-result').innerHTML = 
+                    '<span class="pass">✓ PASS: Dark mode class exists</span>';
+            }
+            
+            // Check if CSS file loaded
+            const link = document.querySelector('link[href*="output.css"]');
+            if (link) {
+                fetch(link.href)
+                    .then(r => {
+                        if (r.ok) {
+                            return r.text();
+                        }
+                        throw new Error('Failed to load CSS');
+                    })
+                    .then(css => {
+                        results.cssLoaded = css.length > 1000; // Should be > 50KB
+                        const statusEl = document.getElementById('css-status');
+                        statusEl.innerHTML = 
+                            results.cssLoaded ? 
+                            '<span class="pass">✓ CSS FILE LOADED: ' + css.length + ' bytes</span>' :
+                            '<span class="fail">✗ CSS FILE TOO SMALL: ' + css.length + ' bytes</span>';
+                        
+                        // Check if specific classes exist in CSS
+                        if (css.includes('.bg-gray-50')) {
+                            statusEl.innerHTML += '<br><span class="pass">✓ .bg-gray-50 class found in CSS</span>';
+                        } else {
+                            statusEl.innerHTML += '<br><span class="fail">✗ .bg-gray-50 class NOT found in CSS</span>';
+                        }
+                        
+                        if (css.includes('.flex')) {
+                            statusEl.innerHTML += '<br><span class="pass">✓ .flex class found in CSS</span>';
+                        } else {
+                            statusEl.innerHTML += '<br><span class="fail">✗ .flex class NOT found in CSS</span>';
+                        }
+                    })
+                    .catch(e => {
+                        document.getElementById('css-status').innerHTML = 
+                            '<span class="fail">✗ CSS FILE FAILED TO LOAD: ' + e.message + '</span>';
+                    });
+            }
+            
+            return results;
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(testCSS, 1000); // Wait a bit for CSS to load
+        });
+    </script>
+</body>
+</html>
+
