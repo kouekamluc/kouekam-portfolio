@@ -58,9 +58,18 @@ class StaticStorage(S3Boto3Storage):
     
     def url(self, name):
         """Override url method to ensure correct URL generation"""
+        # Ensure name doesn't include the location prefix (it's already in self.location)
+        # The storage location is 'static', so if name starts with 'static/', remove it
+        if name.startswith('static/'):
+            name = name[len('static/'):]
+        elif name.startswith('/static/'):
+            name = name[len('/static/'):]
+        
+        # Get the URL from the parent class
         url = super().url(name)
-        # Ensure the URL is correct - storage location is 'static', so name should be relative
-        # The super().url() should handle this, but let's make sure
+        
+        # Ensure the URL is correct - should be https://bucket.s3.region.amazonaws.com/static/name
+        # The super().url() should handle this, but let's verify
         return url
 
 
