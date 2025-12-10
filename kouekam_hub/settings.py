@@ -247,6 +247,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# Admin Email Configuration
+# Used for error reporting and admin notifications
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'kouekamkamgouluc@gmail.com')
+ADMINS = [
+    ('Admin', ADMIN_EMAIL),
+]
+MANAGERS = ADMINS
+
 # OpenAI API Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
