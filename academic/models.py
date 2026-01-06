@@ -24,6 +24,9 @@ class Course(models.Model):
         ordering = ['-created_at', 'name']
         verbose_name = 'Course'
         verbose_name_plural = 'Courses'
+        indexes = [
+            models.Index(fields=['user', 'status']),
+        ]
     
     def __str__(self):
         return f"{self.code} - {self.name}" if self.code else self.name

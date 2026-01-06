@@ -28,8 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-h$+#bnfje2#6663qlvaktl1zr@j%8(8(%=3&_e!2@k30!gg9ia")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Force DEBUG=False in production (Railway sets DEBUG=False by default)
-DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
+# Default to True for local development, but allow override via environment variable
+# In production (Railway/Heroku), set DEBUG=False in environment variables
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes', 'on')
 
 # Parse ALLOWED_HOSTS from environment variable
 # Strip whitespace and filter out empty strings
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
+    "rest_framework",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -58,6 +60,8 @@ INSTALLED_APPS = [
     "business",
     "journal",
     "blog",
+    "notifications",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -255,6 +259,16 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Caching Configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+# Cache timeout (in seconds)
+CACHE_TIMEOUT = 300  # 5 minutes
+
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
@@ -296,6 +310,18 @@ MANAGERS = ADMINS
 
 # OpenAI API Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+
+# Django REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
 
 # Django Allauth Settings
 # Updated settings for django-allauth 0.57+

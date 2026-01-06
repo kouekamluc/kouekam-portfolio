@@ -38,7 +38,7 @@
                     {% if project.image %}
                     <div class="relative overflow-hidden rounded-t-lg h-48">
                         <img class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
-                            src="{{ project.image.url }}" alt="{{ project.title }}">
+                            src="{{ project.image.url }}" alt="{{ project.title }}" loading="lazy">
                     </div>
                     {% else %}
                     <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">

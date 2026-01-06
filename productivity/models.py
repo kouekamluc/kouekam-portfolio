@@ -28,6 +28,10 @@ class Task(models.Model):
         ordering = ['due_date', '-priority', '-created_at']
         verbose_name = 'Task'
         verbose_name_plural = 'Tasks'
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['user', 'due_date']),
+        ]
 
     def __str__(self):
         return self.title

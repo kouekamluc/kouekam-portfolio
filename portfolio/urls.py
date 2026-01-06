@@ -11,5 +11,6 @@ urlpatterns = [
     path('projects/<slug:slug>/', views.project_detail, name='project_detail'),
     path('profile/', views.view_profile, name='view_profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('search/', views.search, name='search'),
     path('debug/static-url/', views.debug_static_url, name='debug_static_url'),
 ]

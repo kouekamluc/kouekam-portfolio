@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from datetime import datetime, timedelta
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from io import BytesIO
 from .models import JournalEntry, Philosophy, VisionGoal, LifeLesson
 from .forms import JournalEntryForm, PhilosophyForm, VisionGoalForm, LifeLessonForm
 
@@ -13,10 +19,40 @@ def journal_dashboard(request):
     recent_philosophies = Philosophy.objects.filter(user=request.user).order_by('-date_written')[:3]
     active_goals = VisionGoal.objects.filter(user=request.user).order_by('target_date')[:5]
     
+    # Journal analytics
+    all_entries = JournalEntry.objects.filter(user=request.user)
+    total_entries = all_entries.count()
+    
+    # Mood distribution
+    mood_counts = {}
+    for entry in all_entries.filter(mood__isnull=False):
+        mood_counts[entry.mood] = mood_counts.get(entry.mood, 0) + 1
+    
+    # Energy level distribution
+    energy_counts = {}
+    for entry in all_entries.filter(energy_level__isnull=False):
+        energy_counts[entry.energy_level] = energy_counts.get(entry.energy_level, 0) + 1
+    
+    # Entries over time (last 30 days)
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    entries_over_time = {}
+    for entry in all_entries.filter(date__gte=thirty_days_ago):
+        date_str = entry.date.isoformat()
+        entries_over_time[date_str] = entries_over_time.get(date_str, 0) + 1
+    
+    # Vision goal progress
+    goal_progress_data = [g.progress for g in VisionGoal.objects.filter(user=request.user)]
+    avg_goal_progress = sum(goal_progress_data) / len(goal_progress_data) if goal_progress_data else 0
+    
     context = {
         'recent_entries': recent_entries,
         'recent_philosophies': recent_philosophies,
         'active_goals': active_goals,
+        'total_entries': total_entries,
+        'mood_counts': mood_counts,
+        'energy_counts': energy_counts,
+        'entries_over_time': entries_over_time,
+        'avg_goal_progress': round(avg_goal_progress, 1),
     }
     return render(request, 'journal/journal_dashboard.html', context)
 
@@ -229,3 +265,84 @@ def life_lessons_update(request, lesson_id):
     else:
         form = LifeLessonForm(instance=lesson)
     return render(request, 'journal/life_lessons_form.html', {'form': form, 'lesson': lesson, 'form_type': 'Update'})
+
+
+@login_required
+def export_journal_pdf(request):
+    """Export journal entries as PDF"""
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+        from reportlab.lib.enums import TA_CENTER
+        from io import BytesIO
+    except ImportError:
+        messages.error(request, 'ReportLab is required for PDF export. Please install it: pip install reportlab')
+        return redirect('journal_dashboard')
+    
+    entries = JournalEntry.objects.filter(user=request.user).order_by('-date')
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Title
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor='#1e40af',
+        spaceAfter=30,
+        alignment=TA_CENTER
+    )
+    story.append(Paragraph("Journal Entries", title_style))
+    story.append(Spacer(1, 0.2*inch))
+    
+    # Entries
+    for entry in entries:
+        # Date header
+        date_style = ParagraphStyle(
+            'DateStyle',
+            parent=styles['Heading2'],
+            fontSize=16,
+            textColor='#374151',
+            spaceAfter=12,
+            spaceBefore=20
+        )
+        story.append(Paragraph(f"{entry.date.strftime('%B %d, %Y')}", date_style))
+        
+        # Mood and energy
+        if entry.mood or entry.energy_level:
+            info_text = []
+            if entry.mood:
+                info_text.append(f"Mood: {entry.get_mood_display()}")
+            if entry.energy_level:
+                info_text.append(f"Energy: {entry.get_energy_level_display()}")
+            story.append(Paragraph(" | ".join(info_text), styles['Normal']))
+            story.append(Spacer(1, 0.1*inch))
+        
+        # Content
+        content_style = ParagraphStyle(
+            'ContentStyle',
+            parent=styles['Normal'],
+            fontSize=11,
+            spaceAfter=15,
+            leftIndent=0.2*inch
+        )
+        story.append(Paragraph(entry.content.replace('\n', '<br/>'), content_style))
+        
+        # Tags
+        if entry.tags:
+            story.append(Paragraph(f"Tags: {entry.tags}", styles['Italic']))
+        
+        story.append(Spacer(1, 0.2*inch))
+        story.append(PageBreak())
+    
+    doc.build(story)
+    buffer.seek(0)
+    
+    response = HttpResponse(buffer.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="journal_entries_{timezone.now().date()}.pdf"'
+    return response

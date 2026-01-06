@@ -1,0 +1,25 @@
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | migrations
+  | __pycache__
+  | staticfiles
+  | media
+)/
+'''
+
+[tool.pylint.messages_control]
+max-line-length = 100
+ignore = ["migrations"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["migrations", "venv", ".venv", "env", ".env", "node_modules", "staticfiles", "media"]
+

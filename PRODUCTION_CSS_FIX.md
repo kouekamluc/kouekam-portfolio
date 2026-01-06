@@ -119,3 +119,5 @@ gunicorn -c gunicorn_config.py kouekam_hub.wsgi:application
 
 Visit `http://localhost:8000` and verify styling is applied.
 
+
+

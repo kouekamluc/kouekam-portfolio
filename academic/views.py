@@ -27,11 +27,40 @@ def dashboard(request):
     # Recent study sessions
     recent_sessions = StudySession.objects.filter(course__user=request.user).order_by('-date')[:5]
     
+    # Study analytics
+    all_sessions = StudySession.objects.filter(course__user=request.user)
+    total_study_time = sum(s.duration_minutes for s in all_sessions)
+    total_study_hours = round(total_study_time / 60, 1) if total_study_time > 0 else 0
+    
+    # Study time by course
+    study_time_by_course = {}
+    for session in all_sessions:
+        course_name = session.course.name
+        study_time_by_course[course_name] = study_time_by_course.get(course_name, 0) + session.duration_minutes
+    
+    # Study sessions over time (last 30 days)
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    recent_sessions_data = {}
+    for session in all_sessions.filter(date__gte=thirty_days_ago):
+        date_str = session.date.isoformat()
+        recent_sessions_data[date_str] = recent_sessions_data.get(date_str, 0) + session.duration_minutes
+    
+    # Course status breakdown
+    course_status_data = {
+        'ongoing': courses.filter(status='ongoing').count(),
+        'completed': courses.filter(status='completed').count(),
+        'dropped': courses.filter(status='dropped').count(),
+    }
+    
     context = {
         'courses': courses,
         'gpa': round(gpa, 2),
         'total_credits': total_credits,
         'recent_sessions': recent_sessions,
+        'total_study_hours': total_study_hours,
+        'study_time_by_course': study_time_by_course,
+        'recent_sessions_data': recent_sessions_data,
+        'course_status_data': course_status_data,
     }
     return render(request, 'academic/dashboard.html', context)
 

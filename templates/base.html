@@ -297,6 +297,22 @@
         
         {% block content %}
         {% endblock %}
+        
+        {% if user.is_authenticated %}
+        <script>
+            // Load unread notification count
+            fetch('{% url "notification_unread_count" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notification-badge');
+                    if (badge && data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.classList.remove('hidden');
+                    }
+                })
+                .catch(error => console.error('Error loading notification count:', error));
+        </script>
+        {% endif %}
     </main>
 
     {% include 'components/footer.html' %}

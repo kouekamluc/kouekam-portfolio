@@ -131,3 +131,5 @@ After configuring CORS, you can verify it's working by:
 - The `AllowedOrigins` includes your production domain and localhost for development
 - `MaxAgeSeconds: 3000` means browsers will cache the CORS preflight response for 50 minutes
 
+
+

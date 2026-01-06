@@ -5,8 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 from django.templatetags.static import static
+from django.db.models import Q
 from .models import Profile, Timeline, Skill, Project
 from .forms import ProfileForm
+from blog.models import BlogPost
+from academic.models import Note
 
 def home(request):
     profile = Profile.objects.first() # Simplification for single-user portfolio
@@ -184,3 +187,43 @@ def debug_static_url(request):
         'urls_match': rendered_url == 'https://kouekam-hub-assets.s3.eu-north-1.amazonaws.com/static/css/output.css',
         'note': 'Check if css_url_from_template matches expected_url and css_exists_in_s3 is True',
     })
+
+
+def search(request):
+    """Global search across blog posts, projects, and notes"""
+    query = request.GET.get('q', '').strip()
+    results = {
+        'blog_posts': [],
+        'projects': [],
+        'notes': [],
+    }
+    
+    if query:
+        # Search blog posts (public)
+        blog_posts = BlogPost.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        ).order_by('-published_date', '-created_at')[:10]
+        results['blog_posts'] = blog_posts
+        
+        # Search projects (public)
+        projects = Project.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query) | 
+            Q(category__icontains=query)
+        ).filter(status__in=['active', 'completed']).order_by('-created_at')[:10]
+        results['projects'] = projects
+        
+        # Search notes (only for authenticated users, their own notes)
+        if request.user.is_authenticated:
+            notes = Note.objects.filter(
+                course__user=request.user
+            ).filter(
+                Q(title__icontains=query) | Q(content__icontains=query)
+            ).order_by('-updated_at')[:10]
+            results['notes'] = notes
+    
+    context = {
+        'query': query,
+        'results': results,
+        'total_results': sum(len(v) for v in results.values()),
+    }
+    return render(request, 'portfolio/search_results.html', context)

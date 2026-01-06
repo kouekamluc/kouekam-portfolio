@@ -111,3 +111,5 @@ if __name__ == '__main__':
     success = update_bucket_policy()
     sys.exit(0 if success else 1)
 
+
+

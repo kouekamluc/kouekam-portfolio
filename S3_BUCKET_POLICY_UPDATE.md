@@ -78,3 +78,5 @@ Replace your entire bucket policy with this:
 
 This makes all files in the `media/` folder publicly readable. This is necessary for profile photos and project images to display on your website. If you need to keep some media files private, you'll need a more complex policy or use signed URLs.
 
+
+

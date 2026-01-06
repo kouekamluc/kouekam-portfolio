@@ -94,3 +94,5 @@ After fix:
 - ✅ `/static/admin/css/base.css` returns CSS content
 - ✅ Admin interface looks normal (not unstyled)
 
+
+

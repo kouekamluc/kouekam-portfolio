@@ -17,7 +17,10 @@ urlpatterns = [
     path('life-lessons/', views.life_lessons_list, name='life_lessons_list'),
     path('life-lessons/create/', views.life_lessons_create, name='life_lessons_create'),
     path('life-lessons/<int:lesson_id>/update/', views.life_lessons_update, name='life_lessons_update'),
+    path('export/pdf/', views.export_journal_pdf, name='export_journal_pdf'),
 ]
+
+
 
 
 

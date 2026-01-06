@@ -147,3 +147,5 @@ def fix_admin_static():
 if __name__ == '__main__':
     sys.exit(fix_admin_static())
 
+
+

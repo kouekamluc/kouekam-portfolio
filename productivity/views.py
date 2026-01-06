@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from datetime import datetime, timedelta
 from decimal import Decimal
 import json
+import csv
 from .models import Task, Habit, Goal, Document, Timetable, Transaction, Milestone
 from .forms import TaskForm, HabitForm, GoalForm, TransactionForm, TimetableForm, DocumentForm, MilestoneForm
 
@@ -15,11 +16,36 @@ def productivity_dashboard(request):
     habits = Habit.objects.filter(user=request.user)
     goals = Goal.objects.filter(user=request.user)
     
+    # Analytics data
+    all_tasks = Task.objects.filter(user=request.user)
+    total_tasks = all_tasks.count()
+    completed_tasks = all_tasks.filter(status='done').count()
+    completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+    
+    # Task status breakdown
+    task_status_data = {
+        'todo': all_tasks.filter(status='todo').count(),
+        'in_progress': all_tasks.filter(status='in_progress').count(),
+        'done': completed_tasks,
+    }
+    
+    # Habit streak data
+    habit_streaks = [h.current_streak for h in habits]
+    avg_streak = sum(habit_streaks) / len(habit_streaks) if habit_streaks else 0
+    
+    # Goal progress data
+    goal_progress = [g.progress for g in goals]
+    avg_goal_progress = sum(goal_progress) / len(goal_progress) if goal_progress else 0
+    
     context = {
         'tasks': tasks,
         'habits': habits,
         'goals': goals,
-        'today': timezone.now().date()
+        'today': timezone.now().date(),
+        'completion_rate': round(completion_rate, 1),
+        'task_status_data': task_status_data,
+        'avg_streak': round(avg_streak, 1),
+        'avg_goal_progress': round(avg_goal_progress, 1),
     }
     return render(request, 'productivity/dashboard.html', context)
 
@@ -413,3 +439,26 @@ def document_delete(request, document_id):
         messages.success(request, 'Document deleted successfully!')
         return redirect('document_list')
     return render(request, 'productivity/document_confirm_delete.html', {'document': document})
+
+
+@login_required
+def export_finance_csv(request):
+    """Export financial transactions as CSV"""
+    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="finance_export_{timezone.now().date()}.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'Type', 'Category', 'Amount', 'Description'])
+    
+    for transaction in transactions:
+        writer.writerow([
+            transaction.date.strftime('%Y-%m-%d'),
+            transaction.get_type_display(),
+            transaction.get_category_display(),
+            str(transaction.amount),
+            transaction.description
+        ])
+    
+    return response

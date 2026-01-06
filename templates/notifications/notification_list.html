@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 mt-20">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+            {% if notifications %}
+            <form method="post" action="{% url 'notification_mark_all_read' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-check-double mr-2"></i>Mark All as Read
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if notifications %}
+        <div class="space-y-4">
+            {% for notification in notifications %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 {% if not notification.read %}border-l-4 border-blue-600{% endif %}">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ notification.title }}
+                            </h3>
+                            {% if not notification.read %}
+                            <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
+                                New
+                            </span>
+                            {% endif %}
+                            <span class="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                                {{ notification.get_type_display }}
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 mb-3">{{ notification.message }}</p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <span><i class="fas fa-clock mr-1"></i>{{ notification.created_at|timesince }} ago</span>
+                            {% if notification.related_url %}
+                            <a href="{{ notification.related_url }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                <i class="fas fa-external-link-alt mr-1"></i>View
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if not notification.read %}
+                    <form method="post" action="{% url 'notification_read' notification.id %}" class="ml-4">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <i class="fas fa-check mr-1"></i>Mark Read
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-bell-slash text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No notifications</h3>
+            <p class="text-gray-600 dark:text-gray-400">
+                You're all caught up! Check back later for updates.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

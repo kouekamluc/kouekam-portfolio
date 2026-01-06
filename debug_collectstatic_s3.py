@@ -124,3 +124,5 @@ print("   5. Check if STATICFILES_STORAGE is actually being used")
 
 print("\n" + "=" * 70)
 
+
+
