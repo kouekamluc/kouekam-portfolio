@@ -121,37 +121,76 @@ def fix_migration_inconsistency():
             print(f"Sites migration recorded: {sites_migration_exists}")
             print(f"Socialaccount migrations recorded: {socialaccount_migration_count} (0001_initial: {socialaccount_0001_exists})")
             
-            # Case 1: Any socialaccount migrations are applied but socialaccount.0001_initial is not
+            # Case 1: Socialaccount tables exist but no migrations are recorded
+            # This happens when we removed migration entries but tables still exist
+            if socialaccount_table_exists and socialaccount_migration_count == 0:
+                print("\n⚠️  Migration inconsistency detected!")
+                print("   Socialaccount tables exist but no migrations are recorded.")
+                print("   Fixing by faking socialaccount migrations...")
+                
+                try:
+                    # Fake the initial migration (and all subsequent ones will be handled by migrate)
+                    call_command('migrate', 'socialaccount', '--fake-initial', verbosity=1)
+                    print("✓ Successfully faked socialaccount migrations")
+                    return True
+                except Exception as e:
+                    print(f"✗ Error faking socialaccount migrations: {e}")
+                    print("   Will try to fake initial migration only...")
+                    try:
+                        call_command('migrate', 'socialaccount', '0001_initial', '--fake', verbosity=1)
+                        print("✓ Successfully faked socialaccount.0001_initial migration")
+                        return True
+                    except Exception as e2:
+                        print(f"✗ Error faking socialaccount.0001_initial: {e2}")
+                        import traceback
+                        traceback.print_exc()
+                        return False
+            
+            # Case 2: Any socialaccount migrations are applied but socialaccount.0001_initial is not
             # This includes cases like 0002_token_max_lengths before 0001_initial
-            if socialaccount_migration_count > 0 and not socialaccount_0001_exists:
+            elif socialaccount_migration_count > 0 and not socialaccount_0001_exists:
                 print("\n⚠️  Migration inconsistency detected!")
                 print(f"   {socialaccount_migration_count} socialaccount migration(s) are marked as applied,")
                 print("   but socialaccount.0001_initial is not marked.")
-                print("   Removing all socialaccount migration entries to fix dependency order...")
                 
-                try:
-                    with transaction.atomic():
-                        # Remove ALL socialaccount migration entries
-                        cursor.execute("""
-                            DELETE FROM django_migrations 
-                            WHERE app = 'socialaccount';
-                        """)
-                        deleted = cursor.rowcount
-                        
-                        if deleted > 0:
-                            print(f"✓ Successfully removed {deleted} socialaccount migration entry/entries")
-                            print("  (Migrations will run in correct order on next migrate)")
-                            return True
-                        else:
-                            print("⚠ Warning: No socialaccount migration entries found")
-                            return True
-                except Exception as e:
-                    print(f"✗ Error removing socialaccount migration entries: {e}")
-                    import traceback
-                    traceback.print_exc()
-                    return False
+                if socialaccount_table_exists:
+                    # Tables exist, so we should fake the 0001_initial migration
+                    print("   Socialaccount tables exist. Fixing by faking socialaccount.0001_initial migration...")
+                    try:
+                        call_command('migrate', 'socialaccount', '0001_initial', '--fake', verbosity=1)
+                        print("✓ Successfully faked socialaccount.0001_initial migration")
+                        return True
+                    except Exception as e:
+                        print(f"✗ Error faking socialaccount.0001_initial migration: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        return False
+                else:
+                    # Tables don't exist, so we can safely remove the migration entries
+                    print("   Removing all socialaccount migration entries to fix dependency order...")
+                    try:
+                        with transaction.atomic():
+                            # Remove ALL socialaccount migration entries
+                            cursor.execute("""
+                                DELETE FROM django_migrations 
+                                WHERE app = 'socialaccount';
+                            """)
+                            deleted = cursor.rowcount
+                            
+                            if deleted > 0:
+                                print(f"✓ Successfully removed {deleted} socialaccount migration entry/entries")
+                                print("  (Migrations will run in correct order on next migrate)")
+                                return True
+                            else:
+                                print("⚠ Warning: No socialaccount migration entries found")
+                                return True
+                    except Exception as e:
+                        print(f"✗ Error removing socialaccount migration entries: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        return False
             
-            # Case 2: socialaccount.0001_initial is applied but sites.0001_initial is not
+            # Case 3: socialaccount.0001_initial is applied but sites.0001_initial is not
             elif socialaccount_0001_exists and not sites_migration_exists:
                 print("\n⚠️  Migration inconsistency detected!")
                 print("   socialaccount.0001_initial is marked as applied,")
@@ -201,7 +240,7 @@ def fix_migration_inconsistency():
                         traceback.print_exc()
                         return False
             
-            # Case 3: Sites tables exist but migration is not recorded
+            # Case 4: Sites tables exist but migration is not recorded
             elif site_table_exists and not sites_migration_exists:
                 print("\n⚠️  Migration inconsistency detected!")
                 print("   Sites tables exist but sites.0001_initial migration is not recorded.")
@@ -216,7 +255,7 @@ def fix_migration_inconsistency():
                     traceback.print_exc()
                     return False
             
-            # Case 4: Everything is consistent
+            # Case 5: Everything is consistent
             elif not site_table_exists and not sites_migration_exists:
                 print("✓ Sites tables don't exist yet - will be created by migrations")
                 return True
