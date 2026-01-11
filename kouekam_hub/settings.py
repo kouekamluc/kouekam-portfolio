@@ -308,6 +308,12 @@ ADMINS = [
 ]
 MANAGERS = ADMINS
 
+# Brevo (formerly Sendinblue) Email Service Configuration
+BREVO_API_KEY = os.getenv('BREVO_API_KEY', '')
+BREVO_SENDER_EMAIL = os.getenv('BREVO_SENDER_EMAIL', DEFAULT_FROM_EMAIL)
+BREVO_SENDER_NAME = os.getenv('BREVO_SENDER_NAME', 'Kouekam Portfolio')
+BREVO_CONTACT_RECIPIENT_EMAIL = os.getenv('BREVO_CONTACT_RECIPIENT_EMAIL', ADMIN_EMAIL)
+
 # OpenAI API Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 

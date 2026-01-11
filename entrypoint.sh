@@ -25,6 +25,16 @@ python create_superuser.py
 
 echo "✓ Using Tailwind CSS CDN (no build step needed)"
 
+# Verify Brevo SDK is installed
+python << EOF >/dev/null 2>&1
+try:
+    import sib_api_v3_sdk
+    print("OK: Brevo SDK installed and ready")
+except ImportError:
+    import sys
+    print("WARNING: Brevo SDK not found! Contact form emails may not work.", file=sys.stderr)
+EOF
+
 # Check if using S3 (case-insensitive check)
 USE_S3_RAW=$(echo "${USE_S3:-False}" | tr '[:upper:]' '[:lower:]')
 if [ "$USE_S3_RAW" = "true" ] || [ "$USE_S3_RAW" = "1" ] || [ "$USE_S3_RAW" = "yes" ]; then

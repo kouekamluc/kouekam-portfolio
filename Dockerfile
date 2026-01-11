@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 # Set work directory
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies (including Brevo SDK for email service)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -2,12 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.conf import settings
 from django.templatetags.static import static
 from django.db.models import Q
 from .models import Profile, Timeline, Skill, Project
 from .forms import ProfileForm
+from .email_utils import send_contact_form_email
 from blog.models import BlogPost
 from academic.models import Note
 
@@ -58,16 +58,18 @@ def contact(request):
         
         if name and email and message:
             try:
-                send_mail(
-                    subject=f'Contact Form: {subject}',
-                    message=f'From: {name} ({email})\n\n{message}',
-                    from_email=settings.DEFAULT_FROM_EMAIL or email,
-                    recipient_list=[settings.DEFAULT_FROM_EMAIL or 'admin@example.com'],
-                    fail_silently=False,
-                )
-                messages.success(request, 'Thank you! Your message has been sent successfully.')
-                return HttpResponseRedirect(request.path)
+                # Send email via Brevo
+                success = send_contact_form_email(name, email, subject, message)
+                
+                if success:
+                    messages.success(request, 'Thank you! Your message has been sent successfully.')
+                    return HttpResponseRedirect(request.path)
+                else:
+                    messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
             except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error in contact form: {str(e)}", exc_info=True)
                 messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
         else:
             messages.error(request, 'Please fill in all required fields.')
