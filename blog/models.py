@@ -29,10 +29,21 @@ class BlogPost(models.Model):
 
     class Meta:
         ordering = ['-published_date', '-created_at']
+        
+    def get_ordering_value(self):
+        """Helper to get ordering value for posts with NULL published_date"""
+        return self.published_date or self.created_at
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            # Handle slug collisions
+            while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk if self.pk else None).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):

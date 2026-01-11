@@ -52,34 +52,41 @@ def blog_create(request):
     if request.method == 'POST':
         form = BlogPostForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            if request.POST.get('publish'):
-                post.published_date = timezone.now()
-            post.save()
-            
-            if post.published_date:
-                messages.success(request, 'Blog post published!')
-            else:
-                messages.success(request, 'Blog post saved as draft!')
-            
-            # Handle code snippets separately if needed
-            snippet_titles = request.POST.getlist('snippet_title')
-            snippet_languages = request.POST.getlist('snippet_language')
-            snippet_codes = request.POST.getlist('snippet_code')
-            snippet_descriptions = request.POST.getlist('snippet_description')
-            
-            for title, language, code, description in zip(snippet_titles, snippet_languages, snippet_codes, snippet_descriptions):
-                if title and code:
-                    CodeSnippet.objects.create(
-                        blog_post=post,
-                        title=title,
-                        language=language or 'python',
-                        code=code,
-                        description=description or '',
-                    )
-            
-            return redirect('blog_detail', slug=post.slug)
+            try:
+                post = form.save(commit=False)
+                post.author = request.user
+                if request.POST.get('publish'):
+                    post.published_date = timezone.now()
+                post.save()
+                
+                if post.published_date:
+                    messages.success(request, 'Blog post published!')
+                else:
+                    messages.success(request, 'Blog post saved as draft!')
+                
+                # Handle code snippets separately if needed
+                snippet_titles = request.POST.getlist('snippet_title')
+                snippet_languages = request.POST.getlist('snippet_language')
+                snippet_codes = request.POST.getlist('snippet_code')
+                snippet_descriptions = request.POST.getlist('snippet_description')
+                
+                for title, language, code, description in zip(snippet_titles, snippet_languages, snippet_codes, snippet_descriptions):
+                    if title and code:
+                        CodeSnippet.objects.create(
+                            blog_post=post,
+                            title=title,
+                            language=language or 'python',
+                            code=code,
+                            description=description or '',
+                        )
+                
+                return redirect('blog_detail', slug=post.slug)
+            except Exception as e:
+                messages.error(request, f'An error occurred while saving the post: {str(e)}')
+                # Log the error for debugging
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error creating blog post: {str(e)}', exc_info=True)
     else:
         form = BlogPostForm()
     return render(request, 'blog/blog_form.html', {'form': form, 'form_type': 'Create'})
@@ -91,30 +98,37 @@ def blog_update(request, slug):
     if request.method == 'POST':
         form = BlogPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
-            post = form.save(commit=False)
-            if request.POST.get('publish') and not post.published_date:
-                post.published_date = timezone.now()
-            post.save()
-            
-            # Update code snippets (simplified - delete and recreate)
-            post.code_snippets.all().delete()
-            snippet_titles = request.POST.getlist('snippet_title')
-            snippet_languages = request.POST.getlist('snippet_language')
-            snippet_codes = request.POST.getlist('snippet_code')
-            snippet_descriptions = request.POST.getlist('snippet_description')
-            
-            for title, language, code, description in zip(snippet_titles, snippet_languages, snippet_codes, snippet_descriptions):
-                if title and code:
-                    CodeSnippet.objects.create(
-                        blog_post=post,
-                        title=title,
-                        language=language or 'python',
-                        code=code,
-                        description=description or '',
-                    )
-            
-            messages.success(request, 'Blog post updated!')
-            return redirect('blog_detail', slug=post.slug)
+            try:
+                post = form.save(commit=False)
+                if request.POST.get('publish') and not post.published_date:
+                    post.published_date = timezone.now()
+                post.save()
+                
+                # Update code snippets (simplified - delete and recreate)
+                post.code_snippets.all().delete()
+                snippet_titles = request.POST.getlist('snippet_title')
+                snippet_languages = request.POST.getlist('snippet_language')
+                snippet_codes = request.POST.getlist('snippet_code')
+                snippet_descriptions = request.POST.getlist('snippet_description')
+                
+                for title, language, code, description in zip(snippet_titles, snippet_languages, snippet_codes, snippet_descriptions):
+                    if title and code:
+                        CodeSnippet.objects.create(
+                            blog_post=post,
+                            title=title,
+                            language=language or 'python',
+                            code=code,
+                            description=description or '',
+                        )
+                
+                messages.success(request, 'Blog post updated!')
+                return redirect('blog_detail', slug=post.slug)
+            except Exception as e:
+                messages.error(request, f'An error occurred while updating the post: {str(e)}')
+                # Log the error for debugging
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error updating blog post: {str(e)}', exc_info=True)
     else:
         form = BlogPostForm(instance=post)
     
