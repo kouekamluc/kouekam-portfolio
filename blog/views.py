@@ -124,8 +124,14 @@ def blog_update(request, slug):
         if form.is_valid():
             try:
                 post = form.save(commit=False)
-                if request.POST.get('publish') and not post.published_date:
+                # Handle publish/unpublish
+                was_published = bool(post.published_date)
+                if request.POST.get('publish'):
+                    # Always set published_date when publish is clicked
                     post.published_date = timezone.now()
+                elif request.POST.get('unpublish'):
+                    # If clicking unpublish, clear published_date
+                    post.published_date = None
                 post.save()
                 
                 # Update code snippets (simplified - delete and recreate)
@@ -145,7 +151,17 @@ def blog_update(request, slug):
                             description=description or '',
                         )
                 
-                messages.success(request, 'Blog post updated!')
+                # Show appropriate message
+                if request.POST.get('publish'):
+                    if was_published:
+                        messages.success(request, 'Blog post updated and republished!')
+                    else:
+                        messages.success(request, 'Blog post published successfully!')
+                elif request.POST.get('unpublish'):
+                    messages.success(request, 'Blog post unpublished and saved as draft!')
+                else:
+                    messages.success(request, 'Blog post updated!')
+                
                 return redirect('blog_detail', slug=post.slug)
             except Exception as e:
                 messages.error(request, f'An error occurred while updating the post: {str(e)}')
