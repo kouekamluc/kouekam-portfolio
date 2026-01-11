@@ -39,28 +39,40 @@ def send_email_via_brevo(subject, message, recipient_email, recipient_name=None,
     Returns:
         bool: True if email was sent successfully, False otherwise
     """
-    # Check if Brevo SDK is available
-    if not BREVO_SDK_AVAILABLE:
-        error_msg = "Brevo SDK is not installed. Please install sib-api-v3-sdk package."
-        logger.error(error_msg)
-        print(f"ERROR: {error_msg}", file=sys.stderr)
-        return False
-    
-    # Check if Brevo API key is configured
-    brevo_api_key = getattr(settings, 'BREVO_API_KEY', None)
-    if not brevo_api_key:
-        error_msg = "BREVO_API_KEY is not configured in environment variables. Cannot send email."
-        logger.error(error_msg)
-        print(f"ERROR: {error_msg}", file=sys.stderr)
-        return False
-    
     try:
-        # Configure Brevo API client
-        configuration = Configuration()
-        configuration.api_key['api-key'] = brevo_api_key
+        # Check if Brevo SDK is available
+        if not BREVO_SDK_AVAILABLE or Configuration is None:
+            error_msg = "Brevo SDK is not installed. Please install sib-api-v3-sdk package."
+            logger.error(error_msg)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
         
-        api_client = ApiClient(configuration)
-        api_instance = TransactionalEmailsApi(api_client)
+        # Check if Brevo API key is configured
+        brevo_api_key = getattr(settings, 'BREVO_API_KEY', None)
+        if not brevo_api_key:
+            error_msg = "BREVO_API_KEY is not configured in environment variables. Cannot send email."
+            logger.error(error_msg)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
+        
+        # Configure Brevo API client
+        try:
+            configuration = Configuration()
+            configuration.api_key['api-key'] = brevo_api_key
+        except Exception as e:
+            error_msg = f"Failed to configure Brevo API client: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
+        
+        try:
+            api_client = ApiClient(configuration)
+            api_instance = TransactionalEmailsApi(api_client)
+        except Exception as e:
+            error_msg = f"Failed to create Brevo API instance: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
         
         # Set sender information
         sender_email = sender_email or getattr(settings, 'BREVO_SENDER_EMAIL', None)
@@ -73,25 +85,31 @@ def send_email_via_brevo(subject, message, recipient_email, recipient_name=None,
             return False
         
         # Create sender object
-        sender = SendSmtpEmailSender(
-            email=sender_email,
-            name=sender_name
-        )
-        
-        # Create recipient object
-        recipient = SendSmtpEmailTo(
-            email=recipient_email,
-            name=recipient_name or recipient_email
-        )
-        
-        # Create email object
-        send_smtp_email = SendSmtpEmail(
-            sender=sender,
-            to=[recipient],
-            subject=subject,
-            html_content=None,
-            text_content=message
-        )
+        try:
+            sender = SendSmtpEmailSender(
+                email=sender_email,
+                name=sender_name
+            )
+            
+            # Create recipient object
+            recipient = SendSmtpEmailTo(
+                email=recipient_email,
+                name=recipient_name or recipient_email
+            )
+            
+            # Create email object
+            send_smtp_email = SendSmtpEmail(
+                sender=sender,
+                to=[recipient],
+                subject=subject,
+                html_content=None,
+                text_content=message
+            )
+        except Exception as e:
+            error_msg = f"Failed to create Brevo email objects: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
         
         # Send email
         print(f"INFO: Attempting to send email via Brevo...", file=sys.stderr)
