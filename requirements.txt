@@ -37,3 +37,6 @@ djangorestframework>=3.14.0
 # PDF Generation
 reportlab>=4.0.0
 
+# Markdown Processing
+markdown>=3.4.4
+

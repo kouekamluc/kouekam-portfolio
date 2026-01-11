@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load blog_tags %}
 
 {% block content %}
 <section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
@@ -76,12 +77,14 @@
                     </a>
                 </h3>
                 
-                <div class="mb-3 text-sm text-gray-600 dark:text-gray-400">
-                    By <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
+                <div class="mb-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-3 flex-wrap">
+                    <span>By <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span></span>
+                    <span class="text-gray-400 dark:text-gray-500">•</span>
+                    <span>{{ post.content|reading_time }}</span>
                 </div>
                 
                 <p class="mb-4 font-normal text-gray-700 dark:text-gray-400 line-clamp-3">
-                    {{ post.content|truncatewords:30|striptags }}
+                    {{ post.content|markdown_excerpt:150 }}
                 </p>
 
                 <a href="{% url 'blog_detail' post.slug %}"

@@ -24,6 +24,8 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js for code syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-theme-light" />
     <style>
         /* Ensure navbar doesn't overlap content */
         :root {
@@ -318,6 +320,42 @@
     {% include 'components/footer.html' %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+    <!-- Prism.js for code syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+        // Prism.js theme switching for dark mode
+        (function() {
+            function updatePrismTheme() {
+                const html = document.documentElement;
+                const lightTheme = document.getElementById('prism-theme-light');
+                let darkTheme = document.getElementById('prism-theme-dark-link');
+                
+                if (html.classList.contains('dark')) {
+                    // Use tomorrow theme for dark mode
+                    if (lightTheme) lightTheme.disabled = true;
+                    if (!darkTheme) {
+                        darkTheme = document.createElement('link');
+                        darkTheme.id = 'prism-theme-dark-link';
+                        darkTheme.rel = 'stylesheet';
+                        darkTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+                        document.head.appendChild(darkTheme);
+                    }
+                } else {
+                    // Use default theme for light mode
+                    if (lightTheme) lightTheme.disabled = false;
+                    if (darkTheme) darkTheme.remove();
+                }
+            }
+            
+            // Update on load
+            updatePrismTheme();
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(updatePrismTheme);
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        })();
+    </script>
     <script>
         // Enable dark mode by default (or use saved preference)
         (function() {
