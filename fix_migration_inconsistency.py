@@ -1,12 +1,12 @@
 """
-Fix migration inconsistency where socialaccount.0001_initial is applied 
-before its dependency sites.0001_initial.
+Fix migration inconsistency where socialaccount migrations are applied 
+out of order or before their dependencies.
 
 This script checks migration history and fixes inconsistencies by:
-1. Checking if socialaccount.0001_initial is marked as applied
+1. Checking if any socialaccount migrations are marked as applied
 2. Checking if sites.0001_initial is marked as applied
-3. Fixing the inconsistency by either faking sites.0001_initial or removing
-   the socialaccount.0001_initial entry as appropriate.
+3. Fixing inconsistencies by either faking missing migrations or removing
+   incorrectly ordered migration entries as appropriate.
 """
 import os
 import sys
@@ -59,7 +59,14 @@ def fix_migration_inconsistency():
                         AND name = '0001_initial'
                     );
                 """)
-                socialaccount_migration_exists = cursor.fetchone()[0]
+                socialaccount_0001_exists = cursor.fetchone()[0]
+                
+                # Check if ANY socialaccount migrations are recorded
+                cursor.execute("""
+                    SELECT COUNT(*) FROM django_migrations 
+                    WHERE app = 'socialaccount';
+                """)
+                socialaccount_migration_count = cursor.fetchone()[0]
                 
                 # Check if socialaccount_socialapp table exists
                 cursor.execute("""
@@ -91,7 +98,14 @@ def fix_migration_inconsistency():
                     SELECT COUNT(*) FROM django_migrations 
                     WHERE app = 'socialaccount' AND name = '0001_initial';
                 """)
-                socialaccount_migration_exists = cursor.fetchone()[0] > 0
+                socialaccount_0001_exists = cursor.fetchone()[0] > 0
+                
+                # Check if ANY socialaccount migrations are recorded
+                cursor.execute("""
+                    SELECT COUNT(*) FROM django_migrations 
+                    WHERE app = 'socialaccount';
+                """)
+                socialaccount_migration_count = cursor.fetchone()[0]
                 
                 # Check if socialaccount_socialapp table exists
                 cursor.execute("""
@@ -105,11 +119,40 @@ def fix_migration_inconsistency():
             
             print(f"Site table exists: {site_table_exists}")
             print(f"Sites migration recorded: {sites_migration_exists}")
-            print(f"Socialaccount migration recorded: {socialaccount_migration_exists}")
+            print(f"Socialaccount migrations recorded: {socialaccount_migration_count} (0001_initial: {socialaccount_0001_exists})")
             
-            # Case 1: socialaccount.0001_initial is applied but sites.0001_initial is not
-            # This is the error we're seeing
-            if socialaccount_migration_exists and not sites_migration_exists:
+            # Case 1: Any socialaccount migrations are applied but socialaccount.0001_initial is not
+            # This includes cases like 0002_token_max_lengths before 0001_initial
+            if socialaccount_migration_count > 0 and not socialaccount_0001_exists:
+                print("\n⚠️  Migration inconsistency detected!")
+                print(f"   {socialaccount_migration_count} socialaccount migration(s) are marked as applied,")
+                print("   but socialaccount.0001_initial is not marked.")
+                print("   Removing all socialaccount migration entries to fix dependency order...")
+                
+                try:
+                    with transaction.atomic():
+                        # Remove ALL socialaccount migration entries
+                        cursor.execute("""
+                            DELETE FROM django_migrations 
+                            WHERE app = 'socialaccount';
+                        """)
+                        deleted = cursor.rowcount
+                        
+                        if deleted > 0:
+                            print(f"✓ Successfully removed {deleted} socialaccount migration entry/entries")
+                            print("  (Migrations will run in correct order on next migrate)")
+                            return True
+                        else:
+                            print("⚠ Warning: No socialaccount migration entries found")
+                            return True
+                except Exception as e:
+                    print(f"✗ Error removing socialaccount migration entries: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return False
+            
+            # Case 2: socialaccount.0001_initial is applied but sites.0001_initial is not
+            elif socialaccount_0001_exists and not sites_migration_exists:
                 print("\n⚠️  Migration inconsistency detected!")
                 print("   socialaccount.0001_initial is marked as applied,")
                 print("   but its dependency sites.0001_initial is not marked.")
@@ -135,23 +178,22 @@ def fix_migration_inconsistency():
                     print("   Removing socialaccount.0001_initial migration entry")
                     print("   so migrations can run in the correct order...")
                     
-                    # Also check if we need to remove any other socialaccount migrations
-                    # that depend on sites
+                    # Remove ALL socialaccount migration entries (in case there are later ones too)
                     try:
                         with transaction.atomic():
-                            # Remove socialaccount.0001_initial migration entry
+                            # Remove ALL socialaccount migration entries
                             cursor.execute("""
                                 DELETE FROM django_migrations 
-                                WHERE app = 'socialaccount' AND name = '0001_initial';
+                                WHERE app = 'socialaccount';
                             """)
                             deleted = cursor.rowcount
                             
                             if deleted > 0:
-                                print(f"✓ Successfully removed socialaccount.0001_initial migration entry")
+                                print(f"✓ Successfully removed {deleted} socialaccount migration entry/entries")
                                 print("  (Migrations will run in correct order on next migrate)")
                                 return True
                             else:
-                                print("⚠ Warning: socialaccount.0001_initial entry not found (may have been removed already)")
+                                print("⚠ Warning: No socialaccount migration entries found")
                                 return True
                     except Exception as e:
                         print(f"✗ Error removing socialaccount migration entry: {e}")
@@ -159,7 +201,7 @@ def fix_migration_inconsistency():
                         traceback.print_exc()
                         return False
             
-            # Case 2: Sites tables exist but migration is not recorded
+            # Case 3: Sites tables exist but migration is not recorded
             elif site_table_exists and not sites_migration_exists:
                 print("\n⚠️  Migration inconsistency detected!")
                 print("   Sites tables exist but sites.0001_initial migration is not recorded.")
@@ -174,7 +216,7 @@ def fix_migration_inconsistency():
                     traceback.print_exc()
                     return False
             
-            # Case 3: Everything is consistent
+            # Case 4: Everything is consistent
             elif not site_table_exists and not sites_migration_exists:
                 print("✓ Sites tables don't exist yet - will be created by migrations")
                 return True
