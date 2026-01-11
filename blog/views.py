@@ -126,13 +126,23 @@ def blog_update(request, slug):
                 post = form.save(commit=False)
                 # Handle publish/unpublish
                 was_published = bool(post.published_date)
-                if request.POST.get('publish'):
+                
+                # Check which button was clicked - check both key existence and value
+                publish_clicked = 'publish' in request.POST or request.POST.get('publish') == '1'
+                unpublish_clicked = 'unpublish' in request.POST or request.POST.get('unpublish') == '1'
+                
+                if publish_clicked:
                     # Always set published_date when publish is clicked
                     post.published_date = timezone.now()
-                elif request.POST.get('unpublish'):
+                elif unpublish_clicked:
                     # If clicking unpublish, clear published_date
                     post.published_date = None
+                
+                # Save the post with the updated published_date
                 post.save()
+                
+                # Refresh from database to ensure we have the latest data
+                post.refresh_from_db()
                 
                 # Update code snippets (simplified - delete and recreate)
                 post.code_snippets.all().delete()
@@ -152,12 +162,12 @@ def blog_update(request, slug):
                         )
                 
                 # Show appropriate message
-                if request.POST.get('publish'):
+                if publish_clicked:
                     if was_published:
                         messages.success(request, 'Blog post updated and republished!')
                     else:
                         messages.success(request, 'Blog post published successfully!')
-                elif request.POST.get('unpublish'):
+                elif unpublish_clicked:
                     messages.success(request, 'Blog post unpublished and saved as draft!')
                 else:
                     messages.success(request, 'Blog post updated!')
