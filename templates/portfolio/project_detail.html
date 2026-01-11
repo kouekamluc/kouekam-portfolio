@@ -49,10 +49,10 @@
         <!-- Main Content -->
         <div class="lg:col-span-2">
             <div class="prose dark:prose-invert max-w-none mb-10">
-                <h3 class="text-2xl font-bold mb-4">About this Project</h3>
-                <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                    {{ project.description }}
-                </p>
+                <h3 class="text-2xl font-bold mb-4 dark:text-white">About this Project</h3>
+                <div class="text-gray-700 dark:text-gray-300 leading-relaxed text-base">
+                    {{ project.description|linebreaks }}
+                </div>
             </div>
 
             {% if project.images.all %}
