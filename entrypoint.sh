@@ -17,6 +17,11 @@ else
     echo "No database configuration detected, using SQLite database"
 fi
 
+echo "Checking for migration inconsistencies..."
+python fix_migration_inconsistency.py || {
+    echo "Warning: Migration consistency check had issues, but continuing..."
+}
+
 echo "Running migrations..."
 python manage.py migrate --noinput
 
