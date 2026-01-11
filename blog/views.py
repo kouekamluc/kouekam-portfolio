@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -8,6 +7,7 @@ from .models import BlogPost, CodeSnippet, Tutorial
 from .forms import BlogPostForm, CodeSnippetForm, TutorialForm
 
 def blog_list(request):
+    # Show all published posts to everyone (admin, staff, or any user)
     posts = BlogPost.objects.filter(published_date__isnull=False).order_by('-published_date')
     
     # Filtering
@@ -35,8 +35,9 @@ def blog_detail(request, slug):
     post = get_object_or_404(BlogPost, slug=slug)
     code_snippets = post.code_snippets.all()
     
-    # Only show published posts to non-staff
-    if not post.published_date and not request.user.is_staff:
+    # Published posts are visible to everyone (admin, staff, or any user)
+    # Only draft posts are restricted to their authors
+    if not post.published_date and request.user != post.author:
         messages.error(request, 'This post is not published yet.')
         return redirect('blog_list')
     
@@ -46,7 +47,7 @@ def blog_detail(request, slug):
     }
     return render(request, 'blog/blog_detail.html', context)
 
-@staff_member_required
+@login_required
 def blog_create(request):
     if request.method == 'POST':
         form = BlogPostForm(request.POST)
@@ -83,9 +84,9 @@ def blog_create(request):
         form = BlogPostForm()
     return render(request, 'blog/blog_form.html', {'form': form, 'form_type': 'Create'})
 
-@staff_member_required
+@login_required
 def blog_update(request, slug):
-    post = get_object_or_404(BlogPost, slug=slug)
+    post = get_object_or_404(BlogPost, slug=slug, author=request.user)
     
     if request.method == 'POST':
         form = BlogPostForm(request.POST, instance=post)
@@ -119,9 +120,9 @@ def blog_update(request, slug):
     
     return render(request, 'blog/blog_form.html', {'form': form, 'post': post, 'form_type': 'Update'})
 
-@staff_member_required
+@login_required
 def blog_delete(request, slug):
-    post = get_object_or_404(BlogPost, slug=slug)
+    post = get_object_or_404(BlogPost, slug=slug, author=request.user)
     if request.method == 'POST':
         post.delete()
         messages.success(request, 'Blog post deleted!')
