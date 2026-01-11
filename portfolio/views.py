@@ -58,16 +58,20 @@ def contact(request):
         
         if name and email and message:
             try:
+                import sys
+                print(f"INFO: Contact form submission received from {name} ({email})", file=sys.stderr)
+                print(f"INFO: Subject: {subject or 'No Subject'}", file=sys.stderr)
+                
                 # Send email via Brevo
                 success = send_contact_form_email(name, email, subject, message)
                 
                 if success:
+                    print(f"INFO: Contact form email sent successfully", file=sys.stderr)
                     messages.success(request, 'Thank you! Your message has been sent successfully.')
                     return HttpResponseRedirect(request.path)
                 else:
                     # Log the failure reason for debugging
                     import logging
-                    import sys
                     logger = logging.getLogger(__name__)
                     logger.error("Contact form email sending failed. Check Brevo configuration.")
                     print("ERROR: Contact form email sending failed. Check Brevo API key and configuration.", file=sys.stderr)

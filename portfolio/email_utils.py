@@ -94,16 +94,37 @@ def send_email_via_brevo(subject, message, recipient_email, recipient_name=None,
         )
         
         # Send email
+        print(f"INFO: Attempting to send email via Brevo...", file=sys.stderr)
+        print(f"INFO: From: {sender_email} ({sender_name})", file=sys.stderr)
+        print(f"INFO: To: {recipient_email}", file=sys.stderr)
+        print(f"INFO: Subject: {subject}", file=sys.stderr)
+        
         api_response = api_instance.send_transac_email(send_smtp_email)
-        success_msg = f"Email sent successfully via Brevo. Message ID: {api_response.message_id}"
+        
+        # Log full response for debugging
+        print(f"INFO: Brevo API Response: {api_response}", file=sys.stderr)
+        message_id = getattr(api_response, 'message_id', 'Unknown')
+        
+        success_msg = f"Email sent successfully via Brevo. Message ID: {message_id}"
         logger.info(success_msg)
         print(f"INFO: {success_msg}", file=sys.stderr)
+        print(f"INFO: Email should be delivered to {recipient_email}", file=sys.stderr)
         return True
         
     except Exception as e:
         error_msg = f"Error sending email via Brevo: {str(e)}"
+        error_type = type(e).__name__
         logger.error(error_msg, exc_info=True)
-        print(f"ERROR: {error_msg}", file=sys.stderr)
+        print(f"ERROR: {error_type}: {error_msg}", file=sys.stderr)
+        
+        # Check for specific Brevo API errors
+        if hasattr(e, 'status'):
+            print(f"ERROR: Brevo API Status Code: {e.status}", file=sys.stderr)
+        if hasattr(e, 'reason'):
+            print(f"ERROR: Brevo API Reason: {e.reason}", file=sys.stderr)
+        if hasattr(e, 'body'):
+            print(f"ERROR: Brevo API Response Body: {e.body}", file=sys.stderr)
+        
         import traceback
         traceback.print_exc(file=sys.stderr)
         return False
