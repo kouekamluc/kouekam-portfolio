@@ -16,10 +16,10 @@ def home(request):
     skills = Skill.objects.all()
     timeline = Timeline.objects.all()
     # Featured/Recent projects can also be added here
-    recent_projects = Project.objects.filter(status='active').order_by('-created_at')[:3]
+    recent_projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')[:3]
     
-    # Dynamic counts for stats
-    total_projects = Project.objects.filter(status='active').count()
+    # Dynamic counts for stats - count all non-archived projects (active and completed)
+    total_projects = Project.objects.filter(status__in=['active', 'completed']).count()
     published_blog_posts = BlogPost.objects.filter(published_date__isnull=False).count()
     total_skills = Skill.objects.count()
     
