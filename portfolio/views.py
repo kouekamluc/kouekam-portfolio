@@ -17,11 +17,20 @@ def home(request):
     timeline = Timeline.objects.all()
     # Featured/Recent projects can also be added here
     recent_projects = Project.objects.filter(status='active').order_by('-created_at')[:3]
+    
+    # Dynamic counts for stats
+    total_projects = Project.objects.filter(status='active').count()
+    published_blog_posts = BlogPost.objects.filter(published_date__isnull=False).count()
+    total_skills = Skill.objects.count()
+    
     context = {
         'profile': profile,
         'skills': skills,
         'timeline': timeline,
-        'recent_projects': recent_projects
+        'recent_projects': recent_projects,
+        'total_projects': total_projects,
+        'published_blog_posts': published_blog_posts,
+        'total_skills': total_skills,
     }
     return render(request, 'home.html', context)
 

@@ -51,16 +51,16 @@
                 <!-- Stats or Features -->
                 <div class="grid grid-cols-3 gap-8 pt-8 border-t border-gray-200 dark:border-gray-800">
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ recent_projects|length }}+</div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_projects }}</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">Projects</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">100%</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Productivity</div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ published_blog_posts }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Blog Posts</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">24/7</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Available</div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_skills }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Skills</div>
                     </div>
                 </div>
             </div>
