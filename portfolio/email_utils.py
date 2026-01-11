@@ -7,6 +7,16 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+# Configure portfolio logger to always show errors in console
+portfolio_logger = logging.getLogger('portfolio')
+portfolio_logger.setLevel(logging.ERROR)
+if not portfolio_logger.handlers:
+    console_handler = logging.StreamHandler(sys.stderr)
+    console_handler.setLevel(logging.ERROR)
+    formatter = logging.Formatter('%(levelname)s: %(message)s')
+    console_handler.setFormatter(formatter)
+    portfolio_logger.addHandler(console_handler)
+
 # Try to import Brevo SDK
 BREVO_SDK_AVAILABLE = False
 ApiClient = None

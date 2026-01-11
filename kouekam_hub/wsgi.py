@@ -16,20 +16,21 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kouekam_hub.settings")
 
 # Suppress verbose output in production to avoid Railway rate limiting
 if not os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on'):
-    # Redirect stdout/stderr to devnull in production to prevent settings dumps
-    # This prevents Django from dumping settings to console
+    # Redirect stdout to devnull in production to prevent settings dumps
+    # But keep stderr for error messages (especially for Brevo email debugging)
     import logging
     logging.getLogger().setLevel(logging.ERROR)
-    # Suppress print statements that might dump settings
+    # Suppress print statements that might dump settings to stdout
     class SuppressOutput:
         def write(self, s):
             pass
         def flush(self):
             pass
     
-    # Only suppress if we're not in a shell/interactive mode
+    # Only suppress stdout if we're not in a shell/interactive mode
+    # Keep stderr open for error messages
     if not sys.stdin.isatty():
         sys.stdout = SuppressOutput()
-        sys.stderr = SuppressOutput()
+        # Don't suppress stderr - we need it for error messages and email debugging
 
 application = get_wsgi_application()
