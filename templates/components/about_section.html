@@ -5,13 +5,15 @@
             <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">
                 About Me
             </h2>
-            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                {% if profile %}
-                    {{ profile.bio|truncatewords:30 }}
+            <div class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                {% if profile and profile.bio %}
+                    <div class="prose prose-lg dark:prose-invert max-w-none">
+                        {{ profile.bio|safe|truncatewords:30 }}
+                    </div>
                 {% else %}
-                    Welcome! I'm a developer passionate about technology and building amazing digital experiences.
+                    <p>Welcome! I'm a developer passionate about technology and building amazing digital experiences.</p>
                 {% endif %}
-            </p>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">

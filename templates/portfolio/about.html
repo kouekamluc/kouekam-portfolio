@@ -19,8 +19,8 @@
         <div class="mb-12">
             <h2 class="text-3xl font-bold mb-6 dark:text-white">About Me</h2>
             {% if profile and profile.bio %}
-            <div class="prose dark:prose-invert max-w-none">
-                <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{{ profile.bio }}</p>
+            <div class="prose prose-lg dark:prose-invert max-w-none">
+                {{ profile.bio|safe }}
             </div>
             {% else %}
             <p class="text-gray-600 dark:text-gray-400">Bio coming soon...</p>
