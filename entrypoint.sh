@@ -34,7 +34,27 @@ python manage.py init_site ${SITE_DOMAIN:+--domain "$SITE_DOMAIN"} ${SITE_NAME:+
 echo "Creating superuser (if not exists)..."
 python create_superuser.py
 
-echo "✓ Using Tailwind CSS CDN (no build step needed)"
+# Verify CSS and JS files exist (built in Dockerfile multi-stage build)
+# If missing, rebuild as fallback (for non-Docker deployments)
+if [ ! -f "static/css/output.css" ] || [ ! -s "static/css/output.css" ]; then
+    echo "⚠ CSS file missing, attempting to build..."
+    if command -v node &> /dev/null && command -v npm &> /dev/null; then
+        npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null
+        npm run build:css:prod 2>/dev/null || echo "⚠ CSS build failed"
+    else
+        echo "⚠ Node.js not available, cannot build CSS"
+    fi
+fi
+
+if [ ! -f "static/js/tiptap-editor.js" ] || [ ! -s "static/js/tiptap-editor.js" ]; then
+    echo "⚠ JS file missing, attempting to build..."
+    if command -v node &> /dev/null && command -v npm &> /dev/null; then
+        npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null
+        npm run build:js 2>/dev/null || echo "⚠ JS build failed"
+    else
+        echo "⚠ Node.js not available, cannot build JS"
+    fi
+fi
 
 # Verify Brevo SDK is installed
 python << EOF >/dev/null 2>&1
