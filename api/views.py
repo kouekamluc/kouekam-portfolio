@@ -31,12 +31,38 @@ class ProfileViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
+class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = []  # Public read access
     
     def get_queryset(self):
-        return Project.objects.filter(status__in=['active', 'completed'])
+        if self.action in ['list', 'retrieve']:
+            # Public read access - show active and completed projects
+            return Project.objects.filter(status__in=['active', 'completed'])
+        else:
+            # For write operations, return all projects
+            return Project.objects.all()
+    
+    def get_permissions(self):
+        """
+        Allow public read access, but require authentication for write operations
+        """
+        from rest_framework.permissions import AllowAny
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]  # No authentication required for read
+        else:
+            return [IsAuthenticated()]  # Authentication required for create, update, delete
+    
+    def perform_create(self, serializer):
+        # Projects don't have a user field, so just save
+        serializer.save()
+    
+    def perform_update(self, serializer):
+        # Allow any authenticated user to update projects
+        serializer.save()
+    
+    def perform_destroy(self, instance):
+        # Allow any authenticated user to delete projects
+        instance.delete()
 
 
 class SkillViewSet(viewsets.ReadOnlyModelViewSet):

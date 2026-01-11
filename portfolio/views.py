@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.templatetags.static import static
 from django.db.models import Q
-from .models import Profile, Timeline, Skill, Project
-from .forms import ProfileForm
+from .models import Profile, Timeline, Skill, Project, ProjectImage
+from .forms import ProfileForm, ProjectForm, ProjectImageForm
 from .email_utils import send_contact_form_email
 from blog.models import BlogPost
 from academic.models import Note
@@ -119,6 +119,85 @@ def project_list(request):
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
     return render(request, 'portfolio/project_detail.html', {'project': project})
+
+@login_required
+def project_create(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                project = form.save()
+                messages.success(request, 'Project created successfully!')
+                return redirect('project_detail', slug=project.slug)
+            except Exception as e:
+                messages.error(request, f'An error occurred while creating the project: {str(e)}')
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error creating project: {str(e)}', exc_info=True)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProjectForm()
+    return render(request, 'portfolio/project_form.html', {'form': form, 'form_type': 'Create'})
+
+@login_required
+def project_update(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES, instance=project)
+        if form.is_valid():
+            try:
+                project = form.save()
+                messages.success(request, 'Project updated successfully!')
+                return redirect('project_detail', slug=project.slug)
+            except Exception as e:
+                messages.error(request, f'An error occurred while updating the project: {str(e)}')
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error updating project: {str(e)}', exc_info=True)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProjectForm(instance=project)
+    
+    return render(request, 'portfolio/project_form.html', {'form': form, 'project': project, 'form_type': 'Update'})
+
+@login_required
+def project_delete(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully!')
+        return redirect('project_list')
+    return render(request, 'portfolio/project_confirm_delete.html', {'project': project})
+
+@login_required
+def project_image_add(request, slug):
+    project = get_object_or_404(Project, slug=slug)
+    if request.method == 'POST':
+        form = ProjectImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            project_image = form.save(commit=False)
+            project_image.project = project
+            project_image.save()
+            messages.success(request, 'Image added successfully!')
+            return redirect('project_detail', slug=project.slug)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProjectImageForm()
+    return render(request, 'portfolio/project_image_form.html', {'form': form, 'project': project})
+
+@login_required
+def project_image_delete(request, image_id):
+    project_image = get_object_or_404(ProjectImage, id=image_id)
+    project = project_image.project
+    if request.method == 'POST':
+        project_image.delete()
+        messages.success(request, 'Image deleted successfully!')
+        return redirect('project_detail', slug=project.slug)
+    return render(request, 'portfolio/project_image_confirm_delete.html', {'project_image': project_image, 'project': project})
 
 @login_required
 def view_profile(request):

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Add Image - {{ project.title }} - Kouekam Digital Hub{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+        <div class="max-w-2xl mx-auto">
+            <a href="{% url 'project_detail' project.slug %}" 
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Project
+            </a>
+            
+            <div class="card">
+                <h1 class="text-3xl font-bold mb-4 dark:text-white">Add Image to Gallery</h1>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    Add an image to the gallery for "<strong>{{ project.title }}</strong>"
+                </p>
+                
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900/20 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div>
+                        <label for="{{ form.image.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-image mr-2 text-blue-600 dark:text-blue-400"></i>
+                            Image <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <label for="{{ form.image.id_for_label }}" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 transition-colors group">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 dark:text-gray-500 mb-3 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"></i>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-blue-600 dark:text-blue-400">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF or WEBP (MAX. 10MB)</p>
+                                </div>
+                                {{ form.image }}
+                            </label>
+                        </div>
+                        {% if form.image.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.image.errors.0 }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.caption.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-comment mr-2 text-blue-600 dark:text-blue-400"></i>
+                            Caption (Optional)
+                        </label>
+                        {{ form.caption }}
+                        {% if form.caption.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.caption.errors.0 }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit" class="btn-primary inline-flex items-center px-6 py-3">
+                            <i class="fas fa-save mr-2"></i>
+                            <span>Add Image</span>
+                        </button>
+                        <a href="{% url 'project_detail' project.slug %}" class="btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.card form input[type="file"] {
+    @apply hidden;
+}
+</style>
+{% endblock %}
