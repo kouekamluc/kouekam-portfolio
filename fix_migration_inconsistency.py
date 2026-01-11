@@ -158,6 +158,22 @@ def fix_migration_inconsistency():
             print(f"Sites migration recorded: {sites_migration_exists}")
             print(f"Socialaccount migrations recorded: {socialaccount_migration_count} (0001_initial: {socialaccount_0001_exists})")
             
+            # Case 0: provider_id column exists but migration 0004 is not recorded
+            # This happens when migration 0004 was partially applied
+            if provider_id_exists and not socialaccount_0004_exists and socialaccount_table_exists:
+                print("\n⚠️  Migration inconsistency detected!")
+                print("   provider_id column exists but migration 0004 is not recorded.")
+                print("   Fixing by faking migration 0004...")
+                try:
+                    call_command('migrate', 'socialaccount', '0004_app_provider_id_settings', '--fake', verbosity=1)
+                    print("✓ Successfully faked socialaccount.0004_app_provider_id_settings migration")
+                    return True
+                except Exception as e:
+                    print(f"✗ Error faking migration 0004: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return False
+            
             # Case 1: Socialaccount tables exist but no migrations are recorded
             # This happens when we removed migration entries but tables still exist
             if socialaccount_table_exists and socialaccount_migration_count == 0:
