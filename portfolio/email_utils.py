@@ -2,10 +2,26 @@
 Email utility functions for sending emails via Brevo (formerly Sendinblue).
 """
 import logging
+import sys
 from django.conf import settings
-from sib_api_v3_sdk import ApiClient, Configuration, TransactionalEmailsApi, SendSmtpEmail, SendSmtpEmailSender, SendSmtpEmailTo
 
 logger = logging.getLogger(__name__)
+
+# Try to import Brevo SDK
+BREVO_SDK_AVAILABLE = False
+ApiClient = None
+Configuration = None
+TransactionalEmailsApi = None
+SendSmtpEmail = None
+SendSmtpEmailSender = None
+SendSmtpEmailTo = None
+
+try:
+    from sib_api_v3_sdk import ApiClient, Configuration, TransactionalEmailsApi, SendSmtpEmail, SendSmtpEmailSender, SendSmtpEmailTo
+    BREVO_SDK_AVAILABLE = True
+except ImportError as e:
+    BREVO_SDK_AVAILABLE = False
+    logger.error(f"Brevo SDK not available: {e}", exc_info=True)
 
 
 def send_email_via_brevo(subject, message, recipient_email, recipient_name=None, sender_email=None, sender_name=None):
@@ -23,22 +39,38 @@ def send_email_via_brevo(subject, message, recipient_email, recipient_name=None,
     Returns:
         bool: True if email was sent successfully, False otherwise
     """
+    # Check if Brevo SDK is available
+    if not BREVO_SDK_AVAILABLE:
+        error_msg = "Brevo SDK is not installed. Please install sib-api-v3-sdk package."
+        logger.error(error_msg)
+        print(f"ERROR: {error_msg}", file=sys.stderr)
+        return False
+    
     # Check if Brevo API key is configured
-    if not settings.BREVO_API_KEY:
-        logger.error("BREVO_API_KEY is not configured. Cannot send email.")
+    brevo_api_key = getattr(settings, 'BREVO_API_KEY', None)
+    if not brevo_api_key:
+        error_msg = "BREVO_API_KEY is not configured in environment variables. Cannot send email."
+        logger.error(error_msg)
+        print(f"ERROR: {error_msg}", file=sys.stderr)
         return False
     
     try:
         # Configure Brevo API client
         configuration = Configuration()
-        configuration.api_key['api-key'] = settings.BREVO_API_KEY
+        configuration.api_key['api-key'] = brevo_api_key
         
         api_client = ApiClient(configuration)
         api_instance = TransactionalEmailsApi(api_client)
         
         # Set sender information
-        sender_email = sender_email or settings.BREVO_SENDER_EMAIL
-        sender_name = sender_name or settings.BREVO_SENDER_NAME
+        sender_email = sender_email or getattr(settings, 'BREVO_SENDER_EMAIL', None)
+        sender_name = sender_name or getattr(settings, 'BREVO_SENDER_NAME', 'Portfolio')
+        
+        if not sender_email:
+            error_msg = "BREVO_SENDER_EMAIL is not configured. Cannot send email."
+            logger.error(error_msg)
+            print(f"ERROR: {error_msg}", file=sys.stderr)
+            return False
         
         # Create sender object
         sender = SendSmtpEmailSender(
@@ -63,11 +95,17 @@ def send_email_via_brevo(subject, message, recipient_email, recipient_name=None,
         
         # Send email
         api_response = api_instance.send_transac_email(send_smtp_email)
-        logger.info(f"Email sent successfully via Brevo. Message ID: {api_response.message_id}")
+        success_msg = f"Email sent successfully via Brevo. Message ID: {api_response.message_id}"
+        logger.info(success_msg)
+        print(f"INFO: {success_msg}", file=sys.stderr)
         return True
         
     except Exception as e:
-        logger.error(f"Error sending email via Brevo: {str(e)}", exc_info=True)
+        error_msg = f"Error sending email via Brevo: {str(e)}"
+        logger.error(error_msg, exc_info=True)
+        print(f"ERROR: {error_msg}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         return False
 
 
@@ -99,9 +137,11 @@ This email was sent from the contact form on your portfolio website.
 """
     
     # Send to the configured recipient
-    recipient_email = settings.BREVO_CONTACT_RECIPIENT_EMAIL
+    recipient_email = getattr(settings, 'BREVO_CONTACT_RECIPIENT_EMAIL', None)
     if not recipient_email:
-        logger.error("BREVO_CONTACT_RECIPIENT_EMAIL is not configured.")
+        error_msg = "BREVO_CONTACT_RECIPIENT_EMAIL is not configured in environment variables."
+        logger.error(error_msg)
+        print(f"ERROR: {error_msg}", file=sys.stderr)
         return False
     
     return send_email_via_brevo(

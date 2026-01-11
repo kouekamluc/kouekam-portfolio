@@ -65,11 +65,22 @@ def contact(request):
                     messages.success(request, 'Thank you! Your message has been sent successfully.')
                     return HttpResponseRedirect(request.path)
                 else:
+                    # Log the failure reason for debugging
+                    import logging
+                    import sys
+                    logger = logging.getLogger(__name__)
+                    logger.error("Contact form email sending failed. Check Brevo configuration.")
+                    print("ERROR: Contact form email sending failed. Check Brevo API key and configuration.", file=sys.stderr)
                     messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
             except Exception as e:
                 import logging
+                import sys
                 logger = logging.getLogger(__name__)
-                logger.error(f"Error in contact form: {str(e)}", exc_info=True)
+                error_msg = f"Error in contact form: {str(e)}"
+                logger.error(error_msg, exc_info=True)
+                print(f"ERROR: {error_msg}", file=sys.stderr)
+                import traceback
+                traceback.print_exc(file=sys.stderr)
                 messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
         else:
             messages.error(request, 'Please fill in all required fields.')
