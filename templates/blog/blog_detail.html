@@ -43,6 +43,12 @@
                 
                 <h1 class="text-4xl font-bold mb-4 dark:text-white">{{ post.title }}</h1>
                 
+                {% if post.image %}
+                <div class="mb-6 rounded-lg overflow-hidden">
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-64 md:h-96 object-cover">
+                </div>
+                {% endif %}
+                
                 <div class="mb-6 text-sm text-gray-600 dark:text-gray-400">
                     By <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
                     {% if post.published_date %}

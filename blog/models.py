@@ -19,6 +19,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     content = models.TextField()
+    image = models.ImageField(upload_to='blog/', blank=True, null=True, help_text="Featured image for the blog post")
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
     published_date = models.DateTimeField(null=True, blank=True)
     featured = models.BooleanField(default=False)

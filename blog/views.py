@@ -50,7 +50,7 @@ def blog_detail(request, slug):
 @login_required
 def blog_create(request):
     if request.method == 'POST':
-        form = BlogPostForm(request.POST)
+        form = BlogPostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -89,7 +89,7 @@ def blog_update(request, slug):
     post = get_object_or_404(BlogPost, slug=slug, author=request.user)
     
     if request.method == 'POST':
-        form = BlogPostForm(request.POST, instance=post)
+        form = BlogPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             if request.POST.get('publish') and not post.published_date:

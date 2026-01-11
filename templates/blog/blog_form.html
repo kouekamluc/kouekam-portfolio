@@ -22,7 +22,7 @@
             </div>
             
             <div class="card">
-                <form method="post" class="space-y-8">
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
                     {% csrf_token %}
                     
                     {% if form.non_field_errors %}
@@ -50,6 +50,41 @@
                             </p>
                         {% endif %}
                         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Choose a clear and descriptive title for your post</p>
+                    </div>
+                    
+                    <!-- Image Field -->
+                    <div>
+                        <label class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-image mr-2 text-blue-600 dark:text-blue-400"></i>
+                            Featured Image
+                        </label>
+                        {% if post and post.image %}
+                            <div class="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Current image:</p>
+                                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="max-w-md h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                            </div>
+                        {% endif %}
+                        <div class="relative">
+                            <label for="{{ form.image.id_for_label }}" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 transition-colors group">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 dark:text-gray-500 mb-3 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"></i>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold text-blue-600 dark:text-blue-400">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF or WEBP (MAX. 10MB)</p>
+                                </div>
+                                {{ form.image }}
+                            </label>
+                        </div>
+                        {% if form.image.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.image.errors.0 }}
+                            </p>
+                        {% endif %}
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-start">
+                            <i class="fas fa-info-circle mr-1.5 mt-0.5"></i>
+                            <span>Upload a featured image that will be displayed at the top of your blog post. Recommended size: 1200x630px for best results.</span>
+                        </p>
                     </div>
                     
                     <!-- Content Field -->
@@ -196,6 +231,16 @@
 /* Checkbox styling improvements */
 .card form input[type="checkbox"] {
     @apply w-5 h-5 cursor-pointer;
+}
+
+/* File input styling - hide default and use custom label */
+.card form input[type="file"] {
+    @apply hidden;
+}
+
+.card form input[type="file"]:focus + label,
+.card form label[for*="image"]:has(input[type="file"]:focus) {
+    @apply ring-2 ring-blue-500 ring-offset-2;
 }
 </style>
 {% endblock %}
