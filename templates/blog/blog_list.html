@@ -2,15 +2,23 @@
 {% load blog_tags %}
 
 {% block content %}
-<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <div class="flex justify-between items-center mb-8 lg:mb-16">
-            <div class="flex-1">
-                <h2 class="mb-2 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Blog Posts</h2>
-                <p class="font-light text-gray-500 sm:text-xl dark:text-gray-400">Read our latest articles, tutorials, and insights.</p>
+<!-- Blog List - Tailwind Plus Inspired -->
+<section class="bg-white dark:bg-gray-900 py-12 lg:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12 lg:mb-16">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6">
+                <i class="fas fa-blog"></i>
+                <span>Latest Articles</span>
             </div>
+            <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">
+                Blog Posts
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+                Read our latest articles, tutorials, and insights.
+            </p>
             {% if user.is_authenticated %}
-            <div class="ml-4">
+            <div class="flex justify-center">
                 <a href="{% url 'blog_create' %}" class="btn-primary inline-flex items-center">
                     <i class="fas fa-plus mr-2"></i>New Post
                 </a>
@@ -19,125 +27,145 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
             <a href="{% url 'blog_list' %}"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if not category_filter and not show_drafts %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if not category_filter and not show_drafts %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 All
             </a>
             {% if user.is_authenticated %}
             <a href="?drafts=true"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if show_drafts == 'true' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if show_drafts == 'true' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 My Drafts
             </a>
             {% endif %}
             <a href="?category=django"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'django' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'django' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Django
             </a>
             <a href="?category=python"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'python' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'python' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Python
             </a>
             <a href="?category=ai"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'ai' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'ai' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 AI & ML
             </a>
             <a href="?category=electronics"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'electronics' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'electronics' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Electronics
             </a>
             <a href="?category=web"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'web' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'web' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Web Dev
             </a>
             <a href="?category=tutorial"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'tutorial' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'tutorial' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Tutorial
             </a>
             <a href="?category=project"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if category_filter == 'project' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'project' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Project
             </a>
             <a href="?featured=true"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors border {% if featured == 'true' %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600{% endif %}">
+                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if featured == 'true' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
                 Featured
             </a>
         </div>
 
-        <div class="grid gap-8 mb-6 lg:mb-16">
+        <!-- Blog Posts Grid - Three Column Layout with Images -->
+        <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
             {% for post in page_obj %}
-            <article
-                class="group bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex gap-3 items-center flex-wrap">
-                        <span
-                            class="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+            <article class="group card-hover overflow-hidden">
+                <a href="{% url 'blog_detail' post.slug %}" class="block">
+                    {% if post.image %}
+                    <div class="relative overflow-hidden rounded-t-xl h-48 mb-4">
+                        <img class="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
+                            src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    {% else %}
+                    <div class="h-48 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-t-xl mb-4 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-5xl text-blue-400 dark:text-blue-500 opacity-50"></i>
+                    </div>
+                    {% endif %}
+                </a>
+                
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-800">
+                            <i class="fas fa-tag text-xs"></i>
                             {{ post.get_category_display }}
                         </span>
                         {% if post.featured %}
-                        <span
-                            class="bg-yellow-100 text-yellow-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-semibold border border-yellow-200 dark:border-yellow-800">
+                            <i class="fas fa-star text-xs"></i>
                             Featured
                         </span>
                         {% endif %}
                         {% if not post.published_date %}
-                        <span
-                            class="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
-                            <i class="fas fa-file-alt mr-1"></i>Draft
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-700">
+                            <i class="fas fa-file-alt text-xs"></i>
+                            Draft
                         </span>
                         {% endif %}
                     </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                    
+                    <time class="block text-xs text-gray-500 dark:text-gray-400 mb-3">
                         {% if post.published_date %}
-                            {{ post.published_date|date:"M d, Y" }}
+                            {{ post.published_date|date:"F j, Y" }}
                         {% else %}
-                            Created: {{ post.created_at|date:"M d, Y" }}
+                            Created: {{ post.created_at|date:"F j, Y" }}
                         {% endif %}
-                    </span>
+                    </time>
+                    
+                    <h3 class="mb-3 text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a>
+                    </h3>
+                    
+                    <p class="mb-4 text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed text-sm">
+                        {{ post.content|markdown_excerpt:120 }}
+                    </p>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
+                            <span class="text-gray-400 dark:text-gray-500">•</span>
+                            <span>{{ post.content|reading_time }}</span>
+                        </div>
+                        <a href="{% url 'blog_detail' post.slug %}"
+                            class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group/link">
+                            Read
+                            <svg class="w-4 h-4 transform group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
-                
-                <h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    <a href="{% url 'blog_detail' post.slug %}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                        {{ post.title }}
-                    </a>
-                </h3>
-                
-                <div class="mb-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-3 flex-wrap">
-                    <span>By <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span></span>
-                    <span class="text-gray-400 dark:text-gray-500">•</span>
-                    <span>{{ post.content|reading_time }}</span>
-                </div>
-                
-                <p class="mb-4 font-normal text-gray-700 dark:text-gray-400 line-clamp-3">
-                    {{ post.content|markdown_excerpt:150 }}
-                </p>
-
-                <a href="{% url 'blog_detail' post.slug %}"
-                    class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                    Read more
-                    <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </a>
             </article>
             {% empty %}
-            <div class="col-span-full text-center py-10">
-                <p class="text-gray-500 text-xl dark:text-gray-400">No blog posts found.</p>
+            <div class="col-span-full">
+                <div class="card text-center py-16">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <i class="fas fa-blog text-4xl text-gray-400 dark:text-gray-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Blog Posts Found</h3>
+                    <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                        No blog posts found in this category. Try selecting a different filter or check back later.
+                    </p>
+                </div>
             </div>
             {% endfor %}
         </div>
 
         <!-- Pagination -->
         {% if page_obj.has_other_pages %}
-        <nav class="flex justify-center mt-8">
+        <nav class="flex justify-center mt-12">
             <ul class="flex items-center gap-2">
                 {% if page_obj.has_previous %}
                 <li>
                     <a href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
                         Previous
                     </a>
                 </li>
@@ -146,14 +174,14 @@
                 {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
                 <li>
-                    <span class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg">
+                    <span class="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-lg shadow-blue-500/50">
                         {{ num }}
                     </span>
                 </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 <li>
                     <a href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
                         {{ num }}
                     </a>
                 </li>
@@ -163,7 +191,7 @@
                 {% if page_obj.has_next %}
                 <li>
                     <a href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
                         Next
                     </a>
                 </li>
