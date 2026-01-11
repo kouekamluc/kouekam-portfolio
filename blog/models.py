@@ -17,7 +17,7 @@ class BlogPost(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
     content = models.TextField()
     image = models.ImageField(upload_to='blog/', blank=True, null=True, help_text="Featured image for the blog post")
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
@@ -37,11 +37,18 @@ class BlogPost(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.title)
+            # Truncate slug to max_length (255) to prevent database errors
+            if len(base_slug) > 255:
+                base_slug = base_slug[:255]
             slug = base_slug
             counter = 1
             # Handle slug collisions
             while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk if self.pk else None).exists():
-                slug = f"{base_slug}-{counter}"
+                # Ensure slug with counter doesn't exceed max_length
+                suffix = f"-{counter}"
+                max_base_length = 255 - len(suffix)
+                truncated_base = base_slug[:max_base_length] if len(base_slug) > max_base_length else base_slug
+                slug = f"{truncated_base}{suffix}"
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
@@ -82,7 +89,7 @@ class Tutorial(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
     description = models.TextField()
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
     parts = models.IntegerField(default=1, help_text="Number of parts in the tutorial series")
@@ -95,7 +102,21 @@ class Tutorial(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            # Truncate slug to max_length (255) to prevent database errors
+            if len(base_slug) > 255:
+                base_slug = base_slug[:255]
+            slug = base_slug
+            counter = 1
+            # Handle slug collisions
+            while Tutorial.objects.filter(slug=slug).exclude(pk=self.pk if self.pk else None).exists():
+                # Ensure slug with counter doesn't exceed max_length
+                suffix = f"-{counter}"
+                max_base_length = 255 - len(suffix)
+                truncated_base = base_slug[:max_base_length] if len(base_slug) > max_base_length else base_slug
+                slug = f"{truncated_base}{suffix}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
