@@ -3,12 +3,25 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.db.models import Q
 from .models import BlogPost, CodeSnippet, Tutorial
 from .forms import BlogPostForm, CodeSnippetForm, TutorialForm
 
 def blog_list(request):
-    # Show all published posts to everyone (admin, staff, or any user)
-    posts = BlogPost.objects.filter(published_date__isnull=False).order_by('-published_date')
+    # Show all published posts to everyone
+    # Also show draft posts to their authors
+    if request.user.is_authenticated:
+        # Authenticated users see published posts + their own drafts
+        posts = BlogPost.objects.filter(
+            Q(published_date__isnull=False) | 
+            Q(author=request.user, published_date__isnull=True)
+        )
+    else:
+        # Anonymous users only see published posts
+        posts = BlogPost.objects.filter(published_date__isnull=False)
+    
+    # Order by published_date (if exists) or created_at, with published posts first
+    posts = posts.order_by('-published_date', '-created_at')
     
     # Filtering
     category_filter = request.GET.get('category')
@@ -19,6 +32,16 @@ def blog_list(request):
     if featured == 'true':
         posts = posts.filter(featured=True)
     
+    # Show drafts filter
+    show_drafts = request.GET.get('drafts')
+    if show_drafts == 'true' and request.user.is_authenticated:
+        # Show only drafts for the current user
+        posts = posts.filter(author=request.user, published_date__isnull=True)
+    elif show_drafts == 'false' or (show_drafts is None and request.user.is_authenticated):
+        # By default, show published posts + user's drafts mixed together
+        # This is already handled above
+        pass
+    
     # Pagination
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
@@ -28,6 +51,7 @@ def blog_list(request):
         'page_obj': page_obj,
         'category_filter': category_filter,
         'featured': featured,
+        'show_drafts': show_drafts,
     }
     return render(request, 'blog/blog_list.html', context)
 
