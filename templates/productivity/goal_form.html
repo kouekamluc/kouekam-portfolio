@@ -11,70 +11,101 @@
             </a>
             <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Goal</h1>
             
-            <div class="card">
-                <form method="post" class="space-y-6">
-                    {% csrf_token %}
-                    
-                    <div>
-                        <label for="{{ form.title.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Goal Title
-                        </label>
-                        {{ form.title }}
-                        {% if form.title.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors.0 }}</p>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Please correct the following errors:</h3>
+                                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                            {{ form.non_field_errors }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
-                    </div>
-                    
-                    <div>
-                        <label for="{{ form.description.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Description
-                        </label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    
-                    <div>
-                        <label for="{{ form.target_date.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Target Date
-                        </label>
-                        {{ form.target_date }}
-                        {% if form.target_date.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.target_date.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Optional: Set a deadline for your goal
-                        </p>
-                    </div>
-                    
-                    <div>
-                        <label for="{{ form.progress.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Progress (%)
-                        </label>
-                        {{ form.progress }}
-                        {% if form.progress.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.progress.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Current progress from 0 to 100
-                        </p>
-                    </div>
-                    
-                    <div class="flex gap-4 pt-4">
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save mr-2"></i>{% if goal %}Update{% else %}Save{% endif %} Goal
-                        </button>
-                        <a href="{% url 'goal_list' %}" class="btn-secondary">
-                            Cancel
-                        </a>
-                        {% if goal %}
-                        <a href="{% url 'goal_delete' goal.id %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            <i class="fas fa-trash mr-2"></i>Delete
-                        </a>
-                        {% endif %}
-                    </div>
-                </form>
+                        
+                        <div>
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Goal Title
+                            </label>
+                            <div class="mt-2">
+                                {{ form.title }}
+                            </div>
+                            {% if form.title.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Description
+                            </label>
+                            <div class="mt-2">
+                                {{ form.description }}
+                            </div>
+                            {% if form.description.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <label for="{{ form.target_date.id_for_label }}" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                    Target Date
+                                </label>
+                                <div class="mt-2">
+                                    {{ form.target_date }}
+                                </div>
+                                {% if form.target_date.errors %}
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.target_date.errors.0 }}</p>
+                                {% endif %}
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    Optional: Set a deadline for your goal
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.progress.id_for_label }}" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                    Progress (%)
+                                </label>
+                                <div class="mt-2">
+                                    {{ form.progress }}
+                                </div>
+                                {% if form.progress.errors %}
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.progress.errors.0 }}</p>
+                                {% endif %}
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    Current progress from 0 to 100
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-end gap-x-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{% url 'goal_list' %}" class="text-sm font-semibold leading-6 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300">
+                                Cancel
+                            </a>
+                            {% if goal %}
+                                <a href="{% url 'goal_delete' goal.id %}" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                                    Delete
+                                </a>
+                            {% endif %}
+                            <button type="submit"
+                                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:bg-blue-500 dark:hover:bg-blue-400">
+                                {% if goal %}Update{% else %}Save{% endif %} Goal
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
