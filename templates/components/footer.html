@@ -1,120 +1,109 @@
-<footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-auto">
-    <div class="mx-auto w-full max-w-screen-2xl p-4 py-6 lg:py-8">
-        <div class="md:flex md:justify-between">
-            <div class="mb-6 md:mb-0">
-                <a href="{% url 'home' %}" class="flex items-center group">
+<!-- Footer - Tailwind Plus Inspired -->
+<footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200/50 dark:border-gray-800/50 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+            <!-- Brand Section -->
+            <div class="md:col-span-4 lg:col-span-5">
+                <a href="{% url 'home' %}" class="flex items-center group mb-4">
                     <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-white transition-colors">
-                        Kouekam<span class="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">.Hub</span>
+                        Kouekam<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 group-hover:from-blue-700 group-hover:to-indigo-700 transition-colors">.Hub</span>
                     </span>
                 </a>
-                <p class="mt-4 text-gray-600 dark:text-gray-400 max-w-sm">
+                <p class="text-gray-600 dark:text-gray-400 max-w-sm leading-relaxed">
                     {% if profile and profile.tagline %}
                         {{ profile.tagline }}
                     {% else %}
                         Empowering your digital journey with tools for productivity, learning, and business management.
                     {% endif %}
                 </p>
+                <!-- Social Links -->
+                <div class="flex gap-4 mt-6">
+                    {% if profile and profile.social_links.github %}
+                    <a href="{{ profile.social_links.github }}" target="_blank" rel="noopener noreferrer" 
+                       class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white hover:bg-gray-900 dark:hover:bg-gray-700 transition-all duration-200">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    {% endif %}
+                    {% if profile and profile.social_links.linkedin %}
+                    <a href="{{ profile.social_links.linkedin }}" target="_blank" rel="noopener noreferrer" 
+                       class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-all duration-200">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    {% endif %}
+                    {% if profile and profile.social_links.twitter %}
+                    <a href="{{ profile.social_links.twitter }}" target="_blank" rel="noopener noreferrer" 
+                       class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white hover:bg-blue-400 dark:hover:bg-blue-500 transition-all duration-200">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+            
+            <!-- Links Sections -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-8 md:col-span-8 lg:col-span-7">
                 <div>
-                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Portfolio</h2>
-                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Portfolio</h3>
+                    <ul class="space-y-3">
                         <li>
-                            <a href="{% url 'project_list' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fas fa-briefcase mr-2 text-sm"></i>Projects
+                            <a href="{% url 'project_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                                <i class="fas fa-briefcase text-xs"></i>
+                                <span>Projects</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'contact' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fas fa-envelope mr-2 text-sm"></i>Contact
+                            <a href="{% url 'contact' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                                <i class="fas fa-envelope text-xs"></i>
+                                <span>Contact</span>
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Connect</h2>
-                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
-                        {% if profile and profile.social_links.github %}
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Resources</h3>
+                    <ul class="space-y-3">
                         <li>
-                            <a href="{{ profile.social_links.github }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fab fa-github mr-2 text-sm"></i>GitHub
+                            <a href="{% url 'blog_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                                <i class="fas fa-blog text-xs"></i>
+                                <span>Blog</span>
                             </a>
                         </li>
-                        {% endif %}
-                        {% if profile and profile.social_links.linkedin %}
                         <li>
-                            <a href="{{ profile.social_links.linkedin }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fab fa-linkedin mr-2 text-sm"></i>LinkedIn
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                                <i class="fas fa-question-circle text-xs"></i>
+                                <span>Help</span>
                             </a>
                         </li>
-                        {% endif %}
-                        {% if profile and profile.social_links.twitter %}
-                        <li>
-                            <a href="{{ profile.social_links.twitter }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fab fa-twitter mr-2 text-sm"></i>Twitter
-                            </a>
-                        </li>
-                        {% endif %}
-                        {% if profile and profile.social_links.website %}
-                        <li>
-                            <a href="{{ profile.social_links.website }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fas fa-globe mr-2 text-sm"></i>Website
-                            </a>
-                        </li>
-                        {% endif %}
                     </ul>
                 </div>
                 <div>
-                    <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Resources</h2>
-                    <ul class="text-gray-600 dark:text-gray-400 font-medium space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-3">
                         <li>
-                            <a href="{% url 'blog_list' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fas fa-blog mr-2 text-sm"></i>Blog
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                Privacy Policy
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center">
-                                <i class="fas fa-question-circle mr-2 text-sm"></i>Help
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                Terms of Service
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
-        <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-        <div class="sm:flex sm:items-center sm:justify-between">
-            <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024 <a href="{% url 'home' %}"
-                    class="hover:underline">Kouekam Digital Hub</a>. All Rights Reserved.
-            </span>
-            <div class="flex mt-4 sm:justify-center sm:mt-0 gap-4">
-                <!-- Social Icons -->
-                {% if profile and profile.social_links.github %}
-                <a href="{{ profile.social_links.github }}" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                        viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 .333A9.911 9.911 0 0 0 6.866 19.65c.5.092.678-.215.678-.477 0-.237-.01-1.017-.014-1.845-2.757.6-3.338-1.169-3.338-1.169a2.719 2.719 0 0 0-1.11-1.466c-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.943 0-1.091.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.326 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span class="sr-only">GitHub account</span>
-                </a>
-                {% endif %}
-                {% if profile and profile.social_links.linkedin %}
-                <a href="{{ profile.social_links.linkedin }}" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="sr-only">LinkedIn account</span>
-                </a>
-                {% endif %}
-                {% if profile and profile.social_links.twitter %}
-                <a href="{{ profile.social_links.twitter }}" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
-                    </svg>
-                    <span class="sr-only">Twitter account</span>
-                </a>
-                {% endif %}
+        
+        <!-- Bottom Bar -->
+        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    © 2024 <a href="{% url 'home' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">Kouekam Digital Hub</a>. All rights reserved.
+                </p>
+                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span>Made with</span>
+                    <i class="fas fa-heart text-red-500"></i>
+                    <span>using Tailwind CSS</span>
+                </div>
             </div>
         </div>
     </div>

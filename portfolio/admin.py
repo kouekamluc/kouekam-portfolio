@@ -363,8 +363,6 @@ class ProjectAdmin(admin.ModelAdmin):
     def mark_as_archived(self, request, queryset):
         updated = queryset.update(status='archived')
         self.message_user(request, f'{updated} project(s) marked as archived.')
-
-
 @admin.register(ProjectImage)
 class ProjectImageAdmin(admin.ModelAdmin):
     list_display = ['project', 'caption', 'created_at']

@@ -54,23 +54,23 @@
             display: none;  /* Chrome, Safari and Opera */
         }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar - Tailwind Plus inspired */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #f8fafc;
         }
 
         .dark ::-webkit-scrollbar-track {
-            background: #1e293b;
+            background: #0f172a;
         }
 
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: background 0.2s;
         }
 
@@ -79,18 +79,18 @@
         }
 
         .dark ::-webkit-scrollbar-thumb {
-            background: #475569;
+            background: #334155;
         }
 
         .dark ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+            background: #475569;
         }
 
-        /* Animations */
+        /* Modern Animations - Tailwind Plus style */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -101,7 +101,7 @@
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateX(-10px);
+                transform: translateX(-20px);
             }
             to {
                 opacity: 1;
@@ -109,149 +109,243 @@
             }
         }
 
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         .animate-fade-in-up {
-            animation: fadeInUp 0.5s ease-out forwards;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Smooth transitions */
+        .animate-scale-in {
+            animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Smooth transitions - Enhanced */
         * {
             transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
+            transition-duration: 200ms;
         }
 
-        /* Card hover effects */
+        /* Modern Card hover effects - Tailwind Plus style */
         .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         .dark .card-hover:hover {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
         }
 
-        /* Button styles */
+        /* Modern Button styles - Tailwind Plus inspired */
         .btn-primary {
-            background-color: rgb(37 99 235);
+            background: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(37 99 235) 100%);
             color: white;
-            font-weight: 500;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -2px rgba(59, 130, 246, 0.2);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .btn-primary:hover {
-            background-color: rgb(29 78 216);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgb(37 99 235) 0%, rgb(29 78 216) 100%);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -4px rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-primary:focus {
             outline: 2px solid transparent;
             outline-offset: 2px;
-            box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.5);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 4px 6px -1px rgba(59, 130, 246, 0.3);
         }
 
         .btn-secondary {
-            background-color: rgb(229 231 235);
+            background-color: white;
             color: rgb(17 24 39);
-            font-weight: 500;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1.5px solid rgb(229 231 235);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .btn-secondary:hover {
-            background-color: rgb(209 213 219);
+            background-color: rgb(249 250 251);
+            border-color: rgb(209 213 219);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
         }
 
         .dark .btn-secondary {
-            background-color: rgb(55 65 81);
+            background-color: rgb(30 41 59);
             color: white;
+            border-color: rgb(51 65 85);
         }
 
         .dark .btn-secondary:hover {
-            background-color: rgb(75 85 99);
+            background-color: rgb(51 65 85);
+            border-color: rgb(71 85 105);
         }
 
-        /* Input styles */
+        /* Modern Input styles - Tailwind Plus inspired */
         .input-field {
             display: block;
             width: 100%;
-            border-radius: 0.5rem;
-            border-width: 1px;
-            border-color: rgb(209 213 219);
-            background-color: rgb(249 250 251);
-            padding: 0.625rem;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            color: rgb(17 24 39);
-            transition: all 0.15s;
+            border-radius: 0.75rem;
+            border-width: 1.5px;
+            border-color: rgb(226 232 240);
+            background-color: white;
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+            line-height: 1.5rem;
+            color: rgb(15 23 42);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .input-field:focus {
             border-color: rgb(59 130 246);
             outline: 2px solid transparent;
             outline-offset: 2px;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .dark .input-field {
-            border-color: rgb(75 85 99);
-            background-color: rgb(55 65 81);
+            border-color: rgb(51 65 85);
+            background-color: rgb(30 41 59);
             color: white;
         }
 
-        .dark .input-field::placeholder {
-            color: rgb(156 163 175);
+        .dark .input-field:focus {
+            border-color: rgb(59 130 246);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* Card styles */
+        .dark .input-field::placeholder {
+            color: rgb(148 163 184);
+        }
+
+        /* Modern Card styles - Tailwind Plus inspired */
         .card {
             background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
             border-width: 1px;
-            border-color: rgb(229 231 235);
+            border-color: rgb(241 245 249);
             padding: 1.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .dark .card {
-            background-color: rgb(31 41 55);
-            border-color: rgb(55 65 81);
+            background-color: rgb(30 41 59);
+            border-color: rgb(51 65 85);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
         }
 
         .card-hover {
             background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
             border-width: 1px;
-            border-color: rgb(229 231 235);
+            border-color: rgb(241 245 249);
             padding: 1.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card-hover:hover {
-            border-color: rgb(209 213 219);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border-color: rgb(226 232 240);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
 
         .dark .card-hover {
-            background-color: rgb(31 41 55);
-            border-color: rgb(55 65 81);
+            background-color: rgb(30 41 59);
+            border-color: rgb(51 65 85);
         }
 
         .dark .card-hover:hover {
-            border-color: rgb(75 85 99);
+            border-color: rgb(71 85 105);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gradient backgrounds - Tailwind Plus style */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-bg-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        /* Blob animation */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
         }
     </style>
 </head>
