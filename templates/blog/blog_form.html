@@ -6,85 +6,147 @@
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
         <div class="max-w-4xl mx-auto">
             <a href="{% if post %}{% url 'blog_detail' post.slug %}{% else %}{% url 'blog_list' %}{% endif %}" 
-               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i>Back
+               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Blog
             </a>
-            <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Blog Post</h1>
+            
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">{{ form_type }} Blog Post</h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    {% if form_type == 'Create' %}
+                        Share your thoughts, tutorials, or insights with the community
+                    {% else %}
+                        Update your blog post content and settings
+                    {% endif %}
+                </p>
+            </div>
             
             <div class="card">
-                <form method="post" class="space-y-6">
+                <form method="post" class="space-y-8">
                     {% csrf_token %}
                     
                     {% if form.non_field_errors %}
-                        <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
-                            {{ form.non_field_errors }}
+                        <div class="p-4 text-sm text-red-800 bg-red-50 dark:bg-red-900/20 dark:text-red-200 rounded-lg border border-red-200 dark:border-red-800">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-circle mr-2 mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold">Please correct the following errors:</p>
+                                    {{ form.non_field_errors }}
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                     
+                    <!-- Title Field -->
                     <div>
-                        <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <label for="{{ form.title.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-heading mr-2 text-blue-600 dark:text-blue-400"></i>
                             Title <span class="text-red-500">*</span>
                         </label>
                         {{ form.title }}
                         {% if form.title.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.title.errors }}</p>
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.title.errors.0 }}
+                            </p>
                         {% endif %}
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Choose a clear and descriptive title for your post</p>
                     </div>
                     
+                    <!-- Content Field -->
                     <div>
-                        <label for="content" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <label for="{{ form.content.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-align-left mr-2 text-blue-600 dark:text-blue-400"></i>
                             Content <span class="text-red-500">*</span>
                         </label>
                         {{ form.content }}
                         {% if form.content.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.content.errors }}</p>
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.content.errors.0 }}
+                            </p>
                         {% endif %}
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">You can use Markdown formatting</p>
+                        <div class="mt-2 flex items-start text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-2 mt-0.5"></i>
+                            <div>
+                                <p class="font-medium mb-1">You can use Markdown formatting:</p>
+                                <ul class="list-disc list-inside space-y-0.5 ml-2">
+                                    <li><strong>**bold**</strong> for bold text</li>
+                                    <li><em>*italic*</em> for italic text</li>
+                                    <li><code>`code`</code> for inline code</li>
+                                    <li><code>```language\ncode\n```</code> for code blocks</li>
+                                    <li><strong>#</strong> for headings</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     
+                    <!-- Category and Published Date -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <label for="{{ form.category.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-folder mr-2 text-blue-600 dark:text-blue-400"></i>
                                 Category
                             </label>
                             {{ form.category }}
                             {% if form.category.errors %}
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.category.errors }}</p>
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.category.errors.0 }}
+                                </p>
                             {% endif %}
                         </div>
                         
                         <div>
-                            <label for="published_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <label for="{{ form.published_date.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-calendar mr-2 text-blue-600 dark:text-blue-400"></i>
                                 Published Date
                             </label>
                             {{ form.published_date }}
                             {% if form.published_date.errors %}
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.published_date.errors }}</p>
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.published_date.errors.0 }}
+                                </p>
                             {% endif %}
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave empty to save as draft</p>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                Leave empty to save as draft
+                            </p>
                         </div>
                     </div>
                     
-                    <div class="flex items-center">
-                        {{ form.featured }}
-                        <label for="id_featured" class="ml-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Featured Post
-                        </label>
-                        {% if form.featured.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.featured.errors }}</p>
-                        {% endif %}
+                    <!-- Featured Checkbox -->
+                    <div class="flex items-start p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div class="flex items-center h-5">
+                            {{ form.featured }}
+                        </div>
+                        <div class="ml-3">
+                            <label for="{{ form.featured.id_for_label }}" class="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer">
+                                <i class="fas fa-star mr-2 text-yellow-500"></i>
+                                Featured Post
+                            </label>
+                            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                Featured posts are highlighted on the blog homepage
+                            </p>
+                            {% if form.featured.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.featured.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
                     </div>
                     
-                    <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button type="submit" name="publish" class="btn-primary">
-                            <i class="fas fa-paper-plane mr-2"></i>Publish
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit" name="publish" class="btn-primary inline-flex items-center px-6 py-3">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            <span>Publish</span>
                         </button>
-                        <button type="submit" class="btn-secondary">
-                            <i class="fas fa-save mr-2"></i>Save Draft
+                        <button type="submit" class="btn-secondary inline-flex items-center px-6 py-3">
+                            <i class="fas fa-save mr-2"></i>
+                            <span>Save Draft</span>
                         </button>
                         <a href="{% if post %}{% url 'blog_detail' post.slug %}{% else %}{% url 'blog_list' %}{% endif %}" 
-                           class="btn-secondary">
-                            Cancel
+                           class="btn-secondary inline-flex items-center px-6 py-3">
+                            <i class="fas fa-times mr-2"></i>
+                            <span>Cancel</span>
                         </a>
                     </div>
                 </form>
@@ -92,7 +154,48 @@
         </div>
     </div>
 </section>
+
+<style>
+/* Enhanced form styling */
+.card form input[type="text"],
+.card form input[type="datetime-local"],
+.card form textarea,
+.card form select {
+    @apply transition-all duration-200;
+}
+
+.card form input[type="text"]:focus,
+.card form input[type="datetime-local"]:focus,
+.card form textarea:focus,
+.card form select:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-50;
+}
+
+/* Dark mode input improvements */
+.dark .card form input[type="text"],
+.dark .card form input[type="datetime-local"],
+.dark .card form textarea,
+.dark .card form select {
+    @apply bg-gray-800 border-gray-600 text-white;
+}
+
+.dark .card form input[type="text"]:focus,
+.dark .card form input[type="datetime-local"]:focus,
+.dark .card form textarea:focus,
+.dark .card form select:focus {
+    @apply border-blue-500;
+    background-color: rgb(30 41 59);
+}
+
+/* Textarea specific styling */
+.card form textarea {
+    @apply resize-y min-h-[300px];
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Checkbox styling improvements */
+.card form input[type="checkbox"] {
+    @apply w-5 h-5 cursor-pointer;
+}
+</style>
 {% endblock %}
-
-
-
