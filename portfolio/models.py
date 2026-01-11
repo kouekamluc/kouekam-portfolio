@@ -55,7 +55,7 @@ class Project(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
     description = models.TextField()
     category = models.CharField(max_length=100, choices=[('ai', 'AI & Machine Learning'), ('electronics', 'Electronics & IoT'), ('web', 'Web Development'), ('other', 'Other')])
     tech_stack = models.JSONField(default=list, help_text="List of technologies used e.g. ['Python', 'Django']")
@@ -82,16 +82,29 @@ class Project(models.Model):
                     # Use a UUID-based slug as fallback
                     base_slug = f"project-{uuid.uuid4().hex[:8]}"
                 
+                # Truncate slug if it's too long (max_length=255)
+                max_slug_length = 255
+                if len(base_slug) > max_slug_length:
+                    base_slug = base_slug[:max_slug_length]
+                    # Remove trailing hyphens if truncation creates them
+                    base_slug = base_slug.rstrip('-')
+                
                 # Ensure slug is unique
                 original_slug = base_slug
                 counter = 1
                 # Check for duplicates, excluding current instance
                 while Project.objects.filter(slug=base_slug).exclude(pk=self.pk if self.pk else None).exists():
-                    base_slug = f"{original_slug}-{counter}"
+                    # Calculate available space for counter
+                    counter_str = f"-{counter}"
+                    available_length = max_slug_length - len(counter_str)
+                    base_slug = original_slug[:available_length] + counter_str
                     counter += 1
                     if counter > 1000:  # Safety limit
                         # If we hit the limit, use UUID as last resort
-                        base_slug = f"{original_slug}-{uuid.uuid4().hex[:8]}"
+                        uuid_str = uuid.uuid4().hex[:8]
+                        uuid_counter = f"-{uuid_str}"
+                        available_length = max_slug_length - len(uuid_counter)
+                        base_slug = original_slug[:available_length] + uuid_counter
                         break
                 
                 self.slug = base_slug
@@ -104,6 +117,10 @@ class Project(models.Model):
                 from django.utils.text import slugify
                 import uuid
                 base_slug = slugify(self.title) if self.title else f"project-{uuid.uuid4().hex[:8]}"
+                # Truncate slug if it's too long (max_length=255)
+                max_slug_length = 255
+                if len(base_slug) > max_slug_length:
+                    base_slug = base_slug[:max_slug_length].rstrip('-')
                 # Update slug directly in database to avoid recursion
                 Project.objects.filter(pk=self.pk).update(slug=base_slug)
                 self.slug = base_slug
