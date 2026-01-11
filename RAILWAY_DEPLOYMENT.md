@@ -33,7 +33,8 @@ When Railway builds and deploys your Docker container:
 
 2. **Container Startup (entrypoint.sh)**:
    - ✅ Waits for PostgreSQL (if using DATABASE_URL)
-   - ✅ Runs database migrations
+   - ✅ Runs database migrations (includes Sites framework)
+   - ✅ Initializes Site for django-allauth (password reset emails)
    - ✅ Creates superuser (if needed)
    - ✅ Rebuilds CSS if missing (fallback safety)
    - ✅ Collects static files (including CSS)

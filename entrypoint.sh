@@ -20,6 +20,12 @@ fi
 echo "Running migrations..."
 python manage.py migrate --noinput
 
+echo "Initializing Site for django-allauth..."
+# init_site will auto-detect domain from SITE_DOMAIN or ALLOWED_HOSTS if not provided
+python manage.py init_site ${SITE_DOMAIN:+--domain "$SITE_DOMAIN"} ${SITE_NAME:+--name "$SITE_NAME"} || {
+    echo "Warning: Site initialization had issues, but continuing..."
+}
+
 echo "Creating superuser (if not exists)..."
 python create_superuser.py
 

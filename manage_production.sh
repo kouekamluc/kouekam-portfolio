@@ -38,11 +38,20 @@ case "$1" in
         echo "Running production deployment..."
         python manage.py check --deploy
         python manage.py migrate
+        echo "Initializing Site for django-allauth..."
+        # init_site will auto-detect domain from SITE_DOMAIN or ALLOWED_HOSTS if not provided
+        python manage.py init_site ${SITE_DOMAIN:+--domain "$SITE_DOMAIN"} ${SITE_NAME:+--name "$SITE_NAME"} || {
+            echo "Warning: Site initialization had issues, but continuing..."
+        }
         python manage.py collectstatic --noinput
         echo "Deployment complete! Restart your application server."
         ;;
+    init_site)
+        echo "Initializing Site for django-allauth..."
+        python manage.py init_site --domain "${SITE_DOMAIN:-localhost:8000}" --name "${SITE_NAME:-Kouekam Portfolio}"
+        ;;
     *)
-        echo "Usage: $0 {collectstatic|migrate|createsuperuser|check|shell|backup|deploy}"
+        echo "Usage: $0 {collectstatic|migrate|createsuperuser|check|shell|backup|deploy|init_site}"
         echo ""
         echo "Commands:"
         echo "  collectstatic    - Collect static files"
@@ -51,7 +60,8 @@ case "$1" in
         echo "  check            - Check deployment configuration"
         echo "  shell            - Open Django shell"
         echo "  backup           - Backup database (requires DATABASE_URL)"
-        echo "  deploy           - Run full deployment (check, migrate, collectstatic)"
+        echo "  deploy           - Run full deployment (check, migrate, init_site, collectstatic)"
+        echo "  init_site        - Initialize Site object for django-allauth"
         exit 1
         ;;
 esac

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # Required for django-allauth
     # Third-party
     "rest_framework",
     "allauth",
@@ -346,6 +347,9 @@ ACCOUNT_FORMS = {
     'login': 'allauth.account.forms.LoginForm',
     'signup': 'allauth.account.forms.SignupForm',
 }
+
+# Password Reset Settings
+ACCOUNT_PASSWORD_RESET_EXPIRE_HOURS = 24  # Password reset link valid for 24 hours
 
 # Security Settings (for production)
 if not DEBUG:
