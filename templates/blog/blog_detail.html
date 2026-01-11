@@ -57,9 +57,9 @@
                     {% endif %}
                 </div>
                 
-                <!-- Main Content (Markdown) -->
-                <div class="prose dark:prose-invert max-w-none mb-8">
-                    {{ post.content|markdownify|safe }}
+                <!-- Main Content (HTML) -->
+                <div class="prose prose-lg dark:prose-invert max-w-none mb-8">
+                    {{ post.content|safe }}
                 </div>
                 
                 <!-- Code Snippets Section -->

@@ -102,14 +102,8 @@
                         <div class="mt-2 flex items-start text-xs text-gray-500 dark:text-gray-400">
                             <i class="fas fa-info-circle mr-2 mt-0.5"></i>
                             <div>
-                                <p class="font-medium mb-1">You can use Markdown formatting:</p>
-                                <ul class="list-disc list-inside space-y-0.5 ml-2">
-                                    <li><strong>**bold**</strong> for bold text</li>
-                                    <li><em>*italic*</em> for italic text</li>
-                                    <li><code>`code`</code> for inline code</li>
-                                    <li><code>```language\ncode\n```</code> for code blocks</li>
-                                    <li><strong>#</strong> for headings</li>
-                                </ul>
+                                <p class="font-medium mb-1">Use the rich text editor to format your content:</p>
+                                <p>Use the toolbar buttons to format text, create headings, lists, and more.</p>
                             </div>
                         </div>
                     </div>
@@ -258,5 +252,88 @@
 .card form label[for*="image"]:has(input[type="file"]:focus) {
     @apply ring-2 ring-blue-500 ring-offset-2;
 }
+
+/* Tiptap Editor Styles */
+.tiptap-editor-content .ProseMirror {
+    outline: none;
+}
+
+.tiptap-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+.tiptap-editor-content .ProseMirror p {
+    margin: 0.5em 0;
+}
+
+.tiptap-editor-content .ProseMirror h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+}
+
+.tiptap-editor-content .ProseMirror h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.75em 0;
+}
+
+.tiptap-editor-content .ProseMirror h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin: 0.83em 0;
+}
+
+.tiptap-editor-content .ProseMirror ul,
+.tiptap-editor-content .ProseMirror ol {
+    padding-left: 1.5em;
+    margin: 1em 0;
+}
+
+.tiptap-editor-content .ProseMirror blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1em;
+    margin: 1em 0;
+    font-style: italic;
+}
+
+.dark .tiptap-editor-content .ProseMirror blockquote {
+    border-left-color: #4b5563;
+}
+
+.tiptap-editor-content .ProseMirror code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.dark .tiptap-editor-content .ProseMirror code {
+    background-color: #374151;
+}
+
+.tiptap-editor-content .ProseMirror pre {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 0.5em;
+    overflow-x: auto;
+    margin: 1em 0;
+}
+
+.dark .tiptap-editor-content .ProseMirror pre {
+    background-color: #1f2937;
+}
+
+.tiptap-editor-content .ProseMirror pre code {
+    background-color: transparent;
+    padding: 0;
+}
 </style>
+{% load static %}
+<script src="{% static 'js/tiptap-editor.js' %}"></script>
 {% endblock %}

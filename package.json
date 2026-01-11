@@ -6,13 +6,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "build:css:prod": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify"
+    "build:css:prod": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "build:js": "esbuild ./static/js/tiptap-editor-source.js --bundle --format=iife --global-name=TiptapEditor --outfile=./static/js/tiptap-editor.js --minify",
+    "build:js:watch": "esbuild ./static/js/tiptap-editor-source.js --bundle --format=iife --global-name=TiptapEditor --outfile=./static/js/tiptap-editor.js --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@tiptap/core": "^3.15.3",
+    "@tiptap/extension-placeholder": "^3.15.3",
+    "@tiptap/starter-kit": "^3.15.3",
+    "esbuild": "^0.27.2",
     "tailwindcss": "^3.4.17"
   },
   "dependencies": {

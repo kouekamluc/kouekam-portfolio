@@ -23,8 +23,8 @@
         </div>
         
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
-            <div class="prose dark:prose-invert max-w-none">
-                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line text-lg leading-relaxed">{{ entry.content }}</p>
+            <div class="prose prose-lg dark:prose-invert max-w-none">
+                {{ entry.content|safe }}
             </div>
             
             {% if entry.tags %}

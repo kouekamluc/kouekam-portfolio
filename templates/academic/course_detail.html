@@ -61,7 +61,7 @@
                             </div>
                             <div
                                 class="prose dark:prose-invert max-w-none text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                {{ note.content|linebreaks|truncatewords:50 }}
+                                {{ note.content|safe|truncatewords:50 }}
                             </div>
                             {% if note.file %}
                             <a href="{{ note.file.url }}"
