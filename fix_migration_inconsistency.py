@@ -78,6 +78,29 @@ def fix_migration_inconsistency():
                 """)
                 socialaccount_table_exists = cursor.fetchone()[0]
                 
+                # Check if migration 0004 is recorded
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM django_migrations 
+                        WHERE app = 'socialaccount' 
+                        AND name = '0004_app_provider_id_settings'
+                    );
+                """)
+                socialaccount_0004_exists = cursor.fetchone()[0]
+                
+                # Check if provider_id column exists (added by migration 0004)
+                provider_id_exists = False
+                if socialaccount_table_exists:
+                    cursor.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.columns 
+                            WHERE table_schema = 'public' 
+                            AND table_name = 'socialaccount_socialapp'
+                            AND column_name = 'provider_id'
+                        );
+                    """)
+                    provider_id_exists = cursor.fetchone()[0]
+                
             elif is_sqlite:
                 # Check if django_site table exists (SQLite)
                 cursor.execute("""
@@ -113,6 +136,20 @@ def fix_migration_inconsistency():
                     WHERE type='table' AND name='socialaccount_socialapp';
                 """)
                 socialaccount_table_exists = cursor.fetchone() is not None
+                
+                # Check if migration 0004 is recorded
+                cursor.execute("""
+                    SELECT COUNT(*) FROM django_migrations 
+                    WHERE app = 'socialaccount' AND name = '0004_app_provider_id_settings';
+                """)
+                socialaccount_0004_exists = cursor.fetchone()[0] > 0
+                
+                # Check if provider_id column exists (added by migration 0004)
+                provider_id_exists = False
+                if socialaccount_table_exists:
+                    cursor.execute("PRAGMA table_info(socialaccount_socialapp);")
+                    columns = [row[1] for row in cursor.fetchall()]
+                    provider_id_exists = 'provider_id' in columns
             else:
                 print(f"Unsupported database engine: {db_engine}")
                 return False
