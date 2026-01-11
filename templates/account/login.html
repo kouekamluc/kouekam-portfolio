@@ -20,9 +20,10 @@
                 </p>
             </div>
 
-    {% get_providers as socialaccount_providers %}
-
-    {% if socialaccount_providers %}
+    {% comment %}Temporarily commented out to debug 500 error - get_providers may be causing the issue{% endcomment %}
+    {% comment %}{% get_providers as socialaccount_providers %}{% endcomment %}
+    {% with socialaccount_providers=None %}
+    {% if False and socialaccount_providers %}
     <div class="mb-6">
         <div class="relative">
             <div class="absolute inset-0 flex items-center">
@@ -34,6 +35,7 @@
         </div>
     </div>
     {% endif %}
+    {% endwith %}
 
     <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
         {% csrf_token %}
