@@ -46,6 +46,10 @@ class Course(models.Model):
         return f"{self.code} - {self.name}" if self.code else self.name
 
     @property
+    def display_title(self):
+        return f"{self.code} - {self.name}" if self.code else self.name
+
+    @property
     def is_professional_development(self):
         return self.learning_type in {'certification', 'training', 'self_study'}
 

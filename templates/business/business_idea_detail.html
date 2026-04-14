@@ -26,6 +26,21 @@
         
         <div class="grid gap-8 lg:grid-cols-3">
             <div class="lg:col-span-2 space-y-6">
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/40 rounded-lg p-5">
+                    <p class="text-xs uppercase tracking-wide text-blue-700 dark:text-blue-300">Next Recommended Action</p>
+                    <p class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">{{ next_action }}</p>
+                    {% if workflow_actions %}
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                        {% for action in workflow_actions %}
+                        <li class="flex items-start">
+                            <i class="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                            <span>{{ action }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+
                 <div>
                     <h2 class="text-2xl font-bold mb-4 dark:text-white">Description</h2>
                     <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ idea.description }}</p>
@@ -118,7 +133,6 @@
     </div>
 </section>
 {% endblock %}
-
 
 
 

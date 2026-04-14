@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.templatetags.static import static
 from django.db.models import Q
@@ -10,6 +11,11 @@ from .forms import ProfileForm, ProjectForm, ProjectImageForm
 from .email_utils import send_contact_form_email
 from blog.models import BlogPost
 from academic.models import Note
+
+
+def _require_portfolio_admin(user):
+    if not user.is_staff:
+        raise PermissionDenied("Only staff users can manage portfolio projects.")
 
 def home(request):
     profile = Profile.objects.first() # Simplification for single-user portfolio
@@ -128,10 +134,13 @@ def project_list(request):
 
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
+    if project.status not in ['active', 'completed'] and not request.user.is_staff:
+        raise PermissionDenied("This project is not publicly available.")
     return render(request, 'portfolio/project_detail.html', {'project': project})
 
 @login_required
 def project_create(request):
+    _require_portfolio_admin(request.user)
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
@@ -152,6 +161,7 @@ def project_create(request):
 
 @login_required
 def project_update(request, slug):
+    _require_portfolio_admin(request.user)
     project = get_object_or_404(Project, slug=slug)
     
     if request.method == 'POST':
@@ -175,6 +185,7 @@ def project_update(request, slug):
 
 @login_required
 def project_delete(request, slug):
+    _require_portfolio_admin(request.user)
     project = get_object_or_404(Project, slug=slug)
     if request.method == 'POST':
         project.delete()
@@ -184,6 +195,7 @@ def project_delete(request, slug):
 
 @login_required
 def project_image_add(request, slug):
+    _require_portfolio_admin(request.user)
     project = get_object_or_404(Project, slug=slug)
     if request.method == 'POST':
         form = ProjectImageForm(request.POST, request.FILES)
@@ -201,6 +213,7 @@ def project_image_add(request, slug):
 
 @login_required
 def project_image_delete(request, image_id):
+    _require_portfolio_admin(request.user)
     project_image = get_object_or_404(ProjectImage, id=image_id)
     project = project_image.project
     if request.method == 'POST':
@@ -308,6 +321,8 @@ def search(request):
         # Search blog posts (public)
         blog_posts = BlogPost.objects.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
+        ).filter(
+            published_date__isnull=False
         ).order_by('-published_date', '-created_at')[:10]
         results['blog_posts'] = blog_posts
         

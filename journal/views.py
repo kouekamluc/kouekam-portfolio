@@ -17,7 +17,7 @@ from .forms import JournalEntryForm, PhilosophyForm, VisionGoalForm, LifeLessonF
 def journal_dashboard(request):
     recent_entries = JournalEntry.objects.filter(user=request.user).order_by('-date')[:5]
     recent_philosophies = Philosophy.objects.filter(user=request.user).order_by('-date_written')[:3]
-    active_goals = VisionGoal.objects.filter(user=request.user).order_by('target_date')[:5]
+    active_goals = VisionGoal.objects.filter(user=request.user, progress__lt=100).order_by('target_date')[:5]
     lessons = LifeLesson.objects.filter(user=request.user)
     
     # Journal analytics
@@ -79,7 +79,7 @@ def journal_entry_list(request):
 @login_required
 def journal_entry_create(request):
     if request.method == 'POST':
-        form = JournalEntryForm(request.POST)
+        form = JournalEntryForm(request.POST, user=request.user)
         if form.is_valid():
             entry, created = JournalEntry.objects.update_or_create(
                 user=request.user,
@@ -91,10 +91,13 @@ def journal_entry_create(request):
                     'tags': form.cleaned_data.get('tags', ''),
                 }
             )
-            messages.success(request, 'Journal entry saved!')
+            if created:
+                messages.success(request, 'Journal entry saved!')
+            else:
+                messages.success(request, 'Existing journal entry updated for that date.')
             return redirect('journal_entry_detail', entry_id=entry.id)
     else:
-        form = JournalEntryForm(initial={'date': timezone.now().date()})
+        form = JournalEntryForm(initial={'date': timezone.now().date()}, user=request.user)
     return render(request, 'journal/journal_entry_form.html', {'form': form, 'form_type': 'Create'})
 
 @login_required
@@ -106,13 +109,13 @@ def journal_entry_detail(request, entry_id):
 def journal_entry_update(request, entry_id):
     entry = get_object_or_404(JournalEntry, id=entry_id, user=request.user)
     if request.method == 'POST':
-        form = JournalEntryForm(request.POST, instance=entry)
+        form = JournalEntryForm(request.POST, instance=entry, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Journal entry updated!')
             return redirect('journal_entry_detail', entry_id=entry.id)
     else:
-        form = JournalEntryForm(instance=entry)
+        form = JournalEntryForm(instance=entry, user=request.user)
     return render(request, 'journal/journal_entry_form.html', {'form': form, 'entry': entry, 'form_type': 'Update'})
 
 @login_required
@@ -309,7 +312,7 @@ def export_journal_pdf(request):
     story.append(Spacer(1, 0.2*inch))
     
     # Entries
-    for entry in entries:
+    for index, entry in enumerate(entries):
         # Date header
         date_style = ParagraphStyle(
             'DateStyle',
@@ -346,7 +349,8 @@ def export_journal_pdf(request):
             story.append(Paragraph(f"Tags: {entry.tags}", styles['Italic']))
         
         story.append(Spacer(1, 0.2*inch))
-        story.append(PageBreak())
+        if index < len(entries) - 1:
+            story.append(PageBreak())
     
     doc.build(story)
     buffer.seek(0)

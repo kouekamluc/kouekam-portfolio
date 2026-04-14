@@ -37,9 +37,12 @@
                             Date
                         </label>
                         <div class="mt-2">
-                            <input type="date" name="date" id="date" value="{% if entry %}{{ entry.date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required
+                            <input type="date" name="date" id="date" value="{{ form.date.value|default:'' }}"
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800">
                         </div>
+                        {% if form.date.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.date.errors|join:", " }}</p>
+                        {% endif %}
                     </div>
 
                     <div>
@@ -48,8 +51,11 @@
                         </label>
                         <div class="mt-2">
                             <textarea id="content" name="content" rows="12" required
-                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800">{% if entry %}{{ entry.content|safe }}{% endif %}</textarea>
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800">{{ form.content.value|default:'' }}</textarea>
                         </div>
+                        {% if form.content.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.content.errors|join:", " }}</p>
+                        {% endif %}
                         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                             <i class="fas fa-info-circle mr-1"></i>
                             Use the rich text editor toolbar to format your content.
@@ -65,11 +71,11 @@
                                 <select id="mood" name="mood"
                                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800">
                                     <option value="">Select mood</option>
-                                    <option value="excellent" {% if entry and entry.mood == 'excellent' %}selected{% endif %}>Excellent</option>
-                                    <option value="good" {% if entry and entry.mood == 'good' %}selected{% endif %}>Good</option>
-                                    <option value="okay" {% if entry and entry.mood == 'okay' %}selected{% endif %}>Okay</option>
-                                    <option value="poor" {% if entry and entry.mood == 'poor' %}selected{% endif %}>Poor</option>
-                                    <option value="terrible" {% if entry and entry.mood == 'terrible' %}selected{% endif %}>Terrible</option>
+                                    <option value="excellent" {% if form.mood.value == 'excellent' %}selected{% endif %}>Excellent</option>
+                                    <option value="good" {% if form.mood.value == 'good' %}selected{% endif %}>Good</option>
+                                    <option value="okay" {% if form.mood.value == 'okay' %}selected{% endif %}>Okay</option>
+                                    <option value="poor" {% if form.mood.value == 'poor' %}selected{% endif %}>Poor</option>
+                                    <option value="terrible" {% if form.mood.value == 'terrible' %}selected{% endif %}>Terrible</option>
                                 </select>
                             </div>
                         </div>
@@ -82,9 +88,9 @@
                                 <select id="energy_level" name="energy_level"
                                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800">
                                     <option value="">Select energy</option>
-                                    <option value="high" {% if entry and entry.energy_level == 'high' %}selected{% endif %}>High</option>
-                                    <option value="medium" {% if entry and entry.energy_level == 'medium' %}selected{% endif %}>Medium</option>
-                                    <option value="low" {% if entry and entry.energy_level == 'low' %}selected{% endif %}>Low</option>
+                                    <option value="high" {% if form.energy_level.value == 'high' %}selected{% endif %}>High</option>
+                                    <option value="medium" {% if form.energy_level.value == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="low" {% if form.energy_level.value == 'low' %}selected{% endif %}>Low</option>
                                 </select>
                             </div>
                         </div>
@@ -95,7 +101,7 @@
                             Tags
                         </label>
                         <div class="mt-2">
-                            <input type="text" name="tags" id="tags" value="{% if entry %}{{ entry.tags }}{% endif %}"
+                            <input type="text" name="tags" id="tags" value="{{ form.tags.value|default:'' }}"
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800"
                                 placeholder="e.g., work, personal, reflection">
                         </div>
@@ -206,7 +212,6 @@
 }
 </style>
 {% endblock %}
-
 
 
 

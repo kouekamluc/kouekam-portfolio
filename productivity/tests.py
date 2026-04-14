@@ -189,6 +189,14 @@ class ProductivityFormsTest(TestCase):
         })
         self.assertTrue(form.is_valid())
 
+    def test_transaction_form_allows_blank_date(self):
+        form = TransactionForm(data={
+            'type': 'expense',
+            'amount': '50.00',
+            'category': 'food',
+        })
+        self.assertTrue(form.is_valid())
+
     def test_transaction_form_rejects_income_with_expense_category(self):
         form = TransactionForm(data={
             'type': 'income',
@@ -231,6 +239,44 @@ class ProductivityWorkflowLogicTest(TestCase):
         response = client.post(reverse('milestone_manage', args=[goal.id]), {
             'complete': '1',
             'milestone_id': completed.id,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        goal.refresh_from_db()
+        self.assertEqual(goal.progress, 50)
+
+    def test_timetable_generator_keeps_only_one_active_timetable(self):
+        client = Client()
+        client.force_login(self.user)
+        existing = Timetable.objects.create(
+            user=self.user,
+            name='Old Timetable',
+            schedule_json={'monday': []},
+            active=True,
+        )
+
+        response = client.post(reverse('timetable_generator'), {
+            'name': 'Fresh Timetable',
+            'monday_time': ['08:00'],
+            'monday_activity': ['Deep work'],
+        })
+
+        self.assertEqual(response.status_code, 302)
+        existing.refresh_from_db()
+        self.assertFalse(existing.active)
+        self.assertTrue(Timetable.objects.get(name='Fresh Timetable', user=self.user).active)
+
+    def test_goal_update_with_milestones_stays_synced(self):
+        client = Client()
+        client.force_login(self.user)
+        goal = Goal.objects.create(user=self.user, title='Build SaaS', progress=10)
+        Milestone.objects.create(goal=goal, title='Research', completed=True)
+        Milestone.objects.create(goal=goal, title='Prototype', completed=False)
+
+        response = client.post(reverse('goal_update', args=[goal.id]), {
+            'title': 'Build SaaS',
+            'description': '',
+            'progress': 90,
         })
 
         self.assertEqual(response.status_code, 302)

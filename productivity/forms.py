@@ -78,6 +78,10 @@ class TransactionForm(forms.ModelForm):
     INCOME_CATEGORIES = {'salary', 'freelance', 'investment', 'other'}
     EXPENSE_CATEGORIES = {'food', 'transport', 'entertainment', 'shopping', 'bills', 'education', 'health', 'other'}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].required = False
+
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
         if amount is not None and amount <= 0:
@@ -194,7 +198,6 @@ class MilestoneForm(forms.ModelForm):
                 'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
             }),
         }
-
 
 
 

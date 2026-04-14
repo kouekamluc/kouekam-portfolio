@@ -32,6 +32,7 @@ urlpatterns = [
     path('transactions/<int:transaction_id>/update/', views.transaction_update, name='transaction_update'),
     path('transactions/<int:transaction_id>/delete/', views.transaction_delete, name='transaction_delete'),
     path('finance/', views.finance_dashboard, name='finance_dashboard'),
+    path('finance/export/csv/', views.export_finance_csv, name='export_finance_csv'),
     # Documents
     path('documents/', views.document_list, name='document_list'),
     path('documents/upload/', views.document_upload, name='document_upload'),

@@ -1,8 +1,10 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from datetime import date
+from django.utils import timezone
+from datetime import date, timedelta
 from .models import JournalEntry, Philosophy, VisionGoal, LifeLesson
+from .forms import JournalEntryForm, LifeLessonForm
 
 User = get_user_model()
 
@@ -112,3 +114,59 @@ class JournalViewsTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse('philosophy_list'))
         self.assertEqual(response.status_code, 200)
+
+    def test_journal_entry_create_defaults_blank_date_to_today(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('journal_entry_create'), {
+            'content': 'A solid day of engineering work.',
+            'mood': 'good',
+            'energy_level': 'high',
+            'tags': 'work,focus',
+        })
+        self.assertEqual(response.status_code, 302)
+        entry = JournalEntry.objects.get(user=self.user)
+        self.assertEqual(entry.date, timezone.now().date())
+
+    def test_journal_entry_update_rejects_duplicate_date(self):
+        entry_one = JournalEntry.objects.create(user=self.user, date=date.today(), content='First')
+        entry_two = JournalEntry.objects.create(user=self.user, date=date.today() - timedelta(days=1), content='Second')
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('journal_entry_update', args=[entry_two.id]), {
+            'date': entry_one.date,
+            'content': 'Second updated',
+            'mood': '',
+            'energy_level': '',
+            'tags': '',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'already have an entry for this date')
+
+    def test_life_lesson_create_defaults_blank_date_to_today(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('life_lessons_create'), {
+            'title': 'Prototype faster',
+            'lesson': 'Shorter feedback loops help.',
+            'context': 'Capstone project',
+        })
+        self.assertEqual(response.status_code, 302)
+        lesson = LifeLesson.objects.get(user=self.user)
+        self.assertEqual(lesson.date_learned, timezone.now().date())
+
+
+class JournalFormsTest(TestCase):
+    def test_journal_entry_form_allows_blank_date(self):
+        form = JournalEntryForm(data={
+            'content': 'Reflection',
+            'mood': 'good',
+            'energy_level': 'medium',
+            'tags': 'daily',
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_life_lesson_form_allows_blank_date(self):
+        form = LifeLessonForm(data={
+            'title': 'Listen more',
+            'lesson': 'Listening changes the outcome.',
+            'context': 'Team project',
+        })
+        self.assertTrue(form.is_valid())

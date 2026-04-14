@@ -5,10 +5,10 @@
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
         <a href="{% url 'course_detail' course.id %}" 
            class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Course
+            <i class="fas fa-arrow-left mr-2"></i>Back to Record
         </a>
         <h1 class="text-4xl font-bold mb-8 dark:text-white">AI Question Generator</h1>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">Course: {{ course.code }} - {{ course.name }}</p>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">Learning record: {{ course.display_title }}</p>
         
         <form method="post" class="max-w-2xl space-y-6 mb-8">
             {% csrf_token %}
@@ -19,7 +19,7 @@
             </div>
             <div>
                 <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Number of Questions</label>
-                <input type="number" name="num_questions" value="5" min="1" max="20" required
+                <input type="number" name="num_questions" value="{{ num_questions|default:5 }}" min="1" max="10" required
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
             <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Generate Questions</button>
@@ -40,7 +40,6 @@
     </div>
 </section>
 {% endblock %}
-
 
 
 

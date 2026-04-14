@@ -1,5 +1,6 @@
 from decimal import Decimal, InvalidOperation
 from django import forms
+from django.utils import timezone
 from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportRecord
 
 
@@ -20,10 +21,15 @@ class BusinessIdeaForm(forms.ModelForm):
                 'Add market sizing and competitor analysis or save at least one market research entry before moving an idea to planning.'
             )
 
-        if status == 'active' and not has_plan:
-            raise forms.ValidationError(
-                'Create a business plan before marking a business idea as active.'
-            )
+        if status == 'active':
+            if not has_plan:
+                raise forms.ValidationError(
+                    'Create a business plan before marking a business idea as active.'
+                )
+            if not (has_market_context or has_research):
+                raise forms.ValidationError(
+                    'Add market sizing, competitor analysis, or saved research before activating a business idea.'
+                )
 
         return cleaned_data
 
@@ -55,6 +61,16 @@ class BusinessIdeaForm(forms.ModelForm):
 
 
 class MarketResearchForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].required = False
+
+    def clean_date(self):
+        research_date = self.cleaned_data.get('date')
+        if research_date and research_date > timezone.now().date():
+            raise forms.ValidationError('Market research cannot be dated in the future.')
+        return research_date
+
     class Meta:
         model = MarketResearch
         fields = ['findings', 'sources', 'date']
@@ -175,6 +191,16 @@ class BusinessPlanForm(forms.ModelForm):
 
 
 class ImportExportRecordForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].required = False
+
+    def clean_date(self):
+        record_date = self.cleaned_data.get('date')
+        if record_date and record_date > timezone.now().date():
+            raise forms.ValidationError('Trade records cannot be dated in the future.')
+        return record_date
+
     def clean_quantity(self):
         quantity = self.cleaned_data.get('quantity')
         if quantity is not None and quantity <= 0:
@@ -220,9 +246,6 @@ class ImportExportRecordForm(forms.ModelForm):
                 'rows': 3
             }),
         }
-
-
-
 
 
 

@@ -3,93 +3,96 @@
 {% block title %}Home - Kouekam Digital Hub{% endblock %}
 
 {% block content %}
-<!-- Hero Section - Tailwind Plus Inspired -->
-<section class="relative overflow-hidden bg-white dark:bg-gray-900">
-    <!-- Background gradient -->
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800"></div>
-    
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-32 lg:pb-28">
-        <div class="grid max-w-screen-xl mx-auto lg:gap-12 xl:gap-0 lg:grid-cols-12 items-center">
-            <!-- Content -->
-            <div class="mr-auto place-self-center lg:col-span-7 animate-fade-in-up">
-                <div class="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium">
-                    <i class="fas fa-sparkles"></i>
-                    <span>Welcome to Your Digital Hub</span>
+<section class="relative overflow-hidden py-12 lg:py-20">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,118,110,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(217,119,6,0.16),transparent_26%)]"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-12 lg:grid-cols-12 items-center">
+            <div class="lg:col-span-7 animate-fade-in-up">
+                <div class="eyebrow mb-6">
+                    <i class="fas fa-compass"></i>
+                    <span>Kouekam Digital Hub</span>
                 </div>
-                
-                <h1 class="max-w-2xl mb-6 text-4xl font-extrabold tracking-tight leading-tight md:text-5xl xl:text-6xl dark:text-white">
-                    Build your next idea even
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">faster</span>
+
+                <h1 class="display-font max-w-4xl text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-[1.02]">
+                    One operating system for your
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-700 via-cyan-600 to-amber-500 dark:from-teal-300 dark:via-cyan-300 dark:to-amber-300">engineering life</span>.
                 </h1>
-                
-                <p class="max-w-2xl mb-8 text-lg text-gray-600 lg:mb-10 lg:text-xl dark:text-gray-300 leading-relaxed">
-                    Project Showcase, Academic Management, and Productivity Tools all in one place. 
-                    Streamline your workflow and achieve your goals with beautifully designed, expertly crafted tools.
+
+                <p class="max-w-2xl mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Kouekam Hub blends portfolio, academic tracking, productivity, business thinking, reflection, and AI support into one workspace that still makes sense when a student becomes a professional.
                 </p>
-                
-                <div class="flex flex-col sm:flex-row gap-4 mb-8">
+
+                <div class="flex flex-col sm:flex-row gap-4 mt-8">
                     {% if user.is_authenticated %}
-                    <a href="{% url 'project_list' %}" class="btn-primary">
-                        Explore Projects
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                        </svg>
+                    <a href="{% url 'academic_dashboard' %}" class="btn-primary">
+                        Open Workspace
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                     {% else %}
                     <a href="{% url 'account_signup' %}" class="btn-primary">
-                        Get Started
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                        </svg>
+                        Start Building
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                     {% endif %}
                     <a href="{% url 'project_list' %}" class="btn-secondary">
-                        View Portfolio
+                        Explore Portfolio
                     </a>
                 </div>
-                
-                <!-- Stats or Features -->
-                <div class="grid grid-cols-3 gap-8 pt-8 border-t border-gray-200 dark:border-gray-800">
-                    <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_projects }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Projects</div>
+
+                <div class="grid gap-4 sm:grid-cols-3 mt-10">
+                    <div class="card">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Projects</p>
+                        <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ total_projects }}</p>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Shipped work and experiments.</p>
                     </div>
-                    <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ published_blog_posts }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Blog Posts</div>
+                    <div class="card">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Writing</p>
+                        <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ published_blog_posts }}</p>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Notes, posts, and lessons learned.</p>
                     </div>
-                    <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_skills }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Skills</div>
+                    <div class="card">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Skills</p>
+                        <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ total_skills }}</p>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Capabilities growing over time.</p>
                     </div>
                 </div>
             </div>
-            
-            <!-- Image/Visual -->
-            <div class="hidden lg:mt-0 lg:col-span-5 lg:flex items-center justify-center animate-scale-in">
-                {% if profile and profile.photo %}
-                <div class="relative w-full max-w-md">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-3xl blur-3xl opacity-20"></div>
-                    <div class="relative w-full h-96 rounded-3xl shadow-2xl overflow-hidden ring-4 ring-white dark:ring-gray-800">
-                        <img src="{{ profile.photo.url }}" alt="Profile Photo" class="w-full h-full object-cover">
+
+            <div class="lg:col-span-5 animate-scale-in">
+                <div class="relative">
+                    <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-teal-500/20 via-cyan-400/10 to-amber-400/20 blur-3xl"></div>
+                    <div class="relative card p-6 sm:p-7">
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-2xl bg-slate-900 text-white p-5 sm:col-span-2">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-300">North Star</p>
+                                <h2 class="display-font mt-3 text-2xl font-bold">From coursework to career systems</h2>
+                                <p class="mt-3 text-sm text-slate-300">Track classes, certifications, goals, money, research, and ideas in one coherent rhythm.</p>
+                            </div>
+                            <div class="rounded-2xl bg-teal-50 dark:bg-teal-900/20 p-5 border border-teal-100 dark:border-teal-900/30">
+                                <i class="fas fa-graduation-cap text-teal-700 dark:text-teal-300"></i>
+                                <p class="display-font mt-4 text-lg font-semibold text-slate-900 dark:text-white">Academic</p>
+                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Courses, study sessions, notes, flashcards.</p>
+                            </div>
+                            <div class="rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-5 border border-amber-100 dark:border-amber-900/30">
+                                <i class="fas fa-briefcase text-amber-700 dark:text-amber-300"></i>
+                                <p class="display-font mt-4 text-lg font-semibold text-slate-900 dark:text-white">Professional</p>
+                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Business plans, projects, certifications, growth.</p>
+                            </div>
+                            <div class="rounded-2xl bg-white dark:bg-slate-900/70 p-5 border border-slate-200 dark:border-slate-800 sm:col-span-2">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Why this app works</p>
+                                <ul class="mt-3 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                                    <li class="flex items-start gap-3"><i class="fas fa-check text-teal-600 mt-1 text-xs"></i><span>Modules connect to the same long-term life workflow.</span></li>
+                                    <li class="flex items-start gap-3"><i class="fas fa-check text-teal-600 mt-1 text-xs"></i><span>Private dashboards coexist with a public-facing portfolio.</span></li>
+                                    <li class="flex items-start gap-3"><i class="fas fa-check text-teal-600 mt-1 text-xs"></i><span>The design now feels more intentional, calmer, and more professional.</span></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {% else %}
-                <div class="relative w-full max-w-md">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-3xl blur-3xl opacity-20"></div>
-                    <div class="relative w-full h-96 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-3xl shadow-2xl flex items-center justify-center ring-4 ring-white dark:ring-gray-800">
-                        <i class="fas fa-rocket text-7xl text-blue-600 dark:text-blue-400 opacity-60"></i>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
-    
-    <!-- Decorative elements -->
-    <div class="absolute top-0 left-1/4 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-    <div class="absolute top-0 right-1/4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-    <div class="absolute -bottom-8 left-1/3 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 </section>
 
 {% include 'components/about_section.html' %}

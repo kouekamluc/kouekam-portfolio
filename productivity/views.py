@@ -10,6 +10,13 @@ import csv
 from .models import Task, Habit, Goal, Document, Timetable, Transaction, Milestone
 from .forms import TaskForm, HabitForm, GoalForm, TransactionForm, TimetableForm, DocumentForm, MilestoneForm
 
+
+def _set_single_active_timetable(user, keep_id=None):
+    queryset = Timetable.objects.filter(user=user, active=True)
+    if keep_id is not None:
+        queryset = queryset.exclude(id=keep_id)
+    queryset.update(active=False)
+
 @login_required
 def productivity_dashboard(request):
     tasks = Task.objects.filter(user=request.user).order_by('due_date', '-priority')[:10]
@@ -222,8 +229,12 @@ def goal_update(request, goal_id):
     if request.method == 'POST':
         form = GoalForm(request.POST, instance=goal)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Goal updated successfully!')
+            goal = form.save()
+            if goal.milestones.exists():
+                goal.recalculate_progress_from_milestones()
+                messages.success(request, 'Goal updated. Progress stays synced with milestones.')
+            else:
+                messages.success(request, 'Goal updated successfully!')
             return redirect('goal_list')
     else:
         form = GoalForm(instance=goal)
@@ -287,6 +298,8 @@ def timetable_create(request):
             except json.JSONDecodeError:
                 timetable.schedule_json = {}
             timetable.save()
+            if timetable.active:
+                _set_single_active_timetable(request.user, keep_id=timetable.id)
             messages.success(request, 'Timetable created successfully!')
             return redirect('timetable_list')
     else:
@@ -305,7 +318,9 @@ def timetable_update(request, timetable_id):
                 timetable.schedule_json = json.loads(schedule_json) if schedule_json else timetable.schedule_json
             except json.JSONDecodeError:
                 pass  # Keep existing schedule_json if invalid
-            form.save()
+            timetable = form.save()
+            if timetable.active:
+                _set_single_active_timetable(request.user, keep_id=timetable.id)
             messages.success(request, 'Timetable updated successfully!')
             return redirect('timetable_list')
     else:
@@ -342,6 +357,7 @@ def timetable_generator(request):
             schedule_json=schedule_data,
             active=True,
         )
+        _set_single_active_timetable(request.user, keep_id=timetable.id)
         messages.success(request, 'Timetable generated successfully!')
         return redirect('timetable_list')
     
@@ -402,8 +418,8 @@ def finance_dashboard(request):
     income_transactions = transactions.filter(type='income')
     expense_transactions = transactions.filter(type='expense')
     
-    total_income = sum(float(t.amount) for t in income_transactions) if income_transactions.exists() else Decimal('0.00')
-    total_expenses = sum(float(t.amount) for t in expense_transactions) if expense_transactions.exists() else Decimal('0.00')
+    total_income = sum((t.amount for t in income_transactions), Decimal('0.00'))
+    total_expenses = sum((t.amount for t in expense_transactions), Decimal('0.00'))
     balance = total_income - total_expenses
     
     # Category breakdown
@@ -426,6 +442,8 @@ def finance_dashboard(request):
             monthly_data[month_key]['income'] += float(transaction.amount)
         else:
             monthly_data[month_key]['expense'] += float(transaction.amount)
+
+    monthly_data = dict(sorted(monthly_data.items()))
     
     context = {
         'total_income': total_income,
@@ -434,6 +452,7 @@ def finance_dashboard(request):
         'income_by_category': income_by_category,
         'expense_by_category': expense_by_category,
         'monthly_data': monthly_data,
+        'recent_transactions': transactions.order_by('-date', '-created_at')[:10],
     }
     return render(request, 'productivity/finance_dashboard.html', context)
 

@@ -153,6 +153,10 @@ class FlashcardForm(forms.ModelForm):
 
 
 class StudySessionForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].required = False
+
     def clean_date(self):
         session_date = self.cleaned_data.get('date')
         if session_date and session_date > timezone.now().date():

@@ -60,6 +60,27 @@
             </a>
         </div>
 
+        {% if records_needing_attention %}
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Needs Attention</h3>
+                <a href="{% url 'study_planner' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Open guided planner</a>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for record in records_needing_attention %}
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">{{ record.course.get_learning_type_display }}</p>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{ record.course.display_title }}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{{ record.next_action }}</p>
+                    <a href="{% url 'course_detail' record.course.id %}" class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline mt-4">
+                        Review record <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {% for course in courses %}
             <div class="card card-hover">
@@ -70,7 +91,7 @@
                         </span>
                         <h3 class="mt-2 text-xl font-bold text-gray-900 dark:text-white">
                             <a href="{% url 'course_detail' course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                {{ course.name }}
+                                {{ course.display_title }}
                             </a>
                         </h3>
                     </div>
@@ -146,7 +167,7 @@
                         <div class="flex-1">
                             <h4 class="font-semibold text-gray-900 dark:text-white">
                                 <a href="{% url 'course_detail' session.course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                                    {{ session.course.code|default:session.course.name }}
+                                    {{ session.course.display_title }}
                                 </a>
                             </h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400">

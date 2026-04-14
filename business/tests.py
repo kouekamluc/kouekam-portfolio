@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from decimal import Decimal
 from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportRecord
 
@@ -137,3 +138,70 @@ class BusinessWorkflowValidationTest(TestCase):
         })
         self.assertFalse(form.is_valid())
         self.assertIn('funding_needed', form.errors)
+
+    def test_active_business_idea_requires_market_validation_as_well(self):
+        idea = BusinessIdea.objects.create(
+            user=self.user,
+            title='IoT Prototype Lab',
+            description='Build devices for local SMEs.',
+            status='planning'
+        )
+        BusinessPlan.objects.create(
+            business_idea=idea,
+            user=self.user,
+            executive_summary='Plan',
+            financial_data={},
+        )
+
+        from .forms import BusinessIdeaForm
+        form = BusinessIdeaForm(
+            data={
+                'title': idea.title,
+                'description': idea.description,
+                'status': 'active',
+                'market_size': '',
+                'competitors': '',
+            },
+            instance=idea,
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_market_research_form_allows_blank_date(self):
+        from .forms import MarketResearchForm
+
+        form = MarketResearchForm(data={
+            'findings': 'Students need affordable prototyping.',
+            'sources': 'Interviews',
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_market_research_create_defaults_date_to_today(self):
+        idea = BusinessIdea.objects.create(
+            user=self.user,
+            title='Research Driven Startup',
+            description='Test description',
+        )
+        client = Client()
+        client.force_login(self.user)
+
+        response = client.post(reverse('market_research_create', args=[idea.id]), {
+            'findings': 'Validated customer pain points',
+            'sources': 'Survey results',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        research = MarketResearch.objects.get(business_idea=idea)
+        self.assertEqual(research.date, timezone.now().date())
+
+    def test_import_export_form_allows_blank_date(self):
+        from .forms import ImportExportRecordForm
+
+        form = ImportExportRecordForm(data={
+            'product': 'Sensors',
+            'quantity': '5',
+            'value': '2500',
+            'country': 'Italy',
+            'type': 'import',
+            'description': 'Sample batch',
+        })
+        self.assertTrue(form.is_valid())

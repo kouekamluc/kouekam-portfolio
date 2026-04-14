@@ -4,11 +4,27 @@ from .models import JournalEntry, Philosophy, VisionGoal, LifeLesson
 
 
 class JournalEntryForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.fields['date'].required = False
+
     def clean_date(self):
         entry_date = self.cleaned_data.get('date')
         if entry_date and entry_date > timezone.now().date():
             raise forms.ValidationError('Journal entries cannot be created in the future.')
         return entry_date
+
+    def clean(self):
+        cleaned_data = super().clean()
+        entry_date = cleaned_data.get('date')
+        if self.user and entry_date:
+            existing_entry = JournalEntry.objects.filter(user=self.user, date=entry_date)
+            if self.instance.pk:
+                existing_entry = existing_entry.exclude(pk=self.instance.pk)
+            if existing_entry.exists():
+                self.add_error('date', 'You already have an entry for this date. Edit the existing one instead.')
+        return cleaned_data
 
     class Meta:
         model = JournalEntry
@@ -90,6 +106,10 @@ class VisionGoalForm(forms.ModelForm):
 
 
 class LifeLessonForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date_learned'].required = False
+
     def clean_date_learned(self):
         learned_date = self.cleaned_data.get('date_learned')
         if learned_date and learned_date > timezone.now().date():

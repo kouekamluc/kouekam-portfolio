@@ -5,10 +5,10 @@
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
         <a href="{% url 'course_detail' course.id %}" 
            class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Course
+            <i class="fas fa-arrow-left mr-2"></i>Back to Record
         </a>
         <h1 class="text-4xl font-bold mb-8 dark:text-white">{{ form_type }} Note</h1>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">Course: {{ course.code }} - {{ course.name }}</p>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">Learning record: {{ course.display_title }}</p>
         
         <form method="post" enctype="multipart/form-data" class="max-w-2xl space-y-6">
             {% csrf_token %}
@@ -32,7 +32,7 @@
                 {% endif %}
                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle mr-1"></i>
-                    Use the rich text editor toolbar to format your content.
+                    Capture the important takeaways, formulas, references, or implementation notes you will want later.
                 </p>
             </div>
             <div>
@@ -135,7 +135,6 @@
 }
 </style>
 {% endblock %}
-
 
 
 

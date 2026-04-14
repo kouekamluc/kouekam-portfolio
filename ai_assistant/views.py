@@ -69,17 +69,11 @@ def conversation_detail(request, conversation_id):
                 
                 # Get conversation history
                 history = []
-                for msg in messages_list:
+                for msg in conversation.messages.all():
                     history.append({
                         'role': msg.role,
                         'content': msg.content
                     })
-                
-                # Add new user message
-                history.append({
-                    'role': 'user',
-                    'content': user_message
-                })
                 
                 try:
                     # Get AI response based on assistant type
@@ -104,7 +98,7 @@ def conversation_detail(request, conversation_id):
                     )
                     
                     # Update conversation title if it's still default
-                    if conversation.title == 'New Conversation' and len(user_message) < 50:
+                    if conversation.title == 'New Conversation':
                         conversation.title = user_message[:50]
                         conversation.save()
                     

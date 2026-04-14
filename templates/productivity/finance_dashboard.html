@@ -26,7 +26,32 @@
         
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold dark:text-white">Recent Transactions</h2>
-            <a href="{% url 'transaction_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Transaction</a>
+            <div class="flex gap-3">
+                <a href="{% url 'export_finance_csv' %}" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800">Export CSV</a>
+                <a href="{% url 'transaction_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Transaction</a>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            {% if recent_transactions %}
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for transaction in recent_transactions %}
+                <div class="flex items-center justify-between p-4">
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ transaction.get_type_display }} · {{ transaction.get_category_display }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ transaction.date|date:"M d, Y" }}{% if transaction.description %} · {{ transaction.description|truncatewords:10 }}{% endif %}</p>
+                    </div>
+                    <p class="font-semibold {% if transaction.type == 'income' %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                        {% if transaction.type == 'income' %}+{% else %}-{% endif %}${{ transaction.amount|floatformat:2 }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                No transactions recorded yet.
+            </div>
+            {% endif %}
         </div>
     </div>
 </section>

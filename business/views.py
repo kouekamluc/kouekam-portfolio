@@ -8,6 +8,37 @@ import json
 from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportRecord
 from .forms import BusinessIdeaForm, MarketResearchForm, BusinessPlanForm, ImportExportRecordForm
 
+
+def _idea_workflow_actions(idea, research_count, has_plan):
+    actions = []
+    has_market_context = bool((idea.market_size or '').strip() and (idea.competitors or '').strip())
+
+    if research_count == 0:
+        actions.append('Add a market research entry so the idea is grounded in real evidence.')
+
+    if not has_market_context:
+        actions.append('Document market size and competitor analysis before moving deeper into planning.')
+
+    if not has_plan and idea.status in {'planning', 'active'}:
+        actions.append('Create the business plan so execution has a real operating guide.')
+    elif not has_plan:
+        actions.append('Create the business plan once research is solid enough to test the model.')
+
+    if idea.status == 'idea':
+        actions.append('Refine the concept and collect first-pass market signals.')
+    elif idea.status == 'researching':
+        actions.append('Synthesize the research into a sharper target customer and offer.')
+    elif idea.status == 'planning':
+        actions.append('Validate assumptions, funding needs, and execution steps before launch.')
+    elif idea.status == 'active':
+        actions.append('Track traction, revenue assumptions, and operational learning consistently.')
+    elif idea.status == 'paused':
+        actions.append('Decide whether to restart with new evidence or archive the idea cleanly.')
+    elif idea.status == 'abandoned':
+        actions.append('Keep the lessons learned so a future version starts from stronger evidence.')
+
+    return actions
+
 @login_required
 def business_dashboard(request):
     ideas = BusinessIdea.objects.filter(user=request.user).order_by('-created_at')[:5]
@@ -15,14 +46,23 @@ def business_dashboard(request):
     all_ideas = BusinessIdea.objects.filter(user=request.user)
     all_research = MarketResearch.objects.filter(user=request.user)
     active_ideas = all_ideas.filter(status='active').count()
-    ready_for_planning = all_ideas.filter(status__in=['idea', 'researching']).exclude(market_research__isnull=True).distinct().count()
-    ready_for_activation = all_ideas.filter(status='planning', business_plan__isnull=False).count()
+    ready_for_planning = sum(
+        1 for idea in all_ideas.filter(status__in=['idea', 'researching']).prefetch_related('market_research')
+        if ((idea.market_size or '').strip() and (idea.competitors or '').strip()) or idea.market_research.exists()
+    )
+    ready_for_activation = sum(
+        1 for idea in all_ideas.filter(status='planning').prefetch_related('market_research')
+        if hasattr(idea, 'business_plan') and (
+            ((idea.market_size or '').strip() and (idea.competitors or '').strip()) or idea.market_research.exists()
+        )
+    )
     ideas_by_status = {
         'idea': all_ideas.filter(status='idea').count(),
         'researching': all_ideas.filter(status='researching').count(),
         'planning': all_ideas.filter(status='planning').count(),
         'active': active_ideas,
         'paused': all_ideas.filter(status='paused').count(),
+        'abandoned': all_ideas.filter(status='abandoned').count(),
     }
     recent_trade_value = sum(record.value for record in ImportExportRecord.objects.filter(user=request.user)[:20])
     
@@ -70,11 +110,14 @@ def business_idea_detail(request, idea_id):
     idea = get_object_or_404(BusinessIdea, id=idea_id, user=request.user)
     market_research = idea.market_research.all().order_by('-date')
     business_plan = getattr(idea, 'business_plan', None)
+    workflow_actions = _idea_workflow_actions(idea, market_research.count(), bool(business_plan))
     
     context = {
         'idea': idea,
         'market_research': market_research,
         'business_plan': business_plan,
+        'workflow_actions': workflow_actions,
+        'next_action': workflow_actions[0] if workflow_actions else 'This business idea is in a healthy operating state.',
     }
     return render(request, 'business/business_idea_detail.html', context)
 

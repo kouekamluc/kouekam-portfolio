@@ -5,10 +5,10 @@
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
         <a href="{% url 'course_detail' course.id %}" 
            class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Course
+            <i class="fas fa-arrow-left mr-2"></i>Back to Record
         </a>
-        <h1 class="text-4xl font-bold mb-8 dark:text-white">Delete Course</h1>
-        <p class="mb-4 text-gray-600 dark:text-gray-400">Are you sure you want to delete "{{ course.code }} - {{ course.name }}"?</p>
+        <h1 class="text-4xl font-bold mb-8 dark:text-white">Delete Learning Record</h1>
+        <p class="mb-4 text-gray-600 dark:text-gray-400">Are you sure you want to delete "{{ course.display_title }}"?</p>
         <form method="post" class="inline">
             {% csrf_token %}
             <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">Yes, Delete</button>
@@ -17,7 +17,6 @@
     </div>
 </section>
 {% endblock %}
-
 
 
 

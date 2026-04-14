@@ -97,6 +97,9 @@ class PortfolioViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = create_test_user()
+        self.staff_user = create_test_user(email='staff@example.com', username='staffuser')
+        self.staff_user.is_staff = True
+        self.staff_user.save(update_fields=['is_staff'])
         self.profile = self.user.profile
         self.skill = Skill.objects.create(name='Python', category='backend')
         self.timeline = Timeline.objects.create(
@@ -140,6 +143,21 @@ class PortfolioViewsTest(TestCase):
         response = self.client.get(reverse('project_detail', args=[project.slug]))
         self.assertEqual(response.status_code, 200)
 
+    def test_archived_project_detail_requires_staff(self):
+        project = Project.objects.create(
+            title='Archived Project',
+            description='Test',
+            category='web',
+            slug='archived-project',
+            status='archived',
+        )
+        response = self.client.get(reverse('project_detail', args=[project.slug]))
+        self.assertEqual(response.status_code, 403)
+
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse('project_detail', args=[project.slug]))
+        self.assertEqual(response.status_code, 200)
+
     def test_contact_view_get(self):
         response = self.client.get(reverse('contact'))
         self.assertEqual(response.status_code, 200)
@@ -170,3 +188,8 @@ class PortfolioViewsTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse('edit_profile'))
         self.assertEqual(response.status_code, 200)
+
+    def test_non_staff_cannot_access_project_create(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('project_create'))
+        self.assertEqual(response.status_code, 403)

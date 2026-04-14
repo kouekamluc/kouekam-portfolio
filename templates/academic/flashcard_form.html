@@ -8,7 +8,7 @@
             <i class="fas fa-arrow-left mr-2"></i>Back to Flashcards
         </a>
         <h1 class="text-4xl font-bold mb-8 dark:text-white">{% if flashcard %}Update{% else %}Create{% endif %} Flashcard</h1>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">Course: {{ course.code }} - {{ course.name }}</p>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">Learning record: {{ course.display_title }}</p>
         
         <form method="post" class="max-w-2xl space-y-6">
             {% csrf_token %}
@@ -41,7 +41,6 @@
     </div>
 </section>
 {% endblock %}
-
 
 
 

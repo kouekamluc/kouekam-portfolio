@@ -17,6 +17,7 @@
             <a href="{% url 'course_list' %}" class="px-4 py-2 rounded {% if not status_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
             <a href="?status=ongoing{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'ongoing' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Ongoing</a>
             <a href="?status=completed{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'completed' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Completed</a>
+            <a href="?status=dropped{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'dropped' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Dropped</a>
         </div>
 
         <div class="flex flex-wrap gap-4 mb-6">
@@ -25,13 +26,14 @@
             <a href="?type=certification{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'certification' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Certifications</a>
             <a href="?type=training{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'training' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Training</a>
             <a href="?type=self_study{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'self_study' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Self-Study</a>
+            <a href="?type=research{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'research' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Research</a>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {% for course in courses %}
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
                 <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">{{ course.get_learning_type_display }}</p>
-                <h3 class="text-xl font-bold mb-2 dark:text-white">{% if course.code %}{{ course.code }} - {% endif %}{{ course.name }}</h3>
+                <h3 class="text-xl font-bold mb-2 dark:text-white">{{ course.display_title }}</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-2">{{ course.provider|default:"Provider not set" }}</p>
                 <p class="text-gray-500 dark:text-gray-500 mb-4">{{ course.display_period }}</p>
                 <div class="flex justify-between items-center">

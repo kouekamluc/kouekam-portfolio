@@ -147,6 +147,48 @@ class AcademicViewsTest(TestCase):
         response = self.client.get(reverse('flashcard_list', args=[self.course.id]))
         self.assertEqual(response.status_code, 200)
 
+    def test_study_session_create_defaults_missing_date_to_today(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('study_session_create', args=[self.course.id]), {
+            'duration_minutes': 90,
+            'topics_covered': 'Signals and systems review',
+        })
+        self.assertEqual(response.status_code, 302)
+        session = StudySession.objects.get(course=self.course)
+        self.assertEqual(session.date, timezone.now().date())
+
+    def test_study_planner_includes_focus_records(self):
+        research_record = Course.objects.create(
+            user=self.user,
+            name='Capstone Research',
+            learning_type='research',
+            credits=0,
+            effort_hours=20,
+            status='ongoing',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('study_planner'))
+        self.assertEqual(response.status_code, 200)
+        focus_titles = [item['course'].name for item in response.context['focus_records']]
+        self.assertIn(self.course.name, focus_titles)
+        self.assertIn(research_record.name, focus_titles)
+
+    def test_gpa_calculator_shows_weighted_points(self):
+        Course.objects.create(
+            user=self.user,
+            name='Algorithms',
+            code='CS201',
+            learning_type='course',
+            credits=3.0,
+            status='completed',
+            grade=4.0,
+            semester='Fall 2025',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('gpa_calculator'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '12.00')
+
 
 class AcademicFormsTest(TestCase):
     def setUp(self):
@@ -184,6 +226,13 @@ class AcademicFormsTest(TestCase):
     def test_study_session_form_valid(self):
         form = StudySessionForm(data={
             'date': date.today(),
+            'duration_minutes': 60,
+            'topics_covered': 'Test topics'
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_study_session_form_allows_blank_date(self):
+        form = StudySessionForm(data={
             'duration_minutes': 60,
             'topics_covered': 'Test topics'
         })

@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
 from portfolio.models import Profile, Project, Skill
 from academic.models import Course, Note, Flashcard, StudySession
@@ -92,7 +93,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         course = serializer.validated_data['course']
         if course.user != self.request.user:
-            raise PermissionError("You can only create notes for your own courses")
+            raise PermissionDenied("You can only create notes for your own courses")
         serializer.save()
 
 
@@ -106,7 +107,7 @@ class FlashcardViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         course = serializer.validated_data['course']
         if course.user != self.request.user:
-            raise PermissionError("You can only create flashcards for your own courses")
+            raise PermissionDenied("You can only create flashcards for your own courses")
         serializer.save()
 
 
@@ -120,7 +121,7 @@ class StudySessionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         course = serializer.validated_data['course']
         if course.user != self.request.user:
-            raise PermissionError("You can only create study sessions for your own courses")
+            raise PermissionDenied("You can only create study sessions for your own courses")
         serializer.save()
 
 
