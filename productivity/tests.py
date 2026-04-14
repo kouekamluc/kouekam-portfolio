@@ -10,12 +10,13 @@ from .forms import TaskForm, HabitForm, GoalForm, TransactionForm
 User = get_user_model()
 
 
+def create_test_user(email='test@example.com', password='testpass123', username='testuser'):
+    return User.objects.create_user(username=username, email=email, password=password)
+
+
 class TaskModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_task_creation(self):
         task = Task.objects.create(
@@ -47,10 +48,7 @@ class TaskModelTest(TestCase):
 
 class HabitModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_habit_creation(self):
         habit = Habit.objects.create(
@@ -65,10 +63,7 @@ class HabitModelTest(TestCase):
 
 class GoalModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_goal_creation(self):
         goal = Goal.objects.create(
@@ -83,10 +78,7 @@ class GoalModelTest(TestCase):
 
 class MilestoneModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.goal = Goal.objects.create(
             user=self.user,
             title='Test Goal',
@@ -105,10 +97,7 @@ class MilestoneModelTest(TestCase):
 
 class TransactionModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_transaction_creation(self):
         transaction = Transaction.objects.create(
@@ -125,17 +114,14 @@ class TransactionModelTest(TestCase):
 class ProductivityViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_dashboard_requires_login(self):
         response = self.client.get(reverse('productivity_dashboard'))
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('productivity_dashboard'))
         self.assertEqual(response.status_code, 200)
 
@@ -144,7 +130,7 @@ class ProductivityViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_task_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         Task.objects.create(
             user=self.user,
             title='Test Task',
@@ -154,17 +140,17 @@ class ProductivityViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_habit_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('habit_list'))
         self.assertEqual(response.status_code, 200)
 
     def test_goal_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('goal_list'))
         self.assertEqual(response.status_code, 200)
 
     def test_transaction_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('transaction_list'))
         self.assertEqual(response.status_code, 200)
 
@@ -202,3 +188,51 @@ class ProductivityFormsTest(TestCase):
             'date': date.today()
         })
         self.assertTrue(form.is_valid())
+
+    def test_transaction_form_rejects_income_with_expense_category(self):
+        form = TransactionForm(data={
+            'type': 'income',
+            'amount': '50.00',
+            'category': 'food',
+            'date': date.today()
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('category', form.errors)
+
+
+class ProductivityWorkflowLogicTest(TestCase):
+    def setUp(self):
+        self.user = create_test_user(username='productivityuser')
+
+    def test_weekly_habit_tracks_once_per_week(self):
+        client = Client()
+        client.force_login(self.user)
+        habit = Habit.objects.create(
+            user=self.user,
+            name='Weekly Review',
+            frequency='weekly',
+            current_streak=2,
+            last_completed_date=date.today() - timedelta(days=7),
+        )
+
+        response = client.post(reverse('habit_track', args=[habit.id]))
+
+        self.assertEqual(response.status_code, 302)
+        habit.refresh_from_db()
+        self.assertEqual(habit.current_streak, 3)
+
+    def test_goal_progress_updates_from_completed_milestones(self):
+        client = Client()
+        client.force_login(self.user)
+        goal = Goal.objects.create(user=self.user, title='Launch Portfolio', progress=0)
+        Milestone.objects.create(goal=goal, title='Resume', completed=False)
+        completed = Milestone.objects.create(goal=goal, title='Projects', completed=False)
+
+        response = client.post(reverse('milestone_manage', args=[goal.id]), {
+            'complete': '1',
+            'milestone_id': completed.id,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        goal.refresh_from_db()
+        self.assertEqual(goal.progress, 50)

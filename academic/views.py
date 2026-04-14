@@ -12,9 +12,11 @@ from ai_assistant.services import generate_questions
 @login_required
 def dashboard(request):
     courses = Course.objects.filter(user=request.user)
+    academic_courses = courses.filter(learning_type='course')
+    professional_learning = courses.exclude(learning_type='course')
     
     # GPA Calculation - only include completed courses
-    completed_courses = courses.filter(status='completed')
+    completed_courses = academic_courses.filter(status='completed')
     total_points = 0
     total_credits = 0
     for course in completed_courses:
@@ -31,6 +33,7 @@ def dashboard(request):
     all_sessions = StudySession.objects.filter(course__user=request.user)
     total_study_time = sum(s.duration_minutes for s in all_sessions)
     total_study_hours = round(total_study_time / 60, 1) if total_study_time > 0 else 0
+    total_learning_hours = sum(course.effort_hours for course in courses)
     
     # Study time by course
     study_time_by_course = {}
@@ -51,16 +54,38 @@ def dashboard(request):
         'completed': courses.filter(status='completed').count(),
         'dropped': courses.filter(status='dropped').count(),
     }
+
+    professional_status_data = {
+        'active_development': professional_learning.filter(status='ongoing').count(),
+        'completed_credentials': courses.filter(
+            learning_type__in=['certification', 'training'],
+            status='completed'
+        ).count(),
+        'self_study_tracks': courses.filter(learning_type='self_study').count(),
+    }
+
+    development_breakdown = {
+        'academic': academic_courses.count(),
+        'professional': professional_learning.count(),
+    }
+
+    recent_completions = courses.filter(status='completed').order_by('-completion_date', '-updated_at')[:5]
     
     context = {
         'courses': courses,
+        'academic_courses': academic_courses,
+        'professional_learning': professional_learning,
         'gpa': round(gpa, 2),
         'total_credits': total_credits,
         'recent_sessions': recent_sessions,
         'total_study_hours': total_study_hours,
+        'total_learning_hours': total_learning_hours,
         'study_time_by_course': study_time_by_course,
         'recent_sessions_data': recent_sessions_data,
         'course_status_data': course_status_data,
+        'professional_status_data': professional_status_data,
+        'development_breakdown': development_breakdown,
+        'recent_completions': recent_completions,
     }
     return render(request, 'academic/dashboard.html', context)
 
@@ -68,9 +93,16 @@ def dashboard(request):
 def course_list(request):
     courses = Course.objects.filter(user=request.user).order_by('-created_at')
     status_filter = request.GET.get('status')
+    type_filter = request.GET.get('type')
     if status_filter:
         courses = courses.filter(status=status_filter)
-    return render(request, 'academic/course_list.html', {'courses': courses, 'status_filter': status_filter})
+    if type_filter:
+        courses = courses.filter(learning_type=type_filter)
+    return render(request, 'academic/course_list.html', {
+        'courses': courses,
+        'status_filter': status_filter,
+        'type_filter': type_filter,
+    })
 
 @login_required
 def course_create(request):
@@ -114,12 +146,14 @@ def course_detail(request, course_id):
     notes = course.notes.all().order_by('-updated_at')
     flashcards = course.flashcards.all()
     sessions = course.study_sessions.all().order_by('-date')
+    total_session_minutes = sum(session.duration_minutes for session in sessions)
     
     context = {
         'course': course,
         'notes': notes,
         'flashcards': flashcards,
-        'sessions': sessions
+        'sessions': sessions,
+        'total_session_minutes': total_session_minutes,
     }
     return render(request, 'academic/course_detail.html', context)
 
@@ -260,7 +294,7 @@ def study_session_delete(request, session_id):
 
 @login_required
 def gpa_calculator(request):
-    courses = Course.objects.filter(user=request.user, status='completed')
+    courses = Course.objects.filter(user=request.user, status='completed', learning_type='course')
     
     if request.method == 'POST':
         # Recalculate GPA
@@ -298,7 +332,11 @@ def ai_question_generator(request, course_id):
     
     if request.method == 'POST':
         topic = request.POST.get('topic', '')
-        num_questions = int(request.POST.get('num_questions', 5))
+        try:
+            num_questions = int(request.POST.get('num_questions', 5))
+        except (TypeError, ValueError):
+            num_questions = 5
+        num_questions = max(1, min(num_questions, 10))
         
         try:
             questions = generate_questions(course.name, topic, num_questions)

@@ -12,10 +12,30 @@ from .forms import BusinessIdeaForm, MarketResearchForm, BusinessPlanForm, Impor
 def business_dashboard(request):
     ideas = BusinessIdea.objects.filter(user=request.user).order_by('-created_at')[:5]
     recent_records = ImportExportRecord.objects.filter(user=request.user).order_by('-date')[:5]
+    all_ideas = BusinessIdea.objects.filter(user=request.user)
+    all_research = MarketResearch.objects.filter(user=request.user)
+    active_ideas = all_ideas.filter(status='active').count()
+    ready_for_planning = all_ideas.filter(status__in=['idea', 'researching']).exclude(market_research__isnull=True).distinct().count()
+    ready_for_activation = all_ideas.filter(status='planning', business_plan__isnull=False).count()
+    ideas_by_status = {
+        'idea': all_ideas.filter(status='idea').count(),
+        'researching': all_ideas.filter(status='researching').count(),
+        'planning': all_ideas.filter(status='planning').count(),
+        'active': active_ideas,
+        'paused': all_ideas.filter(status='paused').count(),
+    }
+    recent_trade_value = sum(record.value for record in ImportExportRecord.objects.filter(user=request.user)[:20])
     
     context = {
         'ideas': ideas,
         'recent_records': recent_records,
+        'total_ideas': all_ideas.count(),
+        'active_ideas': active_ideas,
+        'research_entries': all_research.count(),
+        'ready_for_planning': ready_for_planning,
+        'ready_for_activation': ready_for_activation,
+        'ideas_by_status': ideas_by_status,
+        'recent_trade_value': recent_trade_value,
     }
     return render(request, 'business/business_dashboard.html', context)
 
@@ -245,10 +265,25 @@ def financial_projections(request, idea_id):
     business_plan = getattr(idea, 'business_plan', None)
     
     if request.method == 'POST':
-        # Calculate projections based on inputs
-        monthly_revenue = float(request.POST.get('monthly_revenue', 0))
-        growth_rate = float(request.POST.get('growth_rate', 0)) / 100
-        months = int(request.POST.get('months', 12))
+        try:
+            monthly_revenue = float(request.POST.get('monthly_revenue', 0))
+            growth_rate = float(request.POST.get('growth_rate', 0)) / 100
+            months = int(request.POST.get('months', 12))
+        except (TypeError, ValueError):
+            messages.error(request, 'Enter valid numbers for revenue, growth rate, and months.')
+            return render(request, 'business/financial_projections.html', {
+                'idea': idea,
+                'business_plan': business_plan,
+            })
+
+        if monthly_revenue < 0:
+            messages.error(request, 'Monthly revenue cannot be negative.')
+            return render(request, 'business/financial_projections.html', {
+                'idea': idea,
+                'business_plan': business_plan,
+            })
+
+        months = max(1, min(months, 60))
         
         projections = []
         for month in range(1, months + 1):

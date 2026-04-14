@@ -6,11 +6,33 @@
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
         <div class="mb-8">
             <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Productivity Dashboard</h2>
-            <p class="text-gray-600 dark:text-gray-400">Manage your tasks, habits, and goals in one place.</p>
+            <p class="text-gray-600 dark:text-gray-400">Run school, work, side projects, and personal systems from one operating dashboard.</p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Due This Week</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ due_this_week }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ in_progress_tasks }} tasks currently in progress.</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Habit Momentum</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ active_habits }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ avg_streak }} average streak across habits.</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Goal Delivery</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ completed_goals }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ avg_goal_progress }}% average progress across goals.</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Monthly Balance</p>
+                <p class="text-2xl font-bold {% if monthly_balance >= 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-2">{{ monthly_balance|floatformat:2 }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Income {{ monthly_income|floatformat:2 }} / Expenses {{ monthly_expenses|floatformat:2 }}</p>
+            </div>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-6">
-            <!-- Left Column: Habits -->
             <div class="card">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
@@ -26,14 +48,12 @@
                         <div class="flex-1">
                             <p class="font-medium text-gray-900 dark:text-white">{{ habit.name }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                <i class="fas fa-sync-alt mr-1"></i>{{ habit.get_frequency_display }} • 
-                                <span class="font-semibold text-orange-500">Streak: {{ habit.current_streak }}🔥</span>
+                                <i class="fas fa-sync-alt mr-1"></i>{{ habit.get_frequency_display }} |
+                                <span class="font-semibold text-orange-500">Streak: {{ habit.current_streak }}</span>
                             </p>
                         </div>
                         <a href="{% url 'habit_track' habit.id %}" class="text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors ml-3" title="Track habit">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                            <i class="fas fa-check-circle text-2xl"></i>
                         </a>
                     </li>
                     {% empty %}
@@ -45,11 +65,10 @@
                 </ul>
             </div>
 
-            <!-- Center Column: Tasks -->
             <div class="card lg:col-span-1">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                        <i class="fas fa-tasks text-blue-500 mr-2"></i>Today's Tasks
+                        <i class="fas fa-tasks text-blue-500 mr-2"></i>Current Tasks
                     </h3>
                     <a href="{% url 'task_create' %}" class="btn-primary text-sm py-1.5 px-3">
                         <i class="fas fa-plus mr-1"></i>New Task
@@ -91,13 +110,12 @@
                     <div class="text-center py-8">
                         <i class="fas fa-check-circle text-4xl text-green-300 dark:text-green-600 mb-3"></i>
                         <p class="text-gray-500 dark:text-gray-400 mb-2">No tasks pending.</p>
-                        <p class="text-sm text-blue-600 dark:text-blue-400">Enjoy your free time! 🎉</p>
+                        <p class="text-sm text-blue-600 dark:text-blue-400">Use the space for deep work, learning, or recovery.</p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Right Column: Goals -->
             <div class="card">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">

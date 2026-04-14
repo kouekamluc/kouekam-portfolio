@@ -18,6 +18,7 @@ def journal_dashboard(request):
     recent_entries = JournalEntry.objects.filter(user=request.user).order_by('-date')[:5]
     recent_philosophies = Philosophy.objects.filter(user=request.user).order_by('-date_written')[:3]
     active_goals = VisionGoal.objects.filter(user=request.user).order_by('target_date')[:5]
+    lessons = LifeLesson.objects.filter(user=request.user)
     
     # Journal analytics
     all_entries = JournalEntry.objects.filter(user=request.user)
@@ -41,8 +42,12 @@ def journal_dashboard(request):
         entries_over_time[date_str] = entries_over_time.get(date_str, 0) + 1
     
     # Vision goal progress
-    goal_progress_data = [g.progress for g in VisionGoal.objects.filter(user=request.user)]
+    all_goals = VisionGoal.objects.filter(user=request.user)
+    goal_progress_data = [g.progress for g in all_goals]
     avg_goal_progress = sum(goal_progress_data) / len(goal_progress_data) if goal_progress_data else 0
+    goals_by_category = {}
+    for goal in all_goals:
+        goals_by_category[goal.category] = goals_by_category.get(goal.category, 0) + 1
     
     context = {
         'recent_entries': recent_entries,
@@ -53,6 +58,9 @@ def journal_dashboard(request):
         'energy_counts': energy_counts,
         'entries_over_time': entries_over_time,
         'avg_goal_progress': round(avg_goal_progress, 1),
+        'lesson_count': lessons.count(),
+        'recent_lessons': lessons.order_by('-date_learned')[:3],
+        'goals_by_category': goals_by_category,
     }
     return render(request, 'journal/journal_dashboard.html', context)
 

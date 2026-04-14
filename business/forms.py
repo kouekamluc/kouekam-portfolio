@@ -1,8 +1,32 @@
+from decimal import Decimal, InvalidOperation
 from django import forms
 from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportRecord
 
 
 class BusinessIdeaForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        market_size = (cleaned_data.get('market_size') or '').strip()
+        competitors = (cleaned_data.get('competitors') or '').strip()
+        idea = self.instance
+
+        has_market_context = bool(market_size and competitors)
+        has_research = bool(getattr(idea, 'pk', None) and idea.market_research.exists())
+        has_plan = bool(getattr(idea, 'pk', None) and hasattr(idea, 'business_plan'))
+
+        if status == 'planning' and not (has_market_context or has_research):
+            raise forms.ValidationError(
+                'Add market sizing and competitor analysis or save at least one market research entry before moving an idea to planning.'
+            )
+
+        if status == 'active' and not has_plan:
+            raise forms.ValidationError(
+                'Create a business plan before marking a business idea as active.'
+            )
+
+        return cleaned_data
+
     class Meta:
         model = BusinessIdea
         fields = ['title', 'description', 'status', 'market_size', 'competitors']
@@ -96,6 +120,22 @@ class BusinessPlanForm(forms.ModelForm):
             self.fields['expense_projections'].initial = financial_data.get('expense_projections', '')
             self.fields['funding_needed'].initial = financial_data.get('funding_needed', '')
 
+    def clean_funding_needed(self):
+        funding_needed = (self.cleaned_data.get('funding_needed') or '').strip()
+        if not funding_needed:
+            return ''
+
+        normalized = funding_needed.replace(',', '')
+        try:
+            amount = Decimal(normalized)
+        except InvalidOperation as exc:
+            raise forms.ValidationError('Funding needed must be a valid number.') from exc
+
+        if amount < 0:
+            raise forms.ValidationError('Funding needed cannot be negative.')
+
+        return str(amount)
+
     def save(self, commit=True):
         try:
             plan = super().save(commit=False)
@@ -135,6 +175,18 @@ class BusinessPlanForm(forms.ModelForm):
 
 
 class ImportExportRecordForm(forms.ModelForm):
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if quantity is not None and quantity <= 0:
+            raise forms.ValidationError('Quantity must be greater than 0.')
+        return quantity
+
+    def clean_value(self):
+        value = self.cleaned_data.get('value')
+        if value is not None and value < 0:
+            raise forms.ValidationError('Value cannot be negative.')
+        return value
+
     class Meta:
         model = ImportExportRecord
         fields = ['product', 'quantity', 'value', 'country', 'date', 'type', 'description']
@@ -168,7 +220,6 @@ class ImportExportRecordForm(forms.ModelForm):
                 'rows': 3
             }),
         }
-
 
 
 

@@ -1,8 +1,15 @@
 from django import forms
+from django.utils import timezone
 from .models import JournalEntry, Philosophy, VisionGoal, LifeLesson
 
 
 class JournalEntryForm(forms.ModelForm):
+    def clean_date(self):
+        entry_date = self.cleaned_data.get('date')
+        if entry_date and entry_date > timezone.now().date():
+            raise forms.ValidationError('Journal entries cannot be created in the future.')
+        return entry_date
+
     class Meta:
         model = JournalEntry
         fields = ['date', 'content', 'mood', 'energy_level', 'tags']
@@ -49,6 +56,12 @@ class PhilosophyForm(forms.ModelForm):
 
 
 class VisionGoalForm(forms.ModelForm):
+    def clean_progress(self):
+        progress = self.cleaned_data.get('progress')
+        if progress is not None and not 0 <= progress <= 100:
+            raise forms.ValidationError('Progress must be between 0 and 100.')
+        return progress
+
     class Meta:
         model = VisionGoal
         fields = ['title', 'description', 'category', 'target_date', 'progress']
@@ -77,6 +90,12 @@ class VisionGoalForm(forms.ModelForm):
 
 
 class LifeLessonForm(forms.ModelForm):
+    def clean_date_learned(self):
+        learned_date = self.cleaned_data.get('date_learned')
+        if learned_date and learned_date > timezone.now().date():
+            raise forms.ValidationError('Life lessons cannot be dated in the future.')
+        return learned_date
+
     class Meta:
         model = LifeLesson
         fields = ['title', 'lesson', 'context', 'date_learned']

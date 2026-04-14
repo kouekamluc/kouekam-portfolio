@@ -74,6 +74,17 @@ class Goal(models.Model):
     def __str__(self):
         return self.title
 
+    def recalculate_progress_from_milestones(self, save=True):
+        total_milestones = self.milestones.count()
+        if total_milestones == 0:
+            return self.progress
+
+        completed_milestones = self.milestones.filter(completed=True).count()
+        self.progress = round((completed_milestones / total_milestones) * 100)
+        if save:
+            self.save(update_fields=['progress', 'updated_at'])
+        return self.progress
+
 class Document(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
     title = models.CharField(max_length=255)

@@ -9,12 +9,13 @@ from .forms import CourseForm, NoteForm, FlashcardForm, StudySessionForm
 User = get_user_model()
 
 
+def create_test_user(email='test@example.com', password='testpass123', username='testuser'):
+    return User.objects.create_user(username=username, email=email, password=password)
+
+
 class CourseModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_course_creation(self):
         course = Course.objects.create(
@@ -39,10 +40,7 @@ class CourseModelTest(TestCase):
 
 class NoteModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.course = Course.objects.create(
             user=self.user,
             name='Test Course',
@@ -61,10 +59,7 @@ class NoteModelTest(TestCase):
 
 class FlashcardModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.course = Course.objects.create(
             user=self.user,
             name='Test Course',
@@ -82,10 +77,7 @@ class FlashcardModelTest(TestCase):
 
 class StudySessionModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.course = Course.objects.create(
             user=self.user,
             name='Test Course',
@@ -105,10 +97,7 @@ class StudySessionModelTest(TestCase):
 class AcademicViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.course = Course.objects.create(
             user=self.user,
             name='Test Course',
@@ -121,7 +110,7 @@ class AcademicViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('academic_dashboard'))
         self.assertEqual(response.status_code, 200)
 
@@ -130,7 +119,7 @@ class AcademicViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_course_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('course_list'))
         self.assertEqual(response.status_code, 200)
 
@@ -139,32 +128,29 @@ class AcademicViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_course_create_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('course_create'))
         self.assertEqual(response.status_code, 200)
 
     def test_course_detail(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('course_detail', args=[self.course.id]))
         self.assertEqual(response.status_code, 200)
 
     def test_note_create(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('note_create', args=[self.course.id]))
         self.assertEqual(response.status_code, 200)
 
     def test_flashcard_list(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('flashcard_list', args=[self.course.id]))
         self.assertEqual(response.status_code, 200)
 
 
 class AcademicFormsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.course = Course.objects.create(
             user=self.user,
             name='Test Course',
@@ -175,6 +161,7 @@ class AcademicFormsTest(TestCase):
         form = CourseForm(data={
             'name': 'New Course',
             'code': 'CS102',
+            'learning_type': 'course',
             'credits': 3.0,
             'status': 'ongoing'
         })
@@ -199,5 +186,38 @@ class AcademicFormsTest(TestCase):
             'date': date.today(),
             'duration_minutes': 60,
             'topics_covered': 'Test topics'
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_course_form_rejects_grade_for_ongoing_course(self):
+        form = CourseForm(data={
+            'name': 'New Course',
+            'code': 'CS102',
+            'credits': 3.0,
+            'status': 'ongoing',
+            'grade': 3.8,
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('grade', form.errors)
+
+    def test_certification_requires_provider(self):
+        form = CourseForm(data={
+            'name': 'AWS Cloud Practitioner',
+            'learning_type': 'certification',
+            'credits': 0,
+            'effort_hours': 40,
+            'status': 'completed',
+            'completion_date': date.today(),
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('provider', form.errors)
+
+    def test_self_study_can_use_hours_without_credits(self):
+        form = CourseForm(data={
+            'name': 'Embedded Systems Interview Prep',
+            'learning_type': 'self_study',
+            'credits': 0,
+            'effort_hours': 25,
+            'status': 'ongoing',
         })
         self.assertTrue(form.is_valid())

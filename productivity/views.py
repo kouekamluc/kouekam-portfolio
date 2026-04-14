@@ -15,6 +15,7 @@ def productivity_dashboard(request):
     tasks = Task.objects.filter(user=request.user).order_by('due_date', '-priority')[:10]
     habits = Habit.objects.filter(user=request.user)
     goals = Goal.objects.filter(user=request.user)
+    transactions = Transaction.objects.filter(user=request.user)
     
     # Analytics data
     all_tasks = Task.objects.filter(user=request.user)
@@ -36,16 +37,34 @@ def productivity_dashboard(request):
     # Goal progress data
     goal_progress = [g.progress for g in goals]
     avg_goal_progress = sum(goal_progress) / len(goal_progress) if goal_progress else 0
+
+    today = timezone.now().date()
+    next_week = today + timedelta(days=7)
+    due_this_week = all_tasks.filter(due_date__gte=today, due_date__lte=next_week, status__in=['todo', 'in_progress']).count()
+    in_progress_tasks = all_tasks.filter(status='in_progress').count()
+    completed_goals = goals.filter(progress=100).count()
+    active_habits = habits.filter(current_streak__gt=0).count()
+
+    current_month_transactions = transactions.filter(date__year=today.year, date__month=today.month)
+    monthly_income = sum((t.amount for t in current_month_transactions.filter(type='income')), Decimal('0.00'))
+    monthly_expenses = sum((t.amount for t in current_month_transactions.filter(type='expense')), Decimal('0.00'))
     
     context = {
         'tasks': tasks,
         'habits': habits,
         'goals': goals,
-        'today': timezone.now().date(),
+        'today': today,
         'completion_rate': round(completion_rate, 1),
         'task_status_data': task_status_data,
         'avg_streak': round(avg_streak, 1),
         'avg_goal_progress': round(avg_goal_progress, 1),
+        'due_this_week': due_this_week,
+        'in_progress_tasks': in_progress_tasks,
+        'completed_goals': completed_goals,
+        'active_habits': active_habits,
+        'monthly_income': monthly_income,
+        'monthly_expenses': monthly_expenses,
+        'monthly_balance': monthly_income - monthly_expenses,
     }
     return render(request, 'productivity/dashboard.html', context)
 
@@ -120,29 +139,37 @@ def habit_track(request, habit_id):
     today = timezone.now().date()
     
     if request.method == 'POST':
-        # Check if already completed today
-        if habit.last_completed_date and habit.last_completed_date == today:
+        if habit.frequency == 'weekly':
+            current_week = today.isocalendar()[:2]
+            last_week = habit.last_completed_date.isocalendar()[:2] if habit.last_completed_date else None
+            previous_week = (today - timedelta(days=7)).isocalendar()[:2]
+
+            if last_week == current_week:
+                messages.info(request, 'Habit already completed this week!')
+                return redirect('habit_list')
+
+            if last_week == previous_week:
+                habit.current_streak += 1
+            else:
+                habit.current_streak = 1
+        elif habit.last_completed_date and habit.last_completed_date == today:
             messages.info(request, 'Habit already completed today!')
+            return redirect('habit_list')
         else:
-            # Calculate streak
             if habit.last_completed_date:
                 days_diff = (today - habit.last_completed_date).days
                 if days_diff == 1:
-                    # Consecutive day - increment streak
                     habit.current_streak += 1
                 elif days_diff > 1:
-                    # Streak broken - reset to 1
                     habit.current_streak = 1
                 else:
-                    # Same day or future date (shouldn't happen, but handle it)
                     habit.current_streak = max(habit.current_streak, 1)
             else:
-                # First time tracking - start streak at 1
                 habit.current_streak = 1
-            
-            habit.last_completed_date = today
-            habit.save()
-            messages.success(request, f'Habit tracked! Current streak: {habit.current_streak}')
+
+        habit.last_completed_date = today
+        habit.save()
+        messages.success(request, f'Habit tracked! Current streak: {habit.current_streak}')
         return redirect('habit_list')
     
     return render(request, 'productivity/habit_track.html', {'habit': habit})
@@ -223,6 +250,7 @@ def milestone_manage(request, goal_id):
                 milestone = form.save(commit=False)
                 milestone.goal = goal
                 milestone.save()
+                goal.recalculate_progress_from_milestones()
                 messages.success(request, 'Milestone created!')
                 return redirect('milestone_manage', goal_id=goal.id)
         elif 'complete' in request.POST:
@@ -231,6 +259,7 @@ def milestone_manage(request, goal_id):
             milestone.completed = True
             milestone.completed_date = timezone.now().date()
             milestone.save()
+            goal.recalculate_progress_from_milestones()
             messages.success(request, 'Milestone completed!')
             return redirect('milestone_manage', goal_id=goal.id)
     else:

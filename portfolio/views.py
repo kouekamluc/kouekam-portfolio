@@ -97,6 +97,7 @@ def contact(request):
                 messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
         else:
             messages.error(request, 'Please fill in all required fields.')
+        return HttpResponseRedirect(request.path)
     
     profile = Profile.objects.first()
     return render(request, 'portfolio/contact.html', {'profile': profile})

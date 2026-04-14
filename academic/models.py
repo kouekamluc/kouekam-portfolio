@@ -4,6 +4,14 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Course(models.Model):
+    LEARNING_TYPE_CHOICES = [
+        ('course', 'University Course'),
+        ('certification', 'Certification'),
+        ('training', 'Professional Training'),
+        ('self_study', 'Self-Study'),
+        ('research', 'Research / Thesis'),
+    ]
+
     STATUS_CHOICES = [
         ('ongoing', 'Ongoing'),
         ('completed', 'Completed'),
@@ -13,8 +21,14 @@ class Course(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=50, blank=True)
+    learning_type = models.CharField(max_length=30, choices=LEARNING_TYPE_CHOICES, default='course')
+    provider = models.CharField(max_length=255, blank=True, help_text="University, platform, or employer")
     semester = models.CharField(max_length=50, blank=True) # e.g. "Fall 2024"
     credits = models.DecimalField(max_digits=4, decimal_places=1, default=3.0)
+    effort_hours = models.PositiveIntegerField(default=0, help_text="Estimated total learning or practice hours")
+    start_date = models.DateField(null=True, blank=True)
+    completion_date = models.DateField(null=True, blank=True)
+    outcome = models.CharField(max_length=255, blank=True, help_text="Certificate earned, grade summary, promotion impact, etc.")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ongoing')
     grade = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True, help_text="Grade point (e.g. 4.0)")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -30,6 +44,22 @@ class Course(models.Model):
     
     def __str__(self):
         return f"{self.code} - {self.name}" if self.code else self.name
+
+    @property
+    def is_professional_development(self):
+        return self.learning_type in {'certification', 'training', 'self_study'}
+
+    @property
+    def display_period(self):
+        if self.semester:
+            return self.semester
+        if self.start_date and self.completion_date:
+            return f"{self.start_date} to {self.completion_date}"
+        if self.start_date:
+            return f"Started {self.start_date}"
+        if self.completion_date:
+            return f"Completed {self.completion_date}"
+        return "Timeline not specified"
 
 class Note(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='notes')

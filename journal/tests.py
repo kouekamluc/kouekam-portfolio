@@ -7,12 +7,13 @@ from .models import JournalEntry, Philosophy, VisionGoal, LifeLesson
 User = get_user_model()
 
 
+def create_test_user(email='test@example.com', password='testpass123', username='testuser'):
+    return User.objects.create_user(username=username, email=email, password=password)
+
+
 class JournalEntryModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_journal_entry_creation(self):
         entry = JournalEntry.objects.create(
@@ -46,10 +47,7 @@ class JournalEntryModelTest(TestCase):
 
 class PhilosophyModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_philosophy_creation(self):
         philosophy = Philosophy.objects.create(
@@ -63,10 +61,7 @@ class PhilosophyModelTest(TestCase):
 
 class VisionGoalModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_vision_goal_creation(self):
         goal = VisionGoal.objects.create(
@@ -82,10 +77,7 @@ class VisionGoalModelTest(TestCase):
 
 class LifeLessonModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_life_lesson_creation(self):
         lesson = LifeLesson.objects.create(
@@ -100,26 +92,23 @@ class LifeLessonModelTest(TestCase):
 class JournalViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_journal_dashboard_requires_login(self):
         response = self.client.get(reverse('journal_dashboard'))
         self.assertEqual(response.status_code, 302)
 
     def test_journal_dashboard_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('journal_dashboard'))
         self.assertEqual(response.status_code, 200)
 
     def test_journal_entry_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('journal_entry_list'))
         self.assertEqual(response.status_code, 200)
 
     def test_philosophy_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('philosophy_list'))
         self.assertEqual(response.status_code, 200)

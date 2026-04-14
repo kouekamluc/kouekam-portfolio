@@ -7,12 +7,13 @@ from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportReco
 User = get_user_model()
 
 
+def create_test_user(email='test@example.com', password='testpass123', username='testuser'):
+    return User.objects.create_user(username=username, email=email, password=password)
+
+
 class BusinessIdeaModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_business_idea_creation(self):
         idea = BusinessIdea.objects.create(
@@ -27,10 +28,7 @@ class BusinessIdeaModelTest(TestCase):
 
 class MarketResearchModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.idea = BusinessIdea.objects.create(
             user=self.user,
             title='Test Business',
@@ -49,10 +47,7 @@ class MarketResearchModelTest(TestCase):
 
 class BusinessPlanModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
         self.idea = BusinessIdea.objects.create(
             user=self.user,
             title='Test Business',
@@ -71,10 +66,7 @@ class BusinessPlanModelTest(TestCase):
 
 class ImportExportRecordModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_import_export_record_creation(self):
         record = ImportExportRecord.objects.create(
@@ -92,21 +84,56 @@ class ImportExportRecordModelTest(TestCase):
 class BusinessViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_business_dashboard_requires_login(self):
         response = self.client.get(reverse('business_dashboard'))
         self.assertEqual(response.status_code, 302)
 
     def test_business_dashboard_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('business_dashboard'))
         self.assertEqual(response.status_code, 200)
 
     def test_business_idea_list_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('business_idea_list'))
         self.assertEqual(response.status_code, 200)
+
+
+class BusinessWorkflowValidationTest(TestCase):
+    def setUp(self):
+        self.user = create_test_user(username='businessuser')
+
+    def test_active_business_idea_requires_plan(self):
+        idea = BusinessIdea.objects.create(
+            user=self.user,
+            title='Campus Hardware Studio',
+            description='A productized engineering service.',
+            status='idea'
+        )
+
+        from .forms import BusinessIdeaForm
+        form = BusinessIdeaForm(
+            data={
+                'title': idea.title,
+                'description': idea.description,
+                'status': 'active',
+                'market_size': 'Engineering students and early-career professionals',
+                'competitors': 'Freelance makerspaces',
+            },
+            instance=idea,
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_business_plan_form_rejects_negative_funding(self):
+        from .forms import BusinessPlanForm
+
+        form = BusinessPlanForm(data={
+            'executive_summary': 'Summary',
+            'revenue_projections': '10k',
+            'expense_projections': '7k',
+            'funding_needed': '-1000',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('funding_needed', form.errors)

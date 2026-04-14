@@ -7,27 +7,26 @@ from .models import Profile, Timeline, Skill, Project, ProjectImage
 User = get_user_model()
 
 
+def create_test_user(email='test@example.com', password='testpass123', username='testuser'):
+    return User.objects.create_user(username=username, email=email, password=password)
+
+
 class ProfileModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
+        self.user = create_test_user()
 
     def test_profile_creation(self):
-        profile = Profile.objects.create(
-            user=self.user,
-            bio='Test bio',
-            tagline='Test tagline'
-        )
+        profile = self.user.profile
+        profile.bio = 'Test bio'
+        profile.tagline = 'Test tagline'
+        profile.save()
         self.assertEqual(str(profile), f"{self.user.username}'s Profile")
         self.assertEqual(profile.user, self.user)
 
     def test_profile_social_links(self):
-        profile = Profile.objects.create(
-            user=self.user,
-            social_links={'linkedin': 'https://linkedin.com/test', 'github': 'https://github.com/test'}
-        )
+        profile = self.user.profile
+        profile.social_links = {'linkedin': 'https://linkedin.com/test', 'github': 'https://github.com/test'}
+        profile.save()
         self.assertIn('linkedin', profile.social_links)
         self.assertEqual(profile.social_links['github'], 'https://github.com/test')
 
@@ -85,8 +84,10 @@ class ProjectImageViewTest(TestCase):
         )
 
     def test_project_image_creation(self):
+        image_file = SimpleUploadedFile('test.jpg', b'filecontent', content_type='image/jpeg')
         image = ProjectImage.objects.create(
             project=self.project,
+            image=image_file,
             caption='Test caption'
         )
         self.assertEqual(str(image), f"Image for {self.project.title}")
@@ -95,11 +96,8 @@ class ProjectImageViewTest(TestCase):
 class PortfolioViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123'
-        )
-        self.profile = Profile.objects.create(user=self.user)
+        self.user = create_test_user()
+        self.profile = self.user.profile
         self.skill = Skill.objects.create(name='Python', category='backend')
         self.timeline = Timeline.objects.create(
             year='2024',
@@ -160,7 +158,7 @@ class PortfolioViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_view_profile_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('view_profile'))
         self.assertEqual(response.status_code, 200)
 
@@ -169,6 +167,6 @@ class PortfolioViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_edit_profile_authenticated(self):
-        self.client.login(email='test@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('edit_profile'))
         self.assertEqual(response.status_code, 200)

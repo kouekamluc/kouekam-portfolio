@@ -1,5 +1,6 @@
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q
 from .models import Notification
 from productivity.models import Task, Habit, Goal
 from academic.models import StudySession
@@ -29,9 +30,11 @@ def create_habit_reminder_notifications():
     """Create notifications for habits that haven't been completed today"""
     today = timezone.now().date()
     habits = Habit.objects.filter(
-        frequency='daily',
-        last_completed_date__lt=today
+        Q(frequency='daily') & (Q(last_completed_date__lt=today) | Q(last_completed_date__isnull=True))
     )
+
+    current_week = today.isocalendar()[:2]
+    weekly_habits = Habit.objects.filter(frequency='weekly')
     
     for habit in habits:
         Notification.objects.get_or_create(
@@ -39,6 +42,20 @@ def create_habit_reminder_notifications():
             type='habit_reminder',
             title=f'Habit Reminder: {habit.name}',
             message=f'Don\'t forget to complete your habit "{habit.name}" today!',
+            related_url=f'/productivity/habits/{habit.id}/track/',
+            defaults={'read': False}
+        )
+
+    for habit in weekly_habits:
+        last_week = habit.last_completed_date.isocalendar()[:2] if habit.last_completed_date else None
+        if last_week == current_week:
+            continue
+
+        Notification.objects.get_or_create(
+            user=habit.user,
+            type='habit_reminder',
+            title=f'Habit Reminder: {habit.name}',
+            message=f'Don\'t forget to complete your habit "{habit.name}" this week!',
             related_url=f'/productivity/habits/{habit.id}/track/',
             defaults={'read': False}
         )

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 from portfolio.models import Profile, Project, Skill
 from academic.models import Course, Note, Flashcard, StudySession
@@ -44,24 +44,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         """
-        Allow public read access, but require authentication for write operations
+        Allow public read access, but restrict write operations to admin/staff users.
         """
         from rest_framework.permissions import AllowAny
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]  # No authentication required for read
         else:
-            return [IsAuthenticated()]  # Authentication required for create, update, delete
+            return [IsAdminUser()]  # Admin/staff only for create, update, delete
     
     def perform_create(self, serializer):
         # Projects don't have a user field, so just save
         serializer.save()
     
     def perform_update(self, serializer):
-        # Allow any authenticated user to update projects
         serializer.save()
-    
+
     def perform_destroy(self, instance):
-        # Allow any authenticated user to delete projects
         instance.delete()
 
 

@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from .models import Task, Habit, Goal, Transaction, Timetable, Document, Milestone
 
 
@@ -43,6 +44,12 @@ class HabitForm(forms.ModelForm):
 
 
 class GoalForm(forms.ModelForm):
+    def clean_progress(self):
+        progress = self.cleaned_data.get('progress')
+        if progress is not None and not 0 <= progress <= 100:
+            raise forms.ValidationError('Progress must be between 0 and 100.')
+        return progress
+
     class Meta:
         model = Goal
         fields = ['title', 'description', 'target_date', 'progress']
@@ -68,6 +75,34 @@ class GoalForm(forms.ModelForm):
 
 
 class TransactionForm(forms.ModelForm):
+    INCOME_CATEGORIES = {'salary', 'freelance', 'investment', 'other'}
+    EXPENSE_CATEGORIES = {'food', 'transport', 'entertainment', 'shopping', 'bills', 'education', 'health', 'other'}
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is not None and amount <= 0:
+            raise forms.ValidationError('Amount must be greater than 0.')
+        return amount
+
+    def clean_date(self):
+        transaction_date = self.cleaned_data.get('date')
+        if transaction_date and transaction_date > timezone.now().date():
+            raise forms.ValidationError('Transactions cannot be recorded in the future.')
+        return transaction_date
+
+    def clean(self):
+        cleaned_data = super().clean()
+        transaction_type = cleaned_data.get('type')
+        category = cleaned_data.get('category')
+
+        if transaction_type == 'income' and category and category not in self.INCOME_CATEGORIES:
+            self.add_error('category', 'Choose an income category for income transactions.')
+
+        if transaction_type == 'expense' and category and category not in self.EXPENSE_CATEGORIES:
+            self.add_error('category', 'Choose an expense category for expense transactions.')
+
+        return cleaned_data
+
     class Meta:
         model = Transaction
         fields = ['type', 'amount', 'category', 'date', 'description']
@@ -133,6 +168,12 @@ class DocumentForm(forms.ModelForm):
 
 
 class MilestoneForm(forms.ModelForm):
+    def clean_due_date(self):
+        due_date = self.cleaned_data.get('due_date')
+        if due_date and self.instance.pk and self.instance.completed_date and due_date > self.instance.completed_date:
+            raise forms.ValidationError('A milestone due date cannot be after its completion date.')
+        return due_date
+
     class Meta:
         model = Milestone
         fields = ['title', 'description', 'due_date']
@@ -153,7 +194,6 @@ class MilestoneForm(forms.ModelForm):
                 'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
             }),
         }
-
 
 
 

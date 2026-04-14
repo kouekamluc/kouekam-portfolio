@@ -1,7 +1,41 @@
+import json
 from django import forms
 from .models import Profile, Project, ProjectImage
 
 class ProfileForm(forms.ModelForm):
+    def clean_social_links(self):
+        social_links = self.cleaned_data.get('social_links')
+        if isinstance(social_links, dict):
+            return {str(key).strip().lower(): str(value).strip() for key, value in social_links.items() if str(value).strip()}
+
+        if not social_links:
+            return {}
+
+        if isinstance(social_links, str):
+            raw_value = social_links.strip()
+            if not raw_value:
+                return {}
+
+            try:
+                parsed = json.loads(raw_value)
+            except json.JSONDecodeError:
+                parsed = {}
+                for line in raw_value.splitlines():
+                    if ':' not in line:
+                        raise forms.ValidationError(
+                            'Enter social links as JSON or one "platform: url" pair per line.'
+                        )
+                    platform, url = line.split(':', 1)
+                    if platform.strip() and url.strip():
+                        parsed[platform.strip().lower()] = url.strip()
+                return parsed
+
+            if not isinstance(parsed, dict):
+                raise forms.ValidationError('Social links must be a JSON object or "platform: url" pairs.')
+            return {str(key).strip().lower(): str(value).strip() for key, value in parsed.items() if str(value).strip()}
+
+        raise forms.ValidationError('Unsupported social links format.')
+
     class Meta:
         model = Profile
         fields = ['bio', 'photo', 'tagline', 'cv_file', 'social_links']
@@ -22,11 +56,11 @@ class ProfileForm(forms.ModelForm):
             'social_links': forms.Textarea(attrs={
                 'rows': 3, 
                 'class': 'block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800',
-                'placeholder': 'JSON format: {"linkedin": "url", "github": "url"}'
+                'placeholder': 'JSON format or one per line, e.g. linkedin: https://...'
             }),
         }
         help_texts = {
-            'social_links': 'Enter social links as JSON. Example: {"linkedin": "https://linkedin.com/in/username", "github": "https://github.com/username"}',
+            'social_links': 'Enter social links as JSON or one "platform: url" pair per line.',
         }
 
 class ProjectForm(forms.ModelForm):
