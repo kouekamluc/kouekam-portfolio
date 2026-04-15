@@ -34,7 +34,9 @@ class ProjectSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Project.objects.filter(status__in=['active', 'completed'])
+        return Project.objects.filter(
+            status__in=['active', 'completed']
+        ).exclude(slug='')
 
     def location(self, obj):
         return reverse('project_detail', kwargs={'slug': obj.slug})
@@ -49,7 +51,9 @@ class BlogPostSitemap(Sitemap):
     priority = 0.9
 
     def items(self):
-        return BlogPost.objects.filter(published_date__isnull=False)
+        return BlogPost.objects.filter(
+            published_date__isnull=False
+        ).exclude(slug='')
 
     def location(self, obj):
         return reverse('blog_detail', kwargs={'slug': obj.slug})
@@ -64,7 +68,7 @@ class TutorialSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Tutorial.objects.all()
+        return Tutorial.objects.exclude(slug='')
 
     def location(self, obj):
         return reverse('tutorial_detail', kwargs={'slug': obj.slug})
