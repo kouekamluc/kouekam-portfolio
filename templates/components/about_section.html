@@ -1,11 +1,12 @@
-<!-- About Section - Tailwind Plus Inspired -->
-<section id="about" class="bg-gray-50 dark:bg-gray-900 py-20 lg:py-28">
+<section id="about" class="page-shell py-20 lg:py-28">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">
-                About Me
-            </h2>
-            <div class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <div class="eyebrow mb-6">
+                <i class="fas fa-user-astronaut"></i>
+                <span>About The Builder</span>
+            </div>
+            <h2 class="display-font mb-4 text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">Built from curiosity, structure, and follow-through.</h2>
+            <div class="mx-auto max-w-3xl text-xl text-gray-600 dark:text-gray-300">
                 {% if profile and profile.bio %}
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         {{ profile.bio|safe|truncatewords:30 }}
@@ -17,18 +18,17 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            <!-- Skills Card -->
-            <div class="card-hover">
+            <div class="spotlight-card">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-cyan-500">
                         <i class="fas fa-code text-white text-xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Skills & Expertise</h3>
+                    <h3 class="display-font text-2xl font-bold text-gray-900 dark:text-white">Skills & Expertise</h3>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     {% for skill in skills %}
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-semibold border border-blue-200 dark:border-blue-800">
-                        <i class="fas fa-check-circle text-blue-500"></i>
+                    <span class="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 dark:border-teal-900/40 dark:bg-teal-900/20 dark:text-teal-300">
+                        <i class="fas fa-check-circle text-teal-500"></i>
                         {{ skill.name }}
                     </span>
                     {% empty %}
@@ -37,23 +37,22 @@
                 </div>
             </div>
 
-            <!-- Timeline Card -->
-            <div class="card-hover">
+            <div class="spotlight-card">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500">
                         <i class="fas fa-briefcase text-white text-xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Experience & Timeline</h3>
+                    <h3 class="display-font text-2xl font-bold text-gray-900 dark:text-white">Experience & Timeline</h3>
                 </div>
                 <div class="relative">
-                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-indigo-200 to-purple-200 dark:from-blue-800 dark:via-indigo-800 dark:to-purple-800"></div>
+                    <div class="absolute bottom-0 left-4 top-0 w-0.5 bg-gradient-to-b from-teal-200 via-cyan-200 to-amber-200 dark:from-teal-800 dark:via-cyan-800 dark:to-amber-800"></div>
                     <ol class="space-y-8">
                         {% for item in timeline %}
                         <li class="relative pl-12">
-                            <div class="absolute left-0 top-1.5 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center ring-4 ring-white dark:ring-gray-900">
+                            <div class="absolute left-0 top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-cyan-500 ring-4 ring-white dark:ring-gray-900">
                                 <div class="w-3 h-3 rounded-full bg-white"></div>
                             </div>
-                            <time class="block mb-1 text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                            <time class="mb-1 block text-sm font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-300">
                                 {{ item.year }}
                             </time>
                             <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h4>

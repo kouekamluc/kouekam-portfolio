@@ -2,18 +2,20 @@
 {% block title %}{{ form_type }} Learning Record - Kouekam Digital Hub{% endblock %}
 
 {% block content %}
-<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <div class="mb-8">
-            <a href="{% if course %}{% url 'course_detail' course.id %}{% else %}{% url 'academic_dashboard' %}{% endif %}"
-               class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
+<section class="app-shell">
+    <div class="app-container max-w-5xl">
+        <div class="page-hero">
+            <div>
+                <a href="{% if course %}{% url 'course_detail' course.id %}{% else %}{% url 'academic_dashboard' %}{% endif %}"
+                   class="back-link">
                 <i class="fas fa-arrow-left mr-2"></i>Back
-            </a>
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">{{ form_type }} Learning Record</h1>
-            <p class="text-gray-600 dark:text-gray-400">Use the same workspace for courses, certifications, training, and self-study.</p>
+                </a>
+                <h1 class="page-title">{{ form_type }} Learning Record</h1>
+                <p class="page-subtitle mt-4">Use the same workspace for courses, certifications, training, and self-study.</p>
+            </div>
         </div>
 
-        <div class="card max-w-4xl">
+        <div class="section-card max-w-4xl">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
 
@@ -29,7 +31,7 @@
                     {% if form.name.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors }}</p>{% endif %}
                 </div>
 
-                <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-100">
+                <div class="callout text-sm">
                     Use `course` for university classes, `certification` or `training` for career development, and `self-study` or `research` for independent learning. Courses usually rely on credits and grades, while the other paths work better with effort hours and outcomes.
                 </div>
 

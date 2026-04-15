@@ -2,79 +2,74 @@
 {% block title %}Academic and Professional Development - Kouekam Digital Hub{% endblock %}
 
 {% block content %}
-<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+<section class="app-shell">
+    <div class="app-container">
+        <div class="page-hero">
             <div>
-                <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Academic and Professional Development</h2>
-                <p class="text-gray-600 dark:text-gray-400">Track university work, certifications, self-study, and career growth in one learning system.</p>
-            </div>
-            <div class="flex items-center space-x-6 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div class="text-center">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Course GPA</p>
-                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ gpa|floatformat:2 }}</p>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Learning System</span>
                 </div>
-                <div class="h-12 w-px bg-gray-200 dark:bg-gray-700"></div>
-                <div class="text-center">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Academic Credits</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_credits }}</p>
+                <h1 class="page-title">Academic and Professional Development</h1>
+                <p class="page-subtitle mt-4">Track university work, certifications, self-study, and career growth in one learning system.</p>
+            </div>
+            <div class="metric-card min-w-[18rem]">
+                <div class="grid grid-cols-2 gap-4 items-center">
+                    <div class="text-center">
+                        <p class="metric-label">Course GPA</p>
+                        <p class="metric-value text-teal-700 dark:text-teal-300">{{ gpa|floatformat:2 }}</p>
+                    </div>
+                    <div class="text-center border-l border-slate-200 dark:border-slate-700 pl-4">
+                        <p class="metric-label">Academic Credits</p>
+                        <p class="metric-value">{{ total_credits }}</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Learning Mix</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ development_breakdown.academic }} academic / {{ development_breakdown.professional }} professional</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">One place for classes, certifications, training, and self-study.</p>
+            <div class="metric-card">
+                <p class="metric-label">Learning Mix</p>
+                <p class="metric-value text-2xl">{{ development_breakdown.academic }} / {{ development_breakdown.professional }}</p>
+                <p class="metric-note">One place for classes, certifications, training, and self-study.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Completed Credentials</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ professional_status_data.completed_credentials }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ professional_status_data.active_development }} active professional tracks.</p>
+            <div class="metric-card">
+                <p class="metric-label">Completed Credentials</p>
+                <p class="metric-value">{{ professional_status_data.completed_credentials }}</p>
+                <p class="metric-note">{{ professional_status_data.active_development }} active professional tracks.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Study Session Hours</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ total_study_hours }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ total_learning_hours }} planned hours across all records.</p>
+            <div class="metric-card">
+                <p class="metric-label">Study Session Hours</p>
+                <p class="metric-value">{{ total_study_hours }}</p>
+                <p class="metric-note">{{ total_learning_hours }} planned hours across all records.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Pipeline</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ course_status_data.ongoing }} active / {{ course_status_data.completed }} completed</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ professional_status_data.self_study_tracks }} self-study tracks help bridge school and work.</p>
+            <div class="metric-card">
+                <p class="metric-label">Pipeline</p>
+                <p class="metric-value text-2xl">{{ course_status_data.ongoing }} / {{ course_status_data.completed }}</p>
+                <p class="metric-note">{{ professional_status_data.self_study_tracks }} self-study tracks help bridge school and work.</p>
             </div>
         </div>
 
-        <div class="mb-6 flex flex-wrap gap-4">
-            <a href="{% url 'course_create' %}" class="btn-primary inline-flex items-center">
-                <i class="fas fa-plus mr-2"></i>Add Learning Record
-            </a>
-            <a href="{% url 'course_list' %}" class="btn-secondary inline-flex items-center">
-                <i class="fas fa-list mr-2"></i>View All Records
-            </a>
-            <a href="{% url 'gpa_calculator' %}" class="btn-secondary inline-flex items-center">
-                <i class="fas fa-calculator mr-2"></i>GPA Calculator
-            </a>
-            <a href="{% url 'study_planner' %}" class="btn-secondary inline-flex items-center">
-                <i class="fas fa-calendar-alt mr-2"></i>Study Planner
-            </a>
+        <div class="page-actions mb-8">
+            <a href="{% url 'course_create' %}" class="btn-primary"><i class="fas fa-plus mr-2"></i>Add Learning Record</a>
+            <a href="{% url 'course_list' %}" class="btn-secondary"><i class="fas fa-list mr-2"></i>View All Records</a>
+            <a href="{% url 'gpa_calculator' %}" class="btn-secondary"><i class="fas fa-calculator mr-2"></i>GPA Calculator</a>
+            <a href="{% url 'study_planner' %}" class="btn-secondary"><i class="fas fa-calendar-alt mr-2"></i>Study Planner</a>
         </div>
 
         {% if records_needing_attention %}
         <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Needs Attention</h3>
-                <a href="{% url 'study_planner' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Open guided planner</a>
+            <div class="section-header">
+                <h3 class="section-title">Needs Attention</h3>
+                <a href="{% url 'study_planner' %}" class="section-link">Open guided planner</a>
             </div>
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for record in records_needing_attention %}
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">{{ record.course.get_learning_type_display }}</p>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{ record.course.display_title }}</h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{{ record.next_action }}</p>
-                    <a href="{% url 'course_detail' record.course.id %}" class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline mt-4">
-                        Review record <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                    </a>
+                <div class="feature-tile">
+                    <p class="metric-label">{{ record.course.get_learning_type_display }}</p>
+                    <h4 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">{{ record.course.display_title }}</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">{{ record.next_action }}</p>
+                    <a href="{% url 'course_detail' record.course.id %}" class="section-link inline-flex mt-4">Review record <i class="fas fa-arrow-right ml-2 text-xs"></i></a>
                 </div>
                 {% endfor %}
             </div>
@@ -83,75 +78,48 @@
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {% for course in courses %}
-            <div class="card card-hover">
+            <div class="feature-tile">
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex-1">
-                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                            {{ course.get_learning_type_display }}
-                        </span>
-                        <h3 class="mt-2 text-xl font-bold text-gray-900 dark:text-white">
-                            <a href="{% url 'course_detail' course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                {{ course.display_title }}
-                            </a>
+                        <span class="pill pill-brand">{{ course.get_learning_type_display }}</span>
+                        <h3 class="mt-3 text-xl font-bold text-slate-900 dark:text-white">
+                            <a href="{% url 'course_detail' course.id %}">{{ course.display_title }}</a>
                         </h3>
                     </div>
                     <div class="ml-2">
                         {% if course.status == 'ongoing' %}
                         <span class="w-3 h-3 bg-green-500 rounded-full block animate-pulse" title="Ongoing"></span>
                         {% elif course.status == 'completed' %}
-                        <span class="w-3 h-3 bg-blue-500 rounded-full block" title="Completed"></span>
+                        <span class="w-3 h-3 bg-teal-500 rounded-full block" title="Completed"></span>
                         {% else %}
-                        <span class="w-3 h-3 bg-gray-500 rounded-full block" title="Dropped"></span>
+                        <span class="w-3 h-3 bg-slate-400 rounded-full block" title="Dropped"></span>
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="mb-4 text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                    <p class="flex items-center">
-                        <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                        {{ course.display_period }}
-                    </p>
-                    <p class="flex items-center">
-                        <i class="fas fa-building mr-2 text-gray-400"></i>
-                        {{ course.provider|default:"Self-directed or provider not set" }}
-                    </p>
-                    <p class="flex items-center">
-                        <i class="fas fa-graduation-cap mr-2 text-gray-400"></i>
-                        {{ course.credits }} credits / {{ course.effort_hours }} hours
-                    </p>
+                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400 space-y-1.5">
+                    <p><i class="fas fa-calendar-alt mr-2 text-gray-400"></i>{{ course.display_period }}</p>
+                    <p><i class="fas fa-building mr-2 text-gray-400"></i>{{ course.provider|default:"Self-directed or provider not set" }}</p>
+                    <p><i class="fas fa-graduation-cap mr-2 text-gray-400"></i>{{ course.credits }} credits / {{ course.effort_hours }} hours</p>
                     {% if course.grade %}
-                    <p class="flex items-center font-semibold text-gray-900 dark:text-white">
-                        <i class="fas fa-star mr-2 text-yellow-500"></i>
-                        Grade: {{ course.grade }}
-                    </p>
+                    <p class="font-semibold text-slate-900 dark:text-white"><i class="fas fa-star mr-2 text-amber-500"></i>Grade: {{ course.grade }}</p>
                     {% endif %}
                 </div>
 
-                <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-4 mb-4">
-                    <span class="flex items-center">
-                        <i class="fas fa-sticky-note mr-1"></i>
-                        {{ course.notes.count }} Notes
-                    </span>
-                    <span class="flex items-center">
-                        <i class="fas fa-clock mr-1"></i>
-                        {{ course.study_sessions.count }} Sessions
-                    </span>
+                <div class="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400 border-t border-gray-100 dark:border-gray-700 pt-4 mb-4">
+                    <span><i class="fas fa-sticky-note mr-1"></i>{{ course.notes.count }} Notes</span>
+                    <span><i class="fas fa-clock mr-1"></i>{{ course.study_sessions.count }} Sessions</span>
                 </div>
 
-                <a href="{% url 'course_detail' course.id %}"
-                    class="block text-center w-full py-2.5 bg-gray-50 hover:bg-blue-50 dark:bg-gray-700 dark:hover:bg-blue-900/30 rounded-lg text-sm font-medium text-gray-900 dark:text-white transition-colors">
-                    <i class="fas fa-eye mr-2"></i>View Details
-                </a>
+                <a href="{% url 'course_detail' course.id %}" class="btn-secondary w-full">View Details</a>
             </div>
             {% empty %}
             <div class="col-span-full">
-                <div class="card text-center py-12">
-                    <i class="fas fa-book-open text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Learning Records Yet</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">Start with a course, certification, or self-study track.</p>
-                    <a href="{% url 'course_create' %}" class="btn-primary inline-flex items-center">
-                        <i class="fas fa-plus mr-2"></i>Add Your First Record
-                    </a>
+                <div class="section-card empty-state">
+                    <i class="fas fa-book-open empty-state-icon"></i>
+                    <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Learning Records Yet</h3>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">Start with a course, certification, or self-study track.</p>
+                    <a href="{% url 'course_create' %}" class="btn-primary inline-flex items-center"><i class="fas fa-plus mr-2"></i>Add Your First Record</a>
                 </div>
             </div>
             {% endfor %}
@@ -159,23 +127,23 @@
 
         {% if recent_sessions %}
         <div class="mt-8">
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Study Sessions</h3>
-            <div class="card">
-                <div class="space-y-4">
+            <div class="section-header">
+                <h3 class="section-title">Recent Study Sessions</h3>
+            </div>
+            <div class="section-card">
+                <div class="list-stack">
                     {% for session in recent_sessions %}
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div class="list-item">
                         <div class="flex-1">
-                            <h4 class="font-semibold text-gray-900 dark:text-white">
-                                <a href="{% url 'course_detail' session.course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                                    {{ session.course.display_title }}
-                                </a>
+                            <h4 class="font-semibold text-slate-900 dark:text-white">
+                                <a href="{% url 'course_detail' session.course.id %}">{{ session.course.display_title }}</a>
                             </h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <p class="text-sm text-slate-600 dark:text-slate-400">
                                 <i class="fas fa-calendar mr-1"></i>{{ session.date|date:"M d, Y" }}
                                 <span class="ml-4"><i class="fas fa-clock mr-1"></i>{{ session.duration_minutes }} min</span>
                             </p>
                             {% if session.topics_covered %}
-                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 italic">{{ session.topics_covered|truncatewords:15 }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-500 mt-1 italic">{{ session.topics_covered|truncatewords:15 }}</p>
                             {% endif %}
                         </div>
                     </div>
@@ -187,16 +155,18 @@
 
         {% if recent_completions %}
         <div class="mt-8">
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Completions</h3>
+            <div class="section-header">
+                <h3 class="section-title">Recent Completions</h3>
+            </div>
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {% for course in recent_completions %}
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">{{ course.get_learning_type_display }}</p>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{ course.name }}</h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ course.provider|default:"Provider not set" }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">{{ course.completion_date|default:course.semester }}</p>
+                <div class="metric-card">
+                    <p class="metric-label">{{ course.get_learning_type_display }}</p>
+                    <h4 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">{{ course.name }}</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">{{ course.provider|default:"Provider not set" }}</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-3">{{ course.completion_date|default:course.semester }}</p>
                     {% if course.outcome %}
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">{{ course.outcome }}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">{{ course.outcome }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}

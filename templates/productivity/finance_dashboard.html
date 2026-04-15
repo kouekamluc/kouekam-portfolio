@@ -1,45 +1,54 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <h1 class="text-4xl font-bold mb-8 dark:text-white">Finance Dashboard</h1>
-        
-        <div class="grid gap-6 md:grid-cols-3 mb-8">
-            <div class="bg-green-50 dark:bg-green-900 rounded-lg p-6">
-                <h3 class="text-gray-600 dark:text-gray-400 mb-2">Total Income</h3>
-                <p class="text-3xl font-bold text-green-600 dark:text-green-400">${{ total_income|floatformat:2 }}</p>
+<section class="app-shell">
+    <div class="app-container">
+        <div class="page-hero">
+            <div>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-wallet"></i>
+                    <span>Personal Finance</span>
+                </div>
+                <h1 class="page-title">Finance Dashboard</h1>
+                <p class="page-subtitle mt-4">Keep income, spending, and cashflow visible while you move through school and into professional life.</p>
             </div>
-            <div class="bg-red-50 dark:bg-red-900 rounded-lg p-6">
-                <h3 class="text-gray-600 dark:text-gray-400 mb-2">Total Expenses</h3>
-                <p class="text-3xl font-bold text-red-600 dark:text-red-400">${{ total_expenses|floatformat:2 }}</p>
-            </div>
-            <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-6">
-                <h3 class="text-gray-600 dark:text-gray-400 mb-2">Balance</h3>
-                <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">${{ balance|floatformat:2 }}</p>
-            </div>
-        </div>
-        
-        <div class="mb-8">
-            <canvas id="financeChart" width="400" height="200"></canvas>
-        </div>
-        
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold dark:text-white">Recent Transactions</h2>
-            <div class="flex gap-3">
-                <a href="{% url 'export_finance_csv' %}" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800">Export CSV</a>
-                <a href="{% url 'transaction_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Transaction</a>
+            <div class="page-actions">
+                <a href="{% url 'export_finance_csv' %}" class="btn-secondary">Export CSV</a>
+                <a href="{% url 'transaction_create' %}" class="btn-primary">Add Transaction</a>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="grid gap-6 md:grid-cols-3 mb-8">
+            <div class="metric-card">
+                <p class="metric-label">Total Income</p>
+                <p class="metric-value text-green-600 dark:text-green-400">${{ total_income|floatformat:2 }}</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Total Expenses</p>
+                <p class="metric-value text-red-600 dark:text-red-400">${{ total_expenses|floatformat:2 }}</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Balance</p>
+                <p class="metric-value text-teal-700 dark:text-teal-300">${{ balance|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="section-card mb-8">
+            <canvas id="financeChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">Recent Transactions</h2>
+            </div>
+
             {% if recent_transactions %}
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="list-stack">
                 {% for transaction in recent_transactions %}
-                <div class="flex items-center justify-between p-4">
+                <div class="list-item flex items-center justify-between">
                     <div>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ transaction.get_type_display }} · {{ transaction.get_category_display }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ transaction.date|date:"M d, Y" }}{% if transaction.description %} · {{ transaction.description|truncatewords:10 }}{% endif %}</p>
+                        <p class="font-medium text-slate-900 dark:text-white">{{ transaction.get_type_display }} | {{ transaction.get_category_display }}</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">{{ transaction.date|date:"M d, Y" }}{% if transaction.description %} | {{ transaction.description|truncatewords:10 }}{% endif %}</p>
                     </div>
                     <p class="font-semibold {% if transaction.type == 'income' %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                         {% if transaction.type == 'income' %}+{% else %}-{% endif %}${{ transaction.amount|floatformat:2 }}
@@ -48,8 +57,9 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-                No transactions recorded yet.
+            <div class="empty-state">
+                <i class="fas fa-wallet empty-state-icon"></i>
+                <p class="text-slate-500 dark:text-slate-400">No transactions recorded yet.</p>
             </div>
             {% endif %}
         </div>
@@ -91,12 +101,3 @@ new Chart(ctx, {
 });
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-
-

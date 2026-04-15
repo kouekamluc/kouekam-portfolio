@@ -4,21 +4,31 @@
 {% block title %}Search Results - Kouekam Digital Hub{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 mt-20">
-    <div class="max-w-4xl mx-auto">
-        <!-- Search Form -->
-        <div class="mb-8">
-            <form method="get" action="{% url 'search' %}" class="flex gap-2">
+<section class="app-shell">
+    <div class="app-container max-w-5xl">
+        <div class="page-hero">
+            <div>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-search"></i>
+                    <span>Discovery</span>
+                </div>
+                <h1 class="page-title">{% if query %}Search Results{% else %}Search The Hub{% endif %}</h1>
+                <p class="page-subtitle mt-4">Find blog posts, projects, and notes without losing the rhythm of the rest of the app.</p>
+            </div>
+        </div>
+
+        <div class="section-card mb-8">
+            <form method="get" action="{% url 'search' %}" class="flex flex-col gap-3 sm:flex-row">
                 <input 
                     type="text" 
                     name="q" 
                     value="{{ query }}" 
                     placeholder="Search blog posts, projects, notes..."
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    class="flex-1"
                 >
                 <button 
                     type="submit"
-                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+                    class="btn-primary px-6 py-2"
                 >
                     <i class="fas fa-search mr-2"></i>Search
                 </button>
@@ -27,25 +37,24 @@
 
         {% if query %}
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Search Results for "{{ query }}"
-                </h1>
+                </h2>
                 <p class="text-gray-600 dark:text-gray-400">
                     Found {{ total_results }} result{{ total_results|pluralize }}
                 </p>
             </div>
 
-            <!-- Blog Posts Results -->
             {% if results.blog_posts %}
             <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 class="section-title mb-4">
                     <i class="fas fa-blog mr-2"></i>Blog Posts ({{ results.blog_posts|length }})
                 </h2>
-                <div class="space-y-4">
+                <div class="content-stack">
                     {% for post in results.blog_posts %}
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                    <div class="list-item">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            <a href="{% url 'blog_detail' post.slug %}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                            <a href="{% url 'blog_detail' post.slug %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ post.title }}
                             </a>
                         </h3>
@@ -65,14 +74,14 @@
             <!-- Projects Results -->
             {% if results.projects %}
             <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 class="section-title mb-4">
                     <i class="fas fa-project-diagram mr-2"></i>Projects ({{ results.projects|length }})
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% for project in results.projects %}
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                    <div class="list-item">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            <a href="{% url 'project_detail' project.slug %}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                            <a href="{% url 'project_detail' project.slug %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ project.title }}
                             </a>
                         </h3>
@@ -81,7 +90,9 @@
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                             <span><i class="fas fa-tag mr-1"></i>{{ project.get_category_display }}</span>
-                            <span><i class="fas fa-circle text-{{ project.status }} mr-1"></i>{{ project.get_status_display }}</span>
+                            <span class="pill {% if project.status == 'completed' %}pill-success{% elif project.status == 'in_progress' %}pill-brand{% else %}pill-warning{% endif %}">
+                                {{ project.get_status_display }}
+                            </span>
                         </div>
                     </div>
                     {% endfor %}
@@ -89,17 +100,16 @@
             </div>
             {% endif %}
 
-            <!-- Notes Results (only for authenticated users) -->
             {% if request.user.is_authenticated and results.notes %}
             <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 class="section-title mb-4">
                     <i class="fas fa-sticky-note mr-2"></i>Notes ({{ results.notes|length }})
                 </h2>
-                <div class="space-y-4">
+                <div class="content-stack">
                     {% for note in results.notes %}
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                    <div class="list-item">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            <a href="{% url 'course_detail' note.course.id %}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                            <a href="{% url 'course_detail' note.course.id %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ note.title }}
                             </a>
                         </h3>
@@ -116,9 +126,8 @@
             </div>
             {% endif %}
 
-            <!-- No Results -->
             {% if total_results == 0 %}
-            <div class="text-center py-12">
+            <div class="section-card empty-state">
                 <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No results found</h3>
                 <p class="text-gray-600 dark:text-gray-400">
@@ -127,7 +136,7 @@
             </div>
             {% endif %}
         {% else %}
-            <div class="text-center py-12">
+            <div class="section-card empty-state">
                 <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Search</h3>
                 <p class="text-gray-600 dark:text-gray-400">
@@ -136,6 +145,6 @@
             </div>
         {% endif %}
     </div>
-</div>
+</section>
 {% endblock %}
 

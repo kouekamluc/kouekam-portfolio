@@ -11,21 +11,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+            document.documentElement.classList.toggle('dark', isDark);
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: {} }
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Source Sans 3"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {"50":"#f0fdfa","100":"#ccfbf1","200":"#99f6e4","300":"#5eead4","400":"#2dd4bf","500":"#14b8a6","600":"#0f766e","700":"#115e59","800":"#134e4a","900":"#042f2e","950":"#022c22"}
+                    }
+                }
+            }
         }
     </script>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
-<body class="text-gray-900 dark:text-white flex flex-col min-h-screen transition-colors duration-200">
+<body class="flex min-h-screen flex-col text-slate-900 antialiased transition-colors duration-300 dark:text-white">
     {% include 'components/navbar.html' %}
 
-    <main class="flex-grow">
-        <div class="max-w-2xl mx-auto px-4 py-8">
+    <main class="flex-grow overflow-x-clip">
+        <div class="app-container py-8">
             {% if messages %}
                 <div class="mb-4">
                     {% for message in messages %}
@@ -72,18 +91,32 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script>
-        // Enable saved theme or follow system preference
         (function() {
             const html = document.documentElement;
-            const savedTheme = localStorage.getItem('theme');
-            
-            if (savedTheme === 'light') {
-                html.classList.remove('dark');
-            } else if (savedTheme === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+            const themeButtons = document.querySelectorAll('[data-theme-toggle]');
+
+            function syncThemeButtons() {
+                const dark = html.classList.contains('dark');
+                themeButtons.forEach(button => {
+                    const icon = button.querySelector('i');
+                    if (!icon) return;
+                    icon.className = dark ? 'fas fa-sun text-sm' : 'fas fa-moon text-sm';
+                    button.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+                    button.setAttribute('title', dark ? 'Switch to light theme' : 'Switch to dark theme');
+                });
             }
+
+            themeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const dark = !html.classList.contains('dark');
+                    html.classList.toggle('dark', dark);
+                    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+                    localStorage.setItem('theme', dark ? 'dark' : 'light');
+                    syncThemeButtons();
+                });
+            });
+
+            syncThemeButtons();
         })();
 
         // Auto-dismiss messages after 5 seconds

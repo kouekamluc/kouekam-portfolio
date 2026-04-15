@@ -2,49 +2,67 @@
 {% load static %}
 
 {% block content %}
-<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <a href="{% url 'academic_dashboard' %}"
-           class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+<section class="app-shell">
+    <div class="app-container">
+        <a href="{% url 'academic_dashboard' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i>Back to Dashboard
         </a>
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-bold dark:text-white">My Learning Records</h1>
-            <a href="{% url 'course_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Record</a>
+
+        <div class="page-hero">
+            <div>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Learning Records</span>
+                </div>
+                <h1 class="page-title">My Learning Records</h1>
+                <p class="page-subtitle mt-4">Filter courses, certifications, training, and self-study tracks without losing the big-picture timeline.</p>
+            </div>
+            <div class="page-actions">
+                <a href="{% url 'course_create' %}" class="btn-primary">Add Record</a>
+            </div>
         </div>
 
-        <div class="flex flex-wrap gap-4 mb-4">
-            <a href="{% url 'course_list' %}" class="px-4 py-2 rounded {% if not status_filter %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All</a>
-            <a href="?status=ongoing{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'ongoing' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Ongoing</a>
-            <a href="?status=completed{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'completed' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Completed</a>
-            <a href="?status=dropped{% if type_filter %}&type={{ type_filter }}{% endif %}" class="px-4 py-2 rounded {% if status_filter == 'dropped' %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Dropped</a>
+        <div class="mb-4">
+            <div class="filter-bar">
+                <a href="{% url 'course_list' %}" class="filter-chip {% if not status_filter %}filter-chip-active{% endif %}">All</a>
+                <a href="?status=ongoing{% if type_filter %}&type={{ type_filter }}{% endif %}" class="filter-chip {% if status_filter == 'ongoing' %}filter-chip-active{% endif %}">Ongoing</a>
+                <a href="?status=completed{% if type_filter %}&type={{ type_filter }}{% endif %}" class="filter-chip {% if status_filter == 'completed' %}filter-chip-active{% endif %}">Completed</a>
+                <a href="?status=dropped{% if type_filter %}&type={{ type_filter }}{% endif %}" class="filter-chip {% if status_filter == 'dropped' %}filter-chip-active{% endif %}">Dropped</a>
+            </div>
         </div>
 
-        <div class="flex flex-wrap gap-4 mb-6">
-            <a href="{% url 'course_list' %}" class="px-4 py-2 rounded {% if not type_filter %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">All Types</a>
-            <a href="?type=course{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'course' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Courses</a>
-            <a href="?type=certification{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'certification' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Certifications</a>
-            <a href="?type=training{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'training' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Training</a>
-            <a href="?type=self_study{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'self_study' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Self-Study</a>
-            <a href="?type=research{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-4 py-2 rounded {% if type_filter == 'research' %}bg-gray-900 text-white dark:bg-white dark:text-gray-900{% else %}bg-gray-200 dark:bg-gray-700{% endif %}">Research</a>
+        <div class="mb-8">
+            <div class="filter-bar">
+                <a href="{% url 'course_list' %}" class="filter-chip {% if not type_filter %}filter-chip-active{% endif %}">All Types</a>
+                <a href="?type=course{% if status_filter %}&status={{ status_filter }}{% endif %}" class="filter-chip {% if type_filter == 'course' %}filter-chip-active{% endif %}">Courses</a>
+                <a href="?type=certification{% if status_filter %}&status={{ status_filter }}{% endif %}" class="filter-chip {% if type_filter == 'certification' %}filter-chip-active{% endif %}">Certifications</a>
+                <a href="?type=training{% if status_filter %}&status={{ status_filter }}{% endif %}" class="filter-chip {% if type_filter == 'training' %}filter-chip-active{% endif %}">Training</a>
+                <a href="?type=self_study{% if status_filter %}&status={{ status_filter }}{% endif %}" class="filter-chip {% if type_filter == 'self_study' %}filter-chip-active{% endif %}">Self-Study</a>
+                <a href="?type=research{% if status_filter %}&status={{ status_filter }}{% endif %}" class="filter-chip {% if type_filter == 'research' %}filter-chip-active{% endif %}">Research</a>
+            </div>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {% for course in courses %}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">{{ course.get_learning_type_display }}</p>
-                <h3 class="text-xl font-bold mb-2 dark:text-white">{{ course.display_title }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-2">{{ course.provider|default:"Provider not set" }}</p>
-                <p class="text-gray-500 dark:text-gray-500 mb-4">{{ course.display_period }}</p>
+            <div class="feature-tile">
+                <p class="metric-label">{{ course.get_learning_type_display }}</p>
+                <h3 class="text-xl font-bold mt-3 mb-2 text-slate-900 dark:text-white">{{ course.display_title }}</h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-2">{{ course.provider|default:"Provider not set" }}</p>
+                <p class="text-slate-500 dark:text-slate-500 mb-4">{{ course.display_period }}</p>
                 <div class="flex justify-between items-center">
-                    <span class="px-3 py-1 rounded-full text-sm {% if course.status == 'ongoing' %}bg-blue-100 text-blue-800{% elif course.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <span class="pill {% if course.status == 'ongoing' %}pill-brand{% elif course.status == 'completed' %}pill-success{% else %}pill-muted{% endif %}">
                         {{ course.get_status_display }}
                     </span>
-                    <a href="{% url 'course_detail' course.id %}" class="text-blue-600 hover:underline">View -></a>
+                    <a href="{% url 'course_detail' course.id %}" class="section-link">View <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
             {% empty %}
-            <p class="col-span-3 text-center text-gray-600 dark:text-gray-400">No learning records yet. <a href="{% url 'course_create' %}" class="text-blue-600 hover:underline">Add one</a></p>
+            <div class="col-span-full">
+                <div class="section-card empty-state">
+                    <i class="fas fa-book-open empty-state-icon"></i>
+                    <p class="text-slate-600 dark:text-slate-400">No learning records yet. <a href="{% url 'course_create' %}" class="support-link">Add one</a></p>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </div>

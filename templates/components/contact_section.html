@@ -1,57 +1,58 @@
-<!-- Contact Section - Tailwind Plus Inspired -->
-<section id="contact" class="bg-white dark:bg-gray-900 py-20 lg:py-28">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6">
-                <i class="fas fa-envelope"></i>
-                <span>Let's Connect</span>
+<section id="contact" class="page-shell py-20 lg:py-28">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div class="spotlight-card">
+                <div class="eyebrow mb-6">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Let&apos;s Connect</span>
+                </div>
+                <h2 class="display-font text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">Thoughtful work starts with a clear conversation.</h2>
+                <p class="mt-5 max-w-xl text-lg text-gray-600 dark:text-gray-300">
+                    Bring a collaboration idea, a project question, or a practical challenge. The goal is to make the next step feel obvious and inviting.
+                </p>
+
+                <div class="mt-8 grid gap-4">
+                    <div class="support-card">
+                        <p class="metric-label">Best For</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900 dark:text-white">Collaborations, technical questions, and focused feedback.</p>
+                    </div>
+                    <div class="support-card">
+                        <p class="metric-label">Response Style</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900 dark:text-white">Clear, warm, and action-oriented.</p>
+                    </div>
+                </div>
             </div>
-            <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">
-                Get In Touch
-            </h2>
-            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Have a question, collaboration idea, or just want to connect? I'd love to hear from you! Feel free to reach out.
-            </p>
+
+            <form action="{% url 'contact' %}" method="post" class="spotlight-card space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label for="name" class="field-label">Your Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" name="name" required class="input-field" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="email" class="field-label">Your Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required class="input-field" placeholder="name@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label for="subject" class="field-label">Subject</label>
+                    <input type="text" id="subject" name="subject" class="input-field" placeholder="What are we exploring?">
+                </div>
+                <div>
+                    <label for="message" class="field-label">Your Message <span class="text-red-500">*</span></label>
+                    <textarea id="message" name="message" rows="6" required class="input-field resize-none" placeholder="Share the context, outcome you want, and any useful constraints."></textarea>
+                </div>
+                <div class="callout text-sm leading-relaxed">
+                    Clear prompts help produce clearer responses. If you already know the goal, timeline, or audience, include that here.
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="btn-primary w-full sm:w-auto">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </div>
+            </form>
         </div>
-        
-        <form action="{% url 'contact' %}" method="post" class="card-hover space-y-6">
-            {% csrf_token %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="name" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        Your Name <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" id="name" name="name" required
-                        class="input-field" placeholder="John Doe">
-                </div>
-                <div>
-                    <label for="email" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        Your Email <span class="text-red-500">*</span>
-                    </label>
-                    <input type="email" id="email" name="email" required
-                        class="input-field" placeholder="name@example.com">
-                </div>
-            </div>
-            <div>
-                <label for="subject" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    Subject
-                </label>
-                <input type="text" id="subject" name="subject"
-                    class="input-field" placeholder="What's on your mind?">
-            </div>
-            <div>
-                <label for="message" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    Your Message <span class="text-red-500">*</span>
-                </label>
-                <textarea id="message" name="message" rows="6" required
-                    class="input-field resize-none" placeholder="Leave a comment..."></textarea>
-            </div>
-            <div class="flex justify-end pt-4">
-                <button type="submit" class="btn-primary w-full sm:w-auto">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Message
-                </button>
-            </div>
-        </form>
     </div>
 </section>

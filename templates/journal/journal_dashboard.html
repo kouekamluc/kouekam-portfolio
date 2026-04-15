@@ -2,90 +2,96 @@
 {% block title %}Journal Dashboard - Kouekam Digital Hub{% endblock %}
 
 {% block content %}
-<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <div class="mb-8">
-            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Journal Dashboard</h1>
-            <p class="text-gray-600 dark:text-gray-400">Reflect on who you are becoming while keeping school, career, and life direction aligned.</p>
+<section class="app-shell">
+    <div class="app-container">
+        <div class="page-hero">
+            <div>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-book"></i>
+                    <span>Reflection System</span>
+                </div>
+                <h1 class="page-title">Journal Dashboard</h1>
+                <p class="page-subtitle mt-4">Reflect on who you are becoming while keeping school, career, and life direction aligned.</p>
+            </div>
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Entries Written</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ total_entries }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">A record of how your thinking evolves over time.</p>
+            <div class="metric-card">
+                <p class="metric-label">Entries Written</p>
+                <p class="metric-value">{{ total_entries }}</p>
+                <p class="metric-note">A record of how your thinking evolves over time.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Life Lessons</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ lesson_count }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Turn experience into reusable wisdom.</p>
+            <div class="metric-card">
+                <p class="metric-label">Life Lessons</p>
+                <p class="metric-value">{{ lesson_count }}</p>
+                <p class="metric-note">Turn experience into reusable wisdom.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Vision Progress</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ avg_goal_progress }}%</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Average progress across long-term goals.</p>
+            <div class="metric-card">
+                <p class="metric-label">Vision Progress</p>
+                <p class="metric-value">{{ avg_goal_progress }}%</p>
+                <p class="metric-note">Average progress across long-term goals.</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Goal Domains</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ goals_by_category|length }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Career, education, business, health, and more in one vision board.</p>
+            <div class="metric-card">
+                <p class="metric-label">Goal Domains</p>
+                <p class="metric-value">{{ goals_by_category|length }}</p>
+                <p class="metric-note">Career, education, business, health, and more in one vision board.</p>
             </div>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            <a href="{% url 'journal_entry_list' %}" class="card card-hover group">
+            <a href="{% url 'journal_entry_list' %}" class="feature-tile">
                 <div class="flex items-center mb-3">
-                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
-                        <i class="fas fa-book text-blue-600 dark:text-blue-400 text-xl"></i>
+                    <div class="feature-icon feature-icon-teal">
+                        <i class="fas fa-book text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Journal Entries</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Journal Entries</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Daily reflections and thinking traces.</p>
+                <p class="text-slate-600 dark:text-slate-400">Daily reflections and thinking traces.</p>
             </a>
-            <a href="{% url 'mood_tracker' %}" class="card card-hover group">
+            <a href="{% url 'mood_tracker' %}" class="feature-tile">
                 <div class="flex items-center mb-3">
-                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
-                        <i class="fas fa-smile text-green-600 dark:text-green-400 text-xl"></i>
+                    <div class="feature-icon feature-icon-green">
+                        <i class="fas fa-smile text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Mood Tracker</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Mood Tracker</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Track emotional energy and recovery patterns.</p>
+                <p class="text-slate-600 dark:text-slate-400">Track emotional energy and recovery patterns.</p>
             </a>
-            <a href="{% url 'vision_board' %}" class="card card-hover group">
+            <a href="{% url 'vision_board' %}" class="feature-tile">
                 <div class="flex items-center mb-3">
-                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
-                        <i class="fas fa-bullseye text-purple-600 dark:text-purple-400 text-xl"></i>
+                    <div class="feature-icon feature-icon-violet">
+                        <i class="fas fa-bullseye text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Vision Board</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Vision Board</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Your long-term goals and identity direction.</p>
+                <p class="text-slate-600 dark:text-slate-400">Your long-term goals and identity direction.</p>
             </a>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2">
-            <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Recent Journal Entries</h2>
-                    <a href="{% url 'journal_entry_list' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Journal Entries</h2>
+                    <a href="{% url 'journal_entry_list' %}" class="section-link">View All <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
                 {% if recent_entries %}
-                <div class="space-y-4">
+                <div class="list-stack">
                     {% for entry in recent_entries %}
-                    <div class="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-white dark:hover:bg-gray-700 transition-colors">
+                    <div class="list-item">
                         <a href="{% url 'journal_entry_detail' entry.id %}" class="block">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="font-semibold text-gray-900 dark:text-white"><i class="fas fa-calendar-alt mr-2 text-gray-400"></i>{{ entry.date|date:"M d, Y" }}</span>
-                                {% if entry.mood %}<span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">{{ entry.get_mood_display }}</span>{% endif %}
+                                <span class="font-semibold text-slate-900 dark:text-white"><i class="fas fa-calendar-alt mr-2 text-gray-400"></i>{{ entry.date|date:"M d, Y" }}</span>
+                                {% if entry.mood %}<span class="pill pill-brand">{{ entry.get_mood_display }}</span>{% endif %}
                             </div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">{{ entry.content|truncatewords:30 }}</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">{{ entry.content|truncatewords:30 }}</p>
                         </a>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <i class="fas fa-book text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">No entries yet.</p>
+                <div class="empty-state">
+                    <i class="fas fa-book empty-state-icon"></i>
+                    <p class="text-slate-600 dark:text-slate-400 mb-4">No entries yet.</p>
                     <a href="{% url 'journal_entry_create' %}" class="btn-primary inline-flex items-center text-sm">
                         <i class="fas fa-plus mr-2"></i>Create Your First Entry
                     </a>
@@ -93,24 +99,24 @@
                 {% endif %}
             </div>
 
-            <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Active Vision Goals</h2>
-                    <a href="{% url 'vision_board' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Active Vision Goals</h2>
+                    <a href="{% url 'vision_board' %}" class="section-link">View All <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
                 {% if active_goals %}
-                <div class="space-y-4">
+                <div class="list-stack">
                     {% for goal in active_goals %}
-                    <div class="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <div class="list-item">
                         <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ goal.title }}</h3>
-                            <span class="text-sm font-medium text-blue-600 dark:text-blue-400">{{ goal.progress }}%</span>
+                            <h3 class="font-semibold text-slate-900 dark:text-white">{{ goal.title }}</h3>
+                            <span class="text-sm font-medium text-teal-700 dark:text-teal-300">{{ goal.progress }}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
-                            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ goal.progress }}%"></div>
+                        <div class="progress-track mb-2">
+                            <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
                         </div>
                         {% if goal.target_date %}
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
                             <i class="fas fa-calendar mr-1"></i>Target: {{ goal.target_date|date:"M d, Y" }}
                         </p>
                         {% endif %}
@@ -118,9 +124,9 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <i class="fas fa-bullseye text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">No active goals yet.</p>
+                <div class="empty-state">
+                    <i class="fas fa-bullseye empty-state-icon"></i>
+                    <p class="text-slate-600 dark:text-slate-400 mb-4">No active goals yet.</p>
                     <a href="{% url 'vision_goal_create' %}" class="btn-primary inline-flex items-center text-sm">
                         <i class="fas fa-plus mr-2"></i>Create Your First Goal
                     </a>
@@ -131,16 +137,16 @@
 
         {% if recent_philosophies %}
         <div class="mt-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Recent Philosophy Notes</h2>
-                <a href="{% url 'philosophy_list' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            <div class="section-header">
+                <h2 class="section-title">Recent Philosophy Notes</h2>
+                <a href="{% url 'philosophy_list' %}" class="section-link">View All <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
             <div class="grid gap-4 md:grid-cols-3">
                 {% for philosophy in recent_philosophies %}
-                <div class="card card-hover">
-                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">{{ philosophy.title }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">{{ philosophy.content|truncatewords:15 }}</p>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">{{ philosophy.get_category_display }}</span>
+                <div class="feature-tile">
+                    <h3 class="font-semibold text-slate-900 dark:text-white mb-2">{{ philosophy.title }}</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-3">{{ philosophy.content|truncatewords:15 }}</p>
+                    <span class="pill pill-warning">{{ philosophy.get_category_display }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -149,16 +155,16 @@
 
         {% if recent_lessons %}
         <div class="mt-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Recent Life Lessons</h2>
-                <a href="{% url 'life_lessons_list' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            <div class="section-header">
+                <h2 class="section-title">Recent Life Lessons</h2>
+                <a href="{% url 'life_lessons_list' %}" class="section-link">View All <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
             <div class="grid gap-4 md:grid-cols-3">
                 {% for lesson in recent_lessons %}
-                <div class="card card-hover">
-                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">{{ lesson.title }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">{{ lesson.lesson|truncatewords:18 }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-3">{{ lesson.date_learned|date:"M d, Y" }}</p>
+                <div class="feature-tile">
+                    <h3 class="font-semibold text-slate-900 dark:text-white mb-2">{{ lesson.title }}</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">{{ lesson.lesson|truncatewords:18 }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-500 mt-3">{{ lesson.date_learned|date:"M d, Y" }}</p>
                 </div>
                 {% endfor %}
             </div>

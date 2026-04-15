@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
+<section class="app-shell">
+    <div class="app-container">
         <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
             <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
                 <a href="{% url 'academic_dashboard' %}" class="hover:underline">Dashboard</a>
@@ -31,7 +31,7 @@
                     <a href="{% url 'course_update' course.id %}" class="btn-secondary inline-flex items-center">
                         <i class="fas fa-edit mr-2"></i>Edit
                     </a>
-                    <a href="{% url 'course_delete' course.id %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                    <a href="{% url 'course_delete' course.id %}" class="btn-danger inline-flex items-center">
                         <i class="fas fa-trash mr-2"></i>Delete
                     </a>
                 </div>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Suggested Focus Block</p>
-                            <p class="mt-2 text-2xl font-bold text-blue-600 dark:text-blue-400">{{ recommended_minutes }} min</p>
+                            <p class="mt-2 text-2xl font-bold text-teal-700 dark:text-teal-300">{{ recommended_minutes }} min</p>
                         </div>
                     </div>
                     {% if workflow_actions %}
@@ -57,7 +57,7 @@
                         <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                             {% for action in workflow_actions %}
                             <li class="flex items-start">
-                                <i class="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                <i class="fas fa-arrow-right text-teal-500 mt-1 mr-2 text-xs"></i>
                                 <span>{{ action }}</span>
                             </li>
                             {% endfor %}
@@ -100,11 +100,11 @@
                     </div>
                     <div class="space-y-4">
                         {% for note in notes %}
-                        <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div class="list-item p-6">
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ note.title }}</h3>
                                 <div class="flex gap-2">
-                                    <a href="{% url 'note_update' note.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="{% url 'note_update' note.id %}" class="section-link" title="Edit"><i class="fas fa-edit"></i></a>
                                     <a href="{% url 'note_delete' note.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete"><i class="fas fa-trash"></i></a>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                                 {{ note.content|safe|truncatewords:50 }}
                             </div>
                             {% if note.file %}
-                            <a href="{{ note.file.url }}" class="text-blue-600 hover:underline text-sm flex items-center mb-2">
+                            <a href="{{ note.file.url }}" class="section-link text-sm flex items-center mb-2">
                                 <i class="fas fa-paperclip mr-2"></i>Download Attachment
                             </a>
                             {% endif %}
@@ -132,7 +132,7 @@
                                 <i class="fas fa-plus mr-2"></i>Add Flashcard
                             </a>
                             {% if flashcards %}
-                            <a href="{% url 'flashcard_study' course.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                            <a href="{% url 'flashcard_study' course.id %}" class="btn-primary inline-flex items-center">
                                 <i class="fas fa-book-reader mr-2"></i>Study Mode
                             </a>
                             {% endif %}
@@ -140,9 +140,9 @@
                     </div>
                     <div class="grid sm:grid-cols-2 gap-4">
                         {% for card in flashcards %}
-                        <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 rounded-lg relative">
+                        <div class="relative rounded-2xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900/50 dark:bg-yellow-900/20">
                             <div class="absolute top-2 right-2 flex gap-2">
-                                <a href="{% url 'flashcard_update' card.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Edit"><i class="fas fa-edit text-sm"></i></a>
+                                <a href="{% url 'flashcard_update' card.id %}" class="section-link" title="Edit"><i class="fas fa-edit text-sm"></i></a>
                                 <a href="{% url 'flashcard_delete' card.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete"><i class="fas fa-trash text-sm"></i></a>
                             </div>
                             <p class="font-medium text-gray-900 dark:text-white mb-2 pr-8">Q: {{ card.question }}</p>
@@ -158,7 +158,7 @@
             </div>
 
             <div class="lg:col-span-1">
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 sticky top-24 border border-gray-200 dark:border-gray-700">
+                <div class="section-card sticky top-24 p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Study Sessions</h3>
                         <a href="{% url 'study_session_create' course.id %}" class="btn-primary inline-flex items-center text-sm">
@@ -168,8 +168,8 @@
                     <div class="relative border-l border-gray-200 dark:border-gray-700 ml-3">
                         {% for session in sessions %}
                         <div class="mb-6 ml-6 relative group">
-                            <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-gray-50 dark:ring-gray-800 dark:bg-blue-900">
-                                <i class="fas fa-calendar text-xs text-blue-800 dark:text-blue-300"></i>
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-gray-50 dark:ring-gray-800 dark:bg-teal-900/50">
+                                <i class="fas fa-calendar text-xs text-teal-800 dark:text-teal-300"></i>
                             </span>
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
@@ -180,7 +180,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <a href="{% url 'study_session_update' session.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Edit"><i class="fas fa-edit text-xs"></i></a>
+                                    <a href="{% url 'study_session_update' session.id %}" class="section-link" title="Edit"><i class="fas fa-edit text-xs"></i></a>
                                     <a href="{% url 'study_session_delete' session.id %}" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete"><i class="fas fa-trash text-xs"></i></a>
                                 </div>
                             </div>

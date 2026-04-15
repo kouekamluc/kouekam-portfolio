@@ -1,74 +1,115 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
-    <div class="px-4 mx-auto max-w-screen-xl lg:px-6">
-        <h1 class="text-4xl font-bold mb-8 dark:text-white">AI Assistant Hub</h1>
-        
+<section class="app-shell">
+    <div class="app-container">
+        <div class="page-hero">
+            <div>
+                <div class="eyebrow mb-5">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Workspace</span>
+                </div>
+                <h1 class="page-title">AI Assistant Hub</h1>
+                <p class="page-subtitle mt-4">Switch between general chat, study support, writing help, and document analysis without leaving the same workspace rhythm.</p>
+            </div>
+        </div>
+
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
-            <a href="{% url 'chat_interface' %}" class="bg-blue-50 dark:bg-blue-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">General Chat</h3>
-                <p class="text-gray-600 dark:text-gray-400">Chat with AI assistant</p>
+            <a href="{% url 'chat_interface' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-teal">
+                        <i class="fas fa-comments text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">General Chat</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Think through ideas, ask open-ended questions, and explore next steps.</p>
             </a>
-            <a href="{% url 'study_helper' %}" class="bg-green-50 dark:bg-green-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">Study Helper</h3>
-                <p class="text-gray-600 dark:text-gray-400">Get study assistance</p>
+            <a href="{% url 'study_helper' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-green">
+                        <i class="fas fa-graduation-cap text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Study Helper</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Break down coursework, revision sessions, and difficult concepts.</p>
             </a>
-            <a href="{% url 'code_assistant' %}" class="bg-purple-50 dark:bg-purple-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">Code Assistant</h3>
-                <p class="text-gray-600 dark:text-gray-400">Code review and help</p>
+            <a href="{% url 'code_assistant' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-violet">
+                        <i class="fas fa-code text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Code Assistant</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Review snippets, explain bugs, and refine implementation ideas.</p>
             </a>
-            <a href="{% url 'writing_assistant' %}" class="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">Writing Assistant</h3>
-                <p class="text-gray-600 dark:text-gray-400">Writing help and review</p>
+            <a href="{% url 'writing_assistant' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-amber">
+                        <i class="fas fa-pen-nib text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Writing Assistant</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Improve reports, emails, essays, and professional writing.</p>
             </a>
-            <a href="{% url 'pdf_upload' %}" class="bg-red-50 dark:bg-red-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">PDF Analyzer</h3>
-                <p class="text-gray-600 dark:text-gray-400">Analyze PDF documents</p>
+            <a href="{% url 'pdf_upload' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-rose">
+                        <i class="fas fa-file-pdf text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">PDF Analyzer</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Extract summaries and insights from lecture notes and documents.</p>
             </a>
-            <a href="{% url 'course_recommendation' %}" class="bg-indigo-50 dark:bg-indigo-900 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h3 class="text-xl font-bold mb-2 dark:text-white">Course Recommendations</h3>
-                <p class="text-gray-600 dark:text-gray-400">Get course suggestions</p>
+            <a href="{% url 'course_recommendation' %}" class="feature-tile">
+                <div class="flex items-center mb-4">
+                    <div class="feature-icon feature-icon-sky">
+                        <i class="fas fa-compass text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Course Recommendations</h3>
+                </div>
+                <p class="text-slate-600 dark:text-slate-400">Find learning directions that support the next step in your growth.</p>
             </a>
         </div>
-        
+
         <div class="grid gap-6 md:grid-cols-2">
-            <div>
-                <h2 class="text-2xl font-bold mb-4 dark:text-white">Recent Conversations</h2>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Conversations</h2>
+                </div>
                 {% for conversation in conversations %}
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-                    <a href="{% url 'conversation_detail' conversation.id %}" class="hover:underline">
-                        <h3 class="font-semibold dark:text-white">{{ conversation.title|default:"Untitled" }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ conversation.assistant_type }}</p>
+                <div class="list-item mb-4 last:mb-0">
+                    <a href="{% url 'conversation_detail' conversation.id %}" class="block">
+                        <h3 class="font-semibold text-slate-900 dark:text-white">{{ conversation.title|default:"Untitled" }}</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">{{ conversation.assistant_type }}</p>
                     </a>
                 </div>
                 {% empty %}
-                <p class="text-gray-600 dark:text-gray-400">No conversations yet.</p>
+                <div class="empty-state">
+                    <i class="fas fa-comments empty-state-icon"></i>
+                    <p class="text-slate-600 dark:text-slate-400">No conversations yet.</p>
+                </div>
                 {% endfor %}
             </div>
-            <div>
-                <h2 class="text-2xl font-bold mb-4 dark:text-white">Recent PDF Analyses</h2>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Recent PDF Analyses</h2>
+                </div>
                 {% for analysis in recent_analyses %}
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-                    <a href="{% url 'pdf_analyze' analysis.id %}" class="hover:underline">
-                        <h3 class="font-semibold dark:text-white">{{ analysis.original_filename|default:"PDF Analysis" }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ analysis.date_analyzed|date:"M d, Y" }}</p>
+                <div class="list-item mb-4 last:mb-0">
+                    <a href="{% url 'pdf_analyze' analysis.id %}" class="block">
+                        <h3 class="font-semibold text-slate-900 dark:text-white">{{ analysis.original_filename|default:"PDF Analysis" }}</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">{{ analysis.date_analyzed|date:"M d, Y" }}</p>
                     </a>
                 </div>
                 {% empty %}
-                <p class="text-gray-600 dark:text-gray-400">No PDF analyses yet.</p>
+                <div class="empty-state">
+                    <i class="fas fa-file-pdf empty-state-icon"></i>
+                    <p class="text-slate-600 dark:text-slate-400">No PDF analyses yet.</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 </section>
 {% endblock %}
-
-
-
-
-
-
-
-
-

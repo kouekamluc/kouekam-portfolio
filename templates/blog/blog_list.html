@@ -2,18 +2,14 @@
 {% load blog_tags %}
 
 {% block content %}
-<!-- Blog List - Tailwind Plus Inspired -->
-<section class="bg-white dark:bg-gray-900 py-12 lg:py-20">
+<section class="page-shell py-12 lg:py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
         <div class="text-center mb-12 lg:mb-16">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6">
+            <div class="eyebrow mb-6">
                 <i class="fas fa-blog"></i>
                 <span>Latest Articles</span>
             </div>
-            <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">
-                Blog Posts
-            </h1>
+            <h1 class="display-font text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl mb-4">Blog Posts</h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
                 Read our latest articles, tutorials, and insights.
             </p>
@@ -26,53 +22,21 @@
             {% endif %}
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-wrap justify-center gap-3 mb-12">
-            <a href="{% url 'blog_list' %}"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if not category_filter and not show_drafts %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                All
-            </a>
+        <div class="filter-bar justify-center mb-12">
+            <a href="{% url 'blog_list' %}" class="filter-chip {% if not category_filter and not show_drafts %}filter-chip-active{% endif %}">All</a>
             {% if user.is_authenticated %}
-            <a href="?drafts=true"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if show_drafts == 'true' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                My Drafts
-            </a>
+            <a href="?drafts=true" class="filter-chip {% if show_drafts == 'true' %}filter-chip-active{% endif %}">My Drafts</a>
             {% endif %}
-            <a href="?category=django"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'django' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Django
-            </a>
-            <a href="?category=python"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'python' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Python
-            </a>
-            <a href="?category=ai"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'ai' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                AI & ML
-            </a>
-            <a href="?category=electronics"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'electronics' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Electronics
-            </a>
-            <a href="?category=web"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'web' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Web Dev
-            </a>
-            <a href="?category=tutorial"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'tutorial' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Tutorial
-            </a>
-            <a href="?category=project"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if category_filter == 'project' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Project
-            </a>
-            <a href="?featured=true"
-                class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {% if featured == 'true' %}bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/50{% else %}bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700{% endif %}">
-                Featured
-            </a>
+            <a href="?category=django" class="filter-chip {% if category_filter == 'django' %}filter-chip-active{% endif %}">Django</a>
+            <a href="?category=python" class="filter-chip {% if category_filter == 'python' %}filter-chip-active{% endif %}">Python</a>
+            <a href="?category=ai" class="filter-chip {% if category_filter == 'ai' %}filter-chip-active{% endif %}">AI & ML</a>
+            <a href="?category=electronics" class="filter-chip {% if category_filter == 'electronics' %}filter-chip-active{% endif %}">Electronics</a>
+            <a href="?category=web" class="filter-chip {% if category_filter == 'web' %}filter-chip-active{% endif %}">Web Dev</a>
+            <a href="?category=tutorial" class="filter-chip {% if category_filter == 'tutorial' %}filter-chip-active{% endif %}">Tutorial</a>
+            <a href="?category=project" class="filter-chip {% if category_filter == 'project' %}filter-chip-active{% endif %}">Project</a>
+            <a href="?featured=true" class="filter-chip {% if featured == 'true' %}filter-chip-active{% endif %}">Featured</a>
         </div>
 
-        <!-- Blog Posts Grid - Three Column Layout with Images -->
         <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
             {% for post in page_obj %}
             <article class="group card-hover overflow-hidden">
@@ -84,15 +48,15 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     {% else %}
-                    <div class="h-48 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-t-xl mb-4 flex items-center justify-center">
-                        <i class="fas fa-newspaper text-5xl text-blue-400 dark:text-blue-500 opacity-50"></i>
+                    <div class="h-48 bg-gradient-to-br from-teal-100 via-cyan-100 to-amber-100 dark:from-teal-900/30 dark:via-cyan-900/20 dark:to-amber-900/30 rounded-t-xl mb-4 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-5xl text-teal-400 dark:text-teal-500 opacity-50"></i>
                     </div>
                     {% endif %}
                 </a>
-                
+
                 <div class="p-6">
                     <div class="flex items-center gap-2 mb-3 flex-wrap">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-800">
+                        <span class="pill pill-brand">
                             <i class="fas fa-tag text-xs"></i>
                             {{ post.get_category_display }}
                         </span>
@@ -103,13 +67,13 @@
                         </span>
                         {% endif %}
                         {% if not post.published_date %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold border border-gray-200 dark:border-gray-700">
+                        <span class="pill pill-muted">
                             <i class="fas fa-file-alt text-xs"></i>
                             Draft
                         </span>
                         {% endif %}
                     </div>
-                    
+
                     <time class="block text-xs text-gray-500 dark:text-gray-400 mb-3">
                         {% if post.published_date %}
                             {{ post.published_date|date:"F j, Y" }}
@@ -117,24 +81,24 @@
                             Created: {{ post.created_at|date:"F j, Y" }}
                         {% endif %}
                     </time>
-                    
-                    <h3 class="mb-3 text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+
+                    <h3 class="mb-3 text-xl font-bold text-gray-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
                         <a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a>
                     </h3>
-                    
+
                     <p class="mb-4 text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed text-sm">
                         {{ post.content|markdown_excerpt:120 }}
                     </p>
-                    
+
                     <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <i class="fas fa-user-circle"></i>
                             <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
-                            <span class="text-gray-400 dark:text-gray-500">•</span>
+                            <span class="text-gray-400 dark:text-gray-500">/</span>
                             <span>{{ post.content|reading_time }}</span>
                         </div>
                         <a href="{% url 'blog_detail' post.slug %}"
-                            class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group/link">
+                            class="inline-flex items-center gap-1 text-sm font-semibold text-teal-700 dark:text-teal-300 hover:text-teal-800 dark:hover:text-teal-200 transition-colors group/link">
                             Read
                             <svg class="w-4 h-4 transform group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -145,7 +109,7 @@
             </article>
             {% empty %}
             <div class="col-span-full">
-                <div class="card text-center py-16">
+                <div class="section-card text-center py-16">
                     <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                         <i class="fas fa-blog text-4xl text-gray-400 dark:text-gray-600"></i>
                     </div>
@@ -158,14 +122,13 @@
             {% endfor %}
         </div>
 
-        <!-- Pagination -->
         {% if page_obj.has_other_pages %}
         <nav class="flex justify-center mt-12">
             <ul class="flex items-center gap-2">
                 {% if page_obj.has_previous %}
                 <li>
                     <a href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        class="filter-chip">
                         Previous
                     </a>
                 </li>
@@ -174,14 +137,12 @@
                 {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
                 <li>
-                    <span class="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-lg shadow-blue-500/50">
-                        {{ num }}
-                    </span>
+                    <span class="filter-chip filter-chip-active">{{ num }}</span>
                 </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 <li>
                     <a href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        class="filter-chip">
                         {{ num }}
                     </a>
                 </li>
@@ -191,7 +152,7 @@
                 {% if page_obj.has_next %}
                 <li>
                     <a href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
-                        class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        class="filter-chip">
                         Next
                     </a>
                 </li>
@@ -202,12 +163,3 @@
     </div>
 </section>
 {% endblock %}
-
-
-
-
-
-
-
-
-
