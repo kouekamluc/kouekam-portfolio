@@ -36,6 +36,9 @@ class ProjectSitemap(Sitemap):
     def items(self):
         return Project.objects.filter(status__in=['active', 'completed'])
 
+    def location(self, obj):
+        return reverse('project_detail', kwargs={'slug': obj.slug})
+
     def lastmod(self, obj):
         return obj.created_at
 
@@ -48,6 +51,9 @@ class BlogPostSitemap(Sitemap):
     def items(self):
         return BlogPost.objects.filter(published_date__isnull=False)
 
+    def location(self, obj):
+        return reverse('blog_detail', kwargs={'slug': obj.slug})
+
     def lastmod(self, obj):
         return obj.updated_at or obj.published_date
 
@@ -59,6 +65,9 @@ class TutorialSitemap(Sitemap):
 
     def items(self):
         return Tutorial.objects.all()
+
+    def location(self, obj):
+        return reverse('tutorial_detail', kwargs={'slug': obj.slug})
 
     def lastmod(self, obj):
         return obj.updated_at or obj.created_at
