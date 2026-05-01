@@ -1,29 +1,29 @@
 <section id="contact" class="page-shell py-20 lg:py-28">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-            <div class="spotlight-card">
+            <div class="section-shell">
                 <div class="eyebrow mb-6">
                     <i class="fas fa-envelope-open-text"></i>
                     <span>Let&apos;s Connect</span>
                 </div>
                 <h2 class="display-font text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">Thoughtful work starts with a clear conversation.</h2>
-                <p class="mt-5 max-w-xl text-lg text-gray-600 dark:text-gray-300">
+                <p class="section-copy mt-5 max-w-xl text-lg">
                     Bring a collaboration idea, a project question, or a practical challenge. The goal is to make the next step feel obvious and inviting.
                 </p>
 
                 <div class="mt-8 grid gap-4">
-                    <div class="support-card">
+                    <div class="content-card content-card-muted">
                         <p class="metric-label">Best For</p>
                         <p class="mt-2 text-lg font-semibold text-slate-900 dark:text-white">Collaborations, technical questions, and focused feedback.</p>
                     </div>
-                    <div class="support-card">
+                    <div class="content-card content-card-muted">
                         <p class="metric-label">Response Style</p>
                         <p class="mt-2 text-lg font-semibold text-slate-900 dark:text-white">Clear, warm, and action-oriented.</p>
                     </div>
                 </div>
             </div>
 
-            <form action="{% url 'contact' %}" method="post" class="spotlight-card space-y-6">
+            <form action="{% url 'contact' %}" method="post" class="section-shell space-y-6">
                 {% csrf_token %}
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>

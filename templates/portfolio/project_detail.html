@@ -4,13 +4,13 @@
 {% block content %}
 <section class="page-shell pt-0">
     <div class="px-4 mx-auto max-w-screen-xl lg:px-6 pt-8">
-        <div class="flex items-center justify-between mb-4">
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <a href="{% url 'project_list' %}" 
                class="back-link mb-0">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Projects
             </a>
             {% if user.is_authenticated %}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <a href="{% url 'project_update' project.slug %}" 
                    class="btn-primary text-sm">
                     <i class="fas fa-edit"></i>
@@ -25,7 +25,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="relative h-96 overflow-hidden rounded-[2rem] mx-4 lg:mx-6 bg-gray-900">
+    <div class="relative mx-4 h-72 overflow-hidden rounded-[1.6rem] bg-gray-900 sm:h-80 sm:rounded-[2rem] lg:mx-6 lg:h-96">
         {% if project.image %}
         <img class="absolute inset-0 w-full h-full object-cover opacity-30" src="{{ project.image.url }}"
             alt="{{ project.title }}" loading="lazy">
@@ -35,8 +35,8 @@
             <span class="pill pill-brand mb-4 w-fit">
                 {{ project.get_category_display }}
             </span>
-            <h1 class="text-4xl lg:text-5xl font-extrabold text-white mb-4">{{ project.title }}</h1>
-            <div class="flex items-center gap-4 text-gray-300">
+            <h1 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">{{ project.title }}</h1>
+            <div class="flex flex-wrap items-center gap-3 text-gray-300 sm:gap-4">
                 <span>{{ project.created_at|date:"F Y" }}</span>
                 <span>&bull;</span>
                 <span class="uppercase tracking-wider text-sm">{{ project.get_status_display }}</span>
@@ -55,7 +55,7 @@
             </div>
 
             {% if project.images.all %}
-            <div class="flex items-center justify-between mb-6">
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h3 class="text-2xl font-bold dark:text-white">Gallery</h3>
                 {% if user.is_authenticated %}
                 <a href="{% url 'project_image_add' project.slug %}" 
@@ -102,7 +102,7 @@
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-            <div class="section-card sticky top-8 p-6 lg:p-8">
+            <div class="section-card p-6 lg:sticky lg:top-8 lg:p-8">
                 <h4 class="text-xl font-bold mb-6 dark:text-white">Project Details</h4>
 
                 <div class="mb-6">

@@ -41,20 +41,20 @@
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-3 mt-10">
-                    <div class="card">
-                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Projects</p>
+                    <div class="content-card">
+                        <p class="metric-label">Projects</p>
                         <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ total_projects }}</p>
-                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Shipped work and experiments.</p>
+                        <p class="content-card-copy mt-3 text-sm">Shipped work and experiments.</p>
                     </div>
-                    <div class="card">
-                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Writing</p>
+                    <div class="content-card">
+                        <p class="metric-label">Writing</p>
                         <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ published_blog_posts }}</p>
-                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Notes, posts, and lessons learned.</p>
+                        <p class="content-card-copy mt-3 text-sm">Notes, posts, and lessons learned.</p>
                     </div>
-                    <div class="card">
-                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Skills</p>
+                    <div class="content-card">
+                        <p class="metric-label">Skills</p>
                         <p class="display-font mt-3 text-3xl font-bold text-slate-900 dark:text-white">{{ total_skills }}</p>
-                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Capabilities growing over time.</p>
+                        <p class="content-card-copy mt-3 text-sm">Capabilities growing over time.</p>
                     </div>
                 </div>
             </div>
@@ -62,25 +62,25 @@
             <div class="lg:col-span-5 animate-scale-in">
                 <div class="relative">
                     <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-teal-500/20 via-cyan-400/10 to-amber-400/20 blur-3xl"></div>
-                    <div class="relative card p-6 sm:p-7">
+                    <div class="relative section-shell p-6 sm:p-7">
                         <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="rounded-2xl bg-slate-900 text-white p-5 sm:col-span-2">
-                                <p class="text-xs uppercase tracking-[0.18em] text-slate-300">North Star</p>
+                            <div class="rounded-2xl bg-slate-900 text-white p-5 sm:col-span-2 shadow-[0_28px_54px_-34px_rgba(15,23,42,0.75)]">
+                                <p class="metric-label !text-slate-300">North Star</p>
                                 <h2 class="display-font mt-3 text-2xl font-bold">From coursework to career systems</h2>
                                 <p class="mt-3 text-sm text-slate-300">Track classes, certifications, goals, money, research, and ideas in one coherent rhythm.</p>
                             </div>
-                            <div class="rounded-2xl bg-teal-50 dark:bg-teal-900/20 p-5 border border-teal-100 dark:border-teal-900/30">
+                            <div class="content-card content-card-muted rounded-2xl bg-teal-50/90 dark:bg-teal-900/20 p-5 border border-teal-100 dark:border-teal-900/30">
                                 <i class="fas fa-graduation-cap text-teal-700 dark:text-teal-300"></i>
                                 <p class="display-font mt-4 text-lg font-semibold text-slate-900 dark:text-white">Academic</p>
-                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Courses, study sessions, notes, flashcards.</p>
+                                <p class="content-card-copy mt-2 text-sm">Courses, study sessions, notes, flashcards.</p>
                             </div>
-                            <div class="rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-5 border border-amber-100 dark:border-amber-900/30">
+                            <div class="content-card content-card-muted rounded-2xl bg-amber-50/90 dark:bg-amber-900/20 p-5 border border-amber-100 dark:border-amber-900/30">
                                 <i class="fas fa-briefcase text-amber-700 dark:text-amber-300"></i>
                                 <p class="display-font mt-4 text-lg font-semibold text-slate-900 dark:text-white">Professional</p>
-                                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Business plans, projects, certifications, growth.</p>
+                                <p class="content-card-copy mt-2 text-sm">Business plans, projects, certifications, growth.</p>
                             </div>
-                            <div class="rounded-2xl bg-white dark:bg-slate-900/70 p-5 border border-slate-200 dark:border-slate-800 sm:col-span-2">
-                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Why this app works</p>
+                            <div class="content-card rounded-2xl bg-white dark:bg-slate-900/70 p-5 border border-slate-200 dark:border-slate-800 sm:col-span-2">
+                                <p class="metric-label">Why this app works</p>
                                 <ul class="mt-3 space-y-3 text-sm text-slate-600 dark:text-slate-300">
                                     <li class="flex items-start gap-3"><i class="fas fa-check text-teal-600 mt-1 text-xs"></i><span>Modules connect to the same long-term life workflow.</span></li>
                                     <li class="flex items-start gap-3"><i class="fas fa-check text-teal-600 mt-1 text-xs"></i><span>Private dashboards coexist with a public-facing portfolio.</span></li>

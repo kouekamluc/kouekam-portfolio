@@ -17,30 +17,38 @@
             </div>
         </div>
 
-        <div class="section-card mb-8">
-            <form method="get" action="{% url 'search' %}" class="flex flex-col gap-3 sm:flex-row">
-                <input 
-                    type="text" 
-                    name="q" 
-                    value="{{ query }}" 
-                    placeholder="Search blog posts, projects, notes..."
-                    class="flex-1"
-                >
+        <div class="search-panel mb-8">
+            <form method="get" action="{% url 'search' %}" class="search-form">
+                <div class="search-field-wrap">
+                    <i class="fas fa-search search-field-icon"></i>
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ query }}"
+                        placeholder="Search blog posts, projects, notes..."
+                        class="search-field-input"
+                    >
+                </div>
                 <button 
                     type="submit"
-                    class="btn-primary px-6 py-2"
+                    class="btn-primary search-submit"
                 >
                     <i class="fas fa-search mr-2"></i>Search
                 </button>
             </form>
+            <div class="search-meta">
+                <span class="search-meta-pill"><i class="fas fa-layer-group text-[0.7rem]"></i>Projects</span>
+                <span class="search-meta-pill"><i class="fas fa-blog text-[0.7rem]"></i>Blog posts</span>
+                <span class="search-meta-pill"><i class="fas fa-sticky-note text-[0.7rem]"></i>Study notes</span>
+            </div>
         </div>
 
         {% if query %}
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <div class="section-shell mb-6">
+                <h2 class="page-title text-2xl sm:text-3xl mb-2">
                     Search Results for "{{ query }}"
                 </h2>
-                <p class="text-gray-600 dark:text-gray-400">
+                <p class="section-copy">
                     Found {{ total_results }} result{{ total_results|pluralize }}
                 </p>
             </div>
@@ -52,16 +60,16 @@
                 </h2>
                 <div class="content-stack">
                     {% for post in results.blog_posts %}
-                    <div class="list-item">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <div class="content-card">
+                        <h3 class="content-card-title mb-3">
                             <a href="{% url 'blog_detail' post.slug %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ post.title }}
                             </a>
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                        <p class="content-card-copy text-sm mb-4">
                             {{ post.content|truncatewords:30|striptags }}
                         </p>
-                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="content-card-meta">
                             <span><i class="fas fa-calendar mr-1"></i>{{ post.published_date|date:"M d, Y"|default:post.created_at|date:"M d, Y" }}</span>
                             <span><i class="fas fa-tag mr-1"></i>{{ post.get_category_display }}</span>
                         </div>
@@ -79,16 +87,16 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% for project in results.projects %}
-                    <div class="list-item">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <div class="content-card content-card-muted">
+                        <h3 class="content-card-title mb-3">
                             <a href="{% url 'project_detail' project.slug %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ project.title }}
                             </a>
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                        <p class="content-card-copy text-sm mb-4">
                             {{ project.description|truncatewords:20 }}
                         </p>
-                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="content-card-meta items-center">
                             <span><i class="fas fa-tag mr-1"></i>{{ project.get_category_display }}</span>
                             <span class="pill {% if project.status == 'completed' %}pill-success{% elif project.status == 'in_progress' %}pill-brand{% else %}pill-warning{% endif %}">
                                 {{ project.get_status_display }}
@@ -107,16 +115,16 @@
                 </h2>
                 <div class="content-stack">
                     {% for note in results.notes %}
-                    <div class="list-item">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <div class="content-card">
+                        <h3 class="content-card-title mb-3">
                             <a href="{% url 'course_detail' note.course.id %}" class="hover:text-teal-700 dark:hover:text-teal-300">
                                 {{ note.title }}
                             </a>
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                        <p class="content-card-copy text-sm mb-4">
                             {{ note.content|truncatewords:30|striptags }}
                         </p>
-                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="content-card-meta">
                             <span><i class="fas fa-book mr-1"></i>{{ note.course.name }}</span>
                             <span><i class="fas fa-calendar mr-1"></i>{{ note.updated_at|date:"M d, Y" }}</span>
                         </div>
@@ -127,7 +135,7 @@
             {% endif %}
 
             {% if total_results == 0 %}
-            <div class="section-card empty-state">
+            <div class="section-shell empty-state">
                 <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No results found</h3>
                 <p class="text-gray-600 dark:text-gray-400">
@@ -136,7 +144,7 @@
             </div>
             {% endif %}
         {% else %}
-            <div class="section-card empty-state">
+            <div class="section-shell empty-state">
                 <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Search</h3>
                 <p class="text-gray-600 dark:text-gray-400">

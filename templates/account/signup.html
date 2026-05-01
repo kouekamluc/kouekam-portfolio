@@ -5,20 +5,20 @@
 
 {% block content %}
 <div class="auth-shell">
-    <div class="auth-card">
+    <div class="auth-card auth-card-wide">
         <div class="text-center mb-8">
             <div class="auth-icon mb-4">
                 <i class="fas fa-user-plus text-white text-2xl"></i>
             </div>
-            <h1 class="display-font text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Create Account</h1>
-            <p class="text-slate-600 dark:text-slate-400">Start one workspace that can grow from school into professional life.</p>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-copy">Start one workspace that can grow from school into professional life.</p>
         </div>
 
         <form method="POST" action="{% url 'account_signup' %}" class="space-y-6">
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-            <div class="rounded-xl bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-900/40" role="alert">
+            <div class="form-error" role="alert">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -41,7 +41,7 @@
                     id="{{ form.email.id_for_label }}"
                     {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
                     autocomplete="email"
-                    class="input-field {% if form.email.errors %}ring-red-300 dark:ring-red-700{% endif %}"
+                    class="input-field {% if form.email.errors %}border-red-300 dark:border-red-700{% endif %}"
                     placeholder="name@example.com"
                     required
                 >
@@ -57,7 +57,7 @@
                     name="{{ form.password1.name }}"
                     id="{{ form.password1.id_for_label }}"
                     autocomplete="new-password"
-                    class="input-field {% if form.password1.errors %}ring-red-300 dark:ring-red-700{% endif %}"
+                    class="input-field {% if form.password1.errors %}border-red-300 dark:border-red-700{% endif %}"
                     placeholder="Create a password"
                     required
                     oninput="validatePassword(this.value)"
@@ -66,27 +66,27 @@
                 {% if form.password1.errors %}
                 <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors }}</p>
                 {% endif %}
-                <div id="password-requirements" class="mt-3 space-y-2 hidden">
+                <div id="password-requirements" class="form-note mt-3 space-y-2 hidden">
                     <p class="text-xs font-medium text-gray-700 dark:text-gray-300">Password requirements:</p>
                     <div class="space-y-1.5">
                         <div id="req-length" class="flex items-center text-xs">
-                            <span class="requirement-icon mr-2 text-gray-400">o</span>
+                            <span class="requirement-icon mr-2 text-gray-400">-</span>
                             <span class="text-gray-600 dark:text-gray-400">At least 8 characters</span>
                         </div>
                         <div id="req-uppercase" class="flex items-center text-xs">
-                            <span class="requirement-icon mr-2 text-gray-400">o</span>
+                            <span class="requirement-icon mr-2 text-gray-400">-</span>
                             <span class="text-gray-600 dark:text-gray-400">Contains uppercase letter</span>
                         </div>
                         <div id="req-lowercase" class="flex items-center text-xs">
-                            <span class="requirement-icon mr-2 text-gray-400">o</span>
+                            <span class="requirement-icon mr-2 text-gray-400">-</span>
                             <span class="text-gray-600 dark:text-gray-400">Contains lowercase letter</span>
                         </div>
                         <div id="req-number" class="flex items-center text-xs">
-                            <span class="requirement-icon mr-2 text-gray-400">o</span>
+                            <span class="requirement-icon mr-2 text-gray-400">-</span>
                             <span class="text-gray-600 dark:text-gray-400">Contains number</span>
                         </div>
                         <div id="req-special" class="flex items-center text-xs">
-                            <span class="requirement-icon mr-2 text-gray-400">o</span>
+                            <span class="requirement-icon mr-2 text-gray-400">-</span>
                             <span class="text-gray-600 dark:text-gray-400">Contains special character (!@#$%^&*)</span>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                     name="{{ form.password2.name }}"
                     id="{{ form.password2.id_for_label }}"
                     autocomplete="new-password"
-                    class="input-field {% if form.password2.errors %}ring-red-300 dark:ring-red-700{% endif %}"
+                    class="input-field {% if form.password2.errors %}border-red-300 dark:border-red-700{% endif %}"
                     placeholder="Repeat your password"
                     required
                 >
@@ -162,7 +162,7 @@ function updateRequirement(id, isValid) {
         icon.className = 'requirement-icon mr-2 text-green-600 dark:text-green-400';
         text.className = 'text-green-600 dark:text-green-400';
     } else {
-        icon.textContent = 'o';
+        icon.textContent = '-';
         icon.className = 'requirement-icon mr-2 text-gray-400';
         text.className = 'text-gray-600 dark:text-gray-400';
     }

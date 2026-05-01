@@ -6,7 +6,7 @@
                 <span>About The Builder</span>
             </div>
             <h2 class="display-font mb-4 text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">Built from curiosity, structure, and follow-through.</h2>
-            <div class="mx-auto max-w-3xl text-xl text-gray-600 dark:text-gray-300">
+            <div class="section-copy mx-auto text-xl">
                 {% if profile and profile.bio %}
                     <div class="prose prose-lg dark:prose-invert max-w-none">
                         {{ profile.bio|safe|truncatewords:30 }}
@@ -18,7 +18,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            <div class="spotlight-card">
+            <div class="section-shell">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-cyan-500">
                         <i class="fas fa-code text-white text-xl"></i>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="flex flex-wrap gap-3">
                     {% for skill in skills %}
-                    <span class="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 dark:border-teal-900/40 dark:bg-teal-900/20 dark:text-teal-300">
+                    <span class="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-teal-50/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-[0_14px_28px_-22px_rgba(15,118,110,0.4)] dark:border-teal-900/40 dark:bg-teal-900/20 dark:text-teal-300">
                         <i class="fas fa-check-circle text-teal-500"></i>
                         {{ skill.name }}
                     </span>
@@ -37,7 +37,7 @@
                 </div>
             </div>
 
-            <div class="spotlight-card">
+            <div class="section-shell">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500">
                         <i class="fas fa-briefcase text-white text-xl"></i>

@@ -97,14 +97,14 @@
                 
                 <!-- Search Box (Desktop) -->
                 <form method="get" action="{% url 'search' %}" class="mx-2 flex flex-shrink-0 items-center">
-                    <div class="relative">
+                    <div class="search-field-wrap min-w-[11rem] xl:min-w-[14rem]">
+                        <i class="fas fa-search search-field-icon text-sm"></i>
                         <input
                             type="text"
                             name="q"
                             placeholder="Search your hub..."
-                            class="w-44 xl:w-56 !rounded-[1rem] !border-slate-200/80 !bg-white/82 pl-10 text-sm dark:!border-slate-700/80 dark:!bg-slate-900/72"
+                            class="search-field-input w-44 xl:w-56 text-sm"
                         >
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 transform text-sm text-slate-400"></i>
                     </div>
                 </form>
                 
@@ -155,23 +155,25 @@
         <div class="hidden w-full lg:hidden" id="navbar-sticky">
             <!-- Mobile Search Box -->
             <div class="px-1 pt-4 pb-2">
-                <form method="get" action="{% url 'search' %}" class="flex gap-2">
-                    <div class="relative flex-1">
+                <div class="search-panel">
+                <form method="get" action="{% url 'search' %}" class="search-form">
+                    <div class="search-field-wrap">
+                        <i class="fas fa-search search-field-icon text-sm"></i>
                         <input
                             type="text"
                             name="q"
                             placeholder="Search your hub..."
-                            class="flex-1 pl-10 text-sm"
+                            class="search-field-input text-sm"
                         >
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 transform text-sm text-slate-400"></i>
                     </div>
                     <button 
                         type="submit"
-                        class="btn-primary px-4 py-2"
+                        class="btn-primary search-submit"
                     >
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-search mr-2"></i>Search
                     </button>
                 </form>
+                </div>
             </div>
             <ul class="mobile-nav-shell mt-2 flex flex-col space-y-1 font-medium md:space-y-2">
                 <li>
