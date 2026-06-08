@@ -8,17 +8,13 @@ from .models import BlogPost, CodeSnippet, Tutorial
 from .forms import BlogPostForm, CodeSnippetForm, TutorialForm
 
 def blog_list(request):
-    # Show all published posts to everyone
-    # Also show draft posts to their authors
+    now = timezone.now()
+    public_filter = Q(status=BlogPost.STATUS_PUBLISHED, published_date__lte=now)
+
     if request.user.is_authenticated:
-        # Authenticated users see published posts + their own drafts
-        posts = BlogPost.objects.filter(
-            Q(published_date__isnull=False) | 
-            Q(author=request.user, published_date__isnull=True)
-        )
+        posts = BlogPost.objects.filter(public_filter | Q(author=request.user))
     else:
-        # Anonymous users only see published posts
-        posts = BlogPost.objects.filter(published_date__isnull=False)
+        posts = BlogPost.objects.filter(public_filter)
     
     # Order by published_date (if exists) or created_at, with published posts first
     posts = posts.order_by('-published_date', '-created_at')
@@ -34,9 +30,11 @@ def blog_list(request):
     
     # Show drafts filter
     show_drafts = request.GET.get('drafts')
+    show_scheduled = request.GET.get('scheduled')
     if show_drafts == 'true' and request.user.is_authenticated:
-        # Show only drafts for the current user
-        posts = posts.filter(author=request.user, published_date__isnull=True)
+        posts = posts.filter(author=request.user, status=BlogPost.STATUS_DRAFT)
+    elif show_scheduled == 'true' and request.user.is_authenticated:
+        posts = posts.filter(author=request.user, status=BlogPost.STATUS_SCHEDULED)
     elif show_drafts == 'false' or (show_drafts is None and request.user.is_authenticated):
         # By default, show published posts + user's drafts mixed together
         # This is already handled above
@@ -52,6 +50,7 @@ def blog_list(request):
         'category_filter': category_filter,
         'featured': featured,
         'show_drafts': show_drafts,
+        'show_scheduled': show_scheduled,
     }
     return render(request, 'blog/blog_list.html', context)
 
@@ -59,9 +58,7 @@ def blog_detail(request, slug):
     post = get_object_or_404(BlogPost, slug=slug)
     code_snippets = post.code_snippets.all()
     
-    # Published posts are visible to everyone (admin, staff, or any user)
-    # Only draft posts are restricted to their authors
-    if not post.published_date and request.user != post.author:
+    if not post.is_public and request.user != post.author:
         messages.error(request, 'This post is not published yet.')
         return redirect('blog_list')
     
@@ -80,11 +77,14 @@ def blog_create(request):
                 post = form.save(commit=False)
                 post.author = request.user
                 if request.POST.get('publish'):
+                    post.status = BlogPost.STATUS_PUBLISHED
                     post.published_date = timezone.now()
                 post.save()
                 
-                if post.published_date:
+                if post.status == BlogPost.STATUS_PUBLISHED:
                     messages.success(request, 'Blog post published!')
+                elif post.status == BlogPost.STATUS_SCHEDULED:
+                    messages.success(request, 'Blog post scheduled!')
                 else:
                     messages.success(request, 'Blog post saved as draft!')
                 
@@ -124,7 +124,6 @@ def blog_update(request, slug):
         if form.is_valid():
             try:
                 post = form.save(commit=False)
-                # Handle publish/unpublish
                 was_published = bool(post.published_date)
                 
                 # Check which button was clicked - check both key existence and value
@@ -132,10 +131,10 @@ def blog_update(request, slug):
                 unpublish_clicked = 'unpublish' in request.POST or request.POST.get('unpublish') == '1'
                 
                 if publish_clicked:
-                    # Always set published_date when publish is clicked
+                    post.status = BlogPost.STATUS_PUBLISHED
                     post.published_date = timezone.now()
                 elif unpublish_clicked:
-                    # If clicking unpublish, clear published_date
+                    post.status = BlogPost.STATUS_DRAFT
                     post.published_date = None
                 
                 # Save the post with the updated published_date
@@ -169,6 +168,8 @@ def blog_update(request, slug):
                         messages.success(request, 'Blog post published successfully!')
                 elif unpublish_clicked:
                     messages.success(request, 'Blog post unpublished and saved as draft!')
+                elif post.status == BlogPost.STATUS_SCHEDULED:
+                    messages.success(request, 'Blog post scheduled!')
                 else:
                     messages.success(request, 'Blog post updated!')
                 

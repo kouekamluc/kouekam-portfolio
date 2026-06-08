@@ -24,7 +24,6 @@ from . import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
-    path("css-test/", TemplateView.as_view(template_name="css_test.html"), name="css_test"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
     path("", include("portfolio.urls")),
     path("academic/", include("academic.urls")),
@@ -37,6 +36,8 @@ urlpatterns = [
     path("api/", include("api.urls")),
 ]
 
-# Serve media files in development
 if settings.DEBUG:
+    urlpatterns += [
+        path("css-test/", TemplateView.as_view(template_name="css_test.html"), name="css_test"),
+    ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

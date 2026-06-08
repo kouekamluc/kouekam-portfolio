@@ -41,7 +41,11 @@ def _idea_workflow_actions(idea, research_count, has_plan):
 
 @login_required
 def business_dashboard(request):
-    ideas = BusinessIdea.objects.filter(user=request.user).order_by('-created_at')[:5]
+    ideas = sorted(
+        BusinessIdea.objects.filter(user=request.user),
+        key=lambda idea: (idea.opportunity_score, idea.created_at),
+        reverse=True,
+    )[:5]
     recent_records = ImportExportRecord.objects.filter(user=request.user).order_by('-date')[:5]
     all_ideas = BusinessIdea.objects.filter(user=request.user)
     all_research = MarketResearch.objects.filter(user=request.user)
@@ -86,6 +90,7 @@ def business_idea_list(request):
     status_filter = request.GET.get('status')
     if status_filter:
         ideas = ideas.filter(status=status_filter)
+    ideas = sorted(ideas, key=lambda idea: (idea.opportunity_score, idea.created_at), reverse=True)
     return render(request, 'business/business_idea_list.html', {
         'ideas': ideas,
         'status_filter': status_filter

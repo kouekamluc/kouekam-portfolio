@@ -3,10 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
+from django.db.models import Sum
 from datetime import datetime, timedelta
 from decimal import Decimal
 import json
 import csv
+from academic.models import Course, StudySession
+from business.models import BusinessIdea
+from journal.models import JournalEntry, VisionGoal
+from notifications.models import Notification
+from portfolio.models import ContactLead
 from .models import Task, Habit, Goal, Document, Timetable, Transaction, Milestone
 from .forms import TaskForm, HabitForm, GoalForm, TransactionForm, TimetableForm, DocumentForm, MilestoneForm
 
@@ -23,6 +29,8 @@ def productivity_dashboard(request):
     habits = Habit.objects.filter(user=request.user)
     goals = Goal.objects.filter(user=request.user)
     transactions = Transaction.objects.filter(user=request.user)
+    today = timezone.now().date()
+    next_week = today + timedelta(days=7)
     
     # Analytics data
     all_tasks = Task.objects.filter(user=request.user)
@@ -45,8 +53,6 @@ def productivity_dashboard(request):
     goal_progress = [g.progress for g in goals]
     avg_goal_progress = sum(goal_progress) / len(goal_progress) if goal_progress else 0
 
-    today = timezone.now().date()
-    next_week = today + timedelta(days=7)
     due_this_week = all_tasks.filter(due_date__gte=today, due_date__lte=next_week, status__in=['todo', 'in_progress']).count()
     in_progress_tasks = all_tasks.filter(status='in_progress').count()
     completed_goals = goals.filter(progress=100).count()
@@ -55,6 +61,39 @@ def productivity_dashboard(request):
     current_month_transactions = transactions.filter(date__year=today.year, date__month=today.month)
     monthly_income = sum((t.amount for t in current_month_transactions.filter(type='income')), Decimal('0.00'))
     monthly_expenses = sum((t.amount for t in current_month_transactions.filter(type='expense')), Decimal('0.00'))
+
+    open_tasks = all_tasks.filter(status__in=['todo', 'in_progress'])
+    overdue_tasks = open_tasks.filter(due_date__lt=today).count()
+    today_focus_tasks = open_tasks.filter(due_date__lte=today).order_by('due_date', '-priority', '-created_at')[:5]
+    if not today_focus_tasks:
+        today_focus_tasks = open_tasks.order_by('-priority', 'due_date', '-created_at')[:5]
+
+    habits_due = []
+    current_week = today.isocalendar()[:2]
+    for habit in habits:
+        if habit.frequency == 'daily' and habit.last_completed_date != today:
+            habits_due.append(habit)
+        elif habit.frequency == 'weekly':
+            last_week = habit.last_completed_date.isocalendar()[:2] if habit.last_completed_date else None
+            if last_week != current_week:
+                habits_due.append(habit)
+
+    week_start = today - timedelta(days=today.weekday())
+    study_minutes_week = StudySession.objects.filter(
+        course__user=request.user,
+        date__gte=week_start,
+        date__lte=today,
+    ).aggregate(total=Sum('duration_minutes'))['total'] or 0
+    active_courses = Course.objects.filter(user=request.user, status='ongoing')[:4]
+    active_business_ideas = BusinessIdea.objects.filter(
+        user=request.user,
+        status__in=['idea', 'researching', 'planning', 'active'],
+    )[:4]
+    vision_goals = VisionGoal.objects.filter(user=request.user).exclude(progress=100)[:4]
+    journal_entry_today = JournalEntry.objects.filter(user=request.user, date=today).first()
+    unread_notifications = Notification.objects.filter(user=request.user, read=False)[:5]
+    recent_documents = Document.objects.filter(user=request.user)[:4]
+    new_contact_leads = ContactLead.objects.filter(status=ContactLead.STATUS_NEW)[:5] if request.user.is_staff else []
     
     context = {
         'tasks': tasks,
@@ -72,6 +111,17 @@ def productivity_dashboard(request):
         'monthly_income': monthly_income,
         'monthly_expenses': monthly_expenses,
         'monthly_balance': monthly_income - monthly_expenses,
+        'overdue_tasks': overdue_tasks,
+        'today_focus_tasks': today_focus_tasks,
+        'habits_due': habits_due[:5],
+        'study_minutes_week': study_minutes_week,
+        'active_courses': active_courses,
+        'active_business_ideas': active_business_ideas,
+        'vision_goals': vision_goals,
+        'journal_entry_today': journal_entry_today,
+        'unread_notifications': unread_notifications,
+        'recent_documents': recent_documents,
+        'new_contact_leads': new_contact_leads,
     }
     return render(request, 'productivity/dashboard.html', context)
 

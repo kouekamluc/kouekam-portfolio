@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Profile, Timeline, Skill, Project, ProjectImage
+from .models import ContactLead, Profile, Timeline, Skill, Project, ProjectImage
 from .admin_utils import parse_json_field_string, safe_get_cleaned_data, validate_form_before_save
 
 
@@ -326,16 +326,19 @@ class ProjectAdminForm(forms.ModelForm):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     form = ProjectAdminForm
-    list_display = ['title', 'category', 'status', 'created_at']
-    list_filter = ['category', 'status', 'created_at']
-    search_fields = ['title', 'description']
+    list_display = ['title', 'category', 'status', 'is_featured', 'created_at']
+    list_filter = ['category', 'status', 'is_featured', 'created_at']
+    search_fields = ['title', 'summary', 'description', 'problem', 'solution', 'results']
     readonly_fields = ['slug', 'created_at']
     inlines = [ProjectImageInline]
-    actions = ['mark_as_active', 'mark_as_completed', 'mark_as_archived']
+    actions = ['mark_as_active', 'mark_as_completed', 'mark_as_archived', 'mark_as_featured', 'remove_featured']
     
     fieldsets = (
         ('Project Information', {
-            'fields': ('title', 'slug', 'description', 'category', 'status')
+            'fields': ('title', 'slug', 'summary', 'description', 'category', 'status', 'is_featured')
+        }),
+        ('Case Study', {
+            'fields': ('problem', 'solution', 'results', 'role', 'timeline')
         }),
         ('Technical Details', {
             'fields': ('tech_stack_display', 'image')
@@ -363,9 +366,71 @@ class ProjectAdmin(admin.ModelAdmin):
     def mark_as_archived(self, request, queryset):
         updated = queryset.update(status='archived')
         self.message_user(request, f'{updated} project(s) marked as archived.')
+
+    @admin.action(description='Feature selected projects')
+    def mark_as_featured(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} project(s) marked as featured.')
+
+    @admin.action(description='Remove selected projects from featured')
+    def remove_featured(self, request, queryset):
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} project(s) removed from featured projects.')
 @admin.register(ProjectImage)
 class ProjectImageAdmin(admin.ModelAdmin):
     list_display = ['project', 'caption', 'created_at']
     list_filter = ['created_at']
     search_fields = ['project__title', 'caption']
     readonly_fields = ['created_at']
+
+
+@admin.register(ContactLead)
+class ContactLeadAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'subject_display', 'status', 'email_sent', 'created_at']
+    list_filter = ['status', 'email_sent', 'created_at', 'updated_at']
+    search_fields = ['name', 'email', 'subject', 'message', 'notes']
+    readonly_fields = ['created_at', 'updated_at', 'source_path', 'email_sent', 'email_error']
+    list_editable = ['status']
+    date_hierarchy = 'created_at'
+    actions = ['mark_as_new', 'mark_as_contacted', 'mark_as_closed', 'mark_as_spam']
+
+    fieldsets = (
+        ('Lead Details', {
+            'fields': ('name', 'email', 'subject', 'message', 'status')
+        }),
+        ('Follow-up', {
+            'fields': ('notes',)
+        }),
+        ('Delivery Metadata', {
+            'fields': ('source_path', 'email_sent', 'email_error'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def subject_display(self, obj):
+        return obj.subject or 'No subject'
+    subject_display.short_description = 'Subject'
+
+    @admin.action(description='Mark selected leads as new')
+    def mark_as_new(self, request, queryset):
+        updated = queryset.update(status=ContactLead.STATUS_NEW)
+        self.message_user(request, f'{updated} lead(s) marked as new.')
+
+    @admin.action(description='Mark selected leads as contacted')
+    def mark_as_contacted(self, request, queryset):
+        updated = queryset.update(status=ContactLead.STATUS_CONTACTED)
+        self.message_user(request, f'{updated} lead(s) marked as contacted.')
+
+    @admin.action(description='Mark selected leads as closed')
+    def mark_as_closed(self, request, queryset):
+        updated = queryset.update(status=ContactLead.STATUS_CLOSED)
+        self.message_user(request, f'{updated} lead(s) marked as closed.')
+
+    @admin.action(description='Mark selected leads as spam')
+    def mark_as_spam(self, request, queryset):
+        updated = queryset.update(status=ContactLead.STATUS_SPAM)
+        self.message_user(request, f'{updated} lead(s) marked as spam.')

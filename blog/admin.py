@@ -11,9 +11,9 @@ class CodeSnippetInline(admin.TabularInline):
 
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'category', 'featured', 'published_date', 'created_at']
-    list_filter = ['category', 'featured', 'published_date', 'created_at']
-    search_fields = ['title', 'content', 'author__email']
+    list_display = ['title', 'author', 'category', 'status', 'featured', 'reading_minutes', 'published_date', 'created_at']
+    list_filter = ['category', 'status', 'featured', 'published_date', 'created_at']
+    search_fields = ['title', 'excerpt', 'content', 'tags', 'author__email']
     readonly_fields = ['slug', 'created_at', 'updated_at']
     prepopulated_fields = {'slug': ('title',)}
     inlines = [CodeSnippetInline]
@@ -22,13 +22,13 @@ class BlogPostAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Post Information', {
-            'fields': ('author', 'title', 'slug', 'category', 'featured')
+            'fields': ('author', 'title', 'slug', 'excerpt', 'category', 'tags', 'featured')
         }),
         ('Content', {
             'fields': ('content',)
         }),
         ('Publishing', {
-            'fields': ('published_date',)
+            'fields': ('status', 'published_date')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -38,12 +38,12 @@ class BlogPostAdmin(admin.ModelAdmin):
     
     @admin.action(description='Publish selected posts')
     def publish_posts(self, request, queryset):
-        updated = queryset.update(published_date=timezone.now())
+        updated = queryset.update(status=BlogPost.STATUS_PUBLISHED, published_date=timezone.now())
         self.message_user(request, f'{updated} post(s) published successfully.')
     
     @admin.action(description='Unpublish selected posts')
     def unpublish_posts(self, request, queryset):
-        updated = queryset.update(published_date=None)
+        updated = queryset.update(status=BlogPost.STATUS_DRAFT, published_date=None)
         self.message_user(request, f'{updated} post(s) unpublished successfully.')
     
     @admin.action(description='Mark selected posts as featured')

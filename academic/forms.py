@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import timezone
+from kouekam_hub.validators import validate_document_upload
 from .models import Course, Note, Flashcard, StudySession
 
 
@@ -116,6 +117,9 @@ class CourseForm(forms.ModelForm):
 
 
 class NoteForm(forms.ModelForm):
+    def clean_file(self):
+        return validate_document_upload(self.cleaned_data.get('file'), 'note attachment')
+
     class Meta:
         model = Note
         fields = ['title', 'content', 'file']

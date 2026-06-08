@@ -5,6 +5,14 @@ from .models import BusinessIdea, MarketResearch, BusinessPlan, ImportExportReco
 
 
 class BusinessIdeaForm(forms.ModelForm):
+    SCORE_FIELDS = [
+        'market_demand_score',
+        'revenue_potential_score',
+        'execution_fit_score',
+        'strategic_fit_score',
+        'risk_level_score',
+    ]
+
     def clean(self):
         cleaned_data = super().clean()
         status = cleaned_data.get('status')
@@ -35,7 +43,11 @@ class BusinessIdeaForm(forms.ModelForm):
 
     class Meta:
         model = BusinessIdea
-        fields = ['title', 'description', 'status', 'market_size', 'competitors']
+        fields = [
+            'title', 'description', 'status', 'market_size', 'competitors',
+            'market_demand_score', 'revenue_potential_score', 'execution_fit_score',
+            'strategic_fit_score', 'risk_level_score',
+        ]
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800'
@@ -57,7 +69,17 @@ class BusinessIdeaForm(forms.ModelForm):
                 'rows': 4,
                 'placeholder': 'Analyze your competitors...'
             }),
+            'market_demand_score': forms.NumberInput(attrs={'class': 'score-input', 'min': '1', 'max': '5'}),
+            'revenue_potential_score': forms.NumberInput(attrs={'class': 'score-input', 'min': '1', 'max': '5'}),
+            'execution_fit_score': forms.NumberInput(attrs={'class': 'score-input', 'min': '1', 'max': '5'}),
+            'strategic_fit_score': forms.NumberInput(attrs={'class': 'score-input', 'min': '1', 'max': '5'}),
+            'risk_level_score': forms.NumberInput(attrs={'class': 'score-input', 'min': '1', 'max': '5'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.SCORE_FIELDS:
+            self.fields[field_name].help_text = 'Score from 1 to 5.'
 
 
 class MarketResearchForm(forms.ModelForm):
@@ -246,6 +268,5 @@ class ImportExportRecordForm(forms.ModelForm):
                 'rows': 3
             }),
         }
-
 
 

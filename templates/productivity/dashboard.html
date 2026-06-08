@@ -38,6 +38,155 @@
             </div>
         </div>
 
+        <div class="grid gap-6 xl:grid-cols-3 mb-8">
+            <div class="section-card xl:col-span-2">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-compass text-teal-600 mr-2"></i>Today Focus</h3>
+                    <a href="{% url 'task_create' %}" class="section-link"><i class="fas fa-plus mr-1"></i>Task</a>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="list-stack">
+                        {% for task in today_focus_tasks %}
+                        <a href="{% url 'task_update' task.id %}" class="list-item block">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900 dark:text-white">{{ task.title }}</p>
+                                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                        {{ task.get_status_display }}{% if task.due_date %} · Due {{ task.due_date|date:"M d" }}{% endif %}
+                                    </p>
+                                </div>
+                                <span class="pill {% if task.priority == 'high' %}pill-warning{% elif task.priority == 'medium' %}pill-brand{% else %}pill-success{% endif %}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="empty-state">
+                            <i class="fas fa-mug-hot empty-state-icon"></i>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">No urgent focus items today.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="grid gap-4">
+                        <div class="content-card content-card-muted">
+                            <p class="metric-label">Overdue</p>
+                            <p class="metric-value">{{ overdue_tasks }}</p>
+                            <p class="metric-note">Open tasks past their due date.</p>
+                        </div>
+                        <div class="content-card content-card-muted">
+                            <p class="metric-label">Study This Week</p>
+                            <p class="metric-value">{{ study_minutes_week }}</p>
+                            <p class="metric-note">Minutes logged across active learning.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-bell text-amber-500 mr-2"></i>Signals</h3>
+                    <a href="{% url 'notification_list' %}" class="section-link">Open</a>
+                </div>
+                <div class="list-stack">
+                    {% for notification in unread_notifications %}
+                    <a href="{{ notification.related_url|default:'#' }}" class="list-item block">
+                        <p class="font-semibold text-slate-900 dark:text-white">{{ notification.title }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{{ notification.message }}</p>
+                    </a>
+                    {% empty %}
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash empty-state-icon"></i>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">No unread notifications.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2 xl:grid-cols-4 mb-8">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-graduation-cap text-blue-500 mr-2"></i>Learning</h3>
+                    <a href="{% url 'academic_dashboard' %}" class="section-link">View</a>
+                </div>
+                <div class="list-stack">
+                    {% for course in active_courses %}
+                    <a href="{% url 'course_detail' course.id %}" class="list-item block">
+                        <p class="font-semibold text-slate-900 dark:text-white">{{ course.display_title }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ course.get_learning_type_display }} · {{ course.display_period }}</p>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-slate-500 dark:text-slate-400">No active courses yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-briefcase text-amber-600 mr-2"></i>Business</h3>
+                    <a href="{% url 'business_idea_create' %}" class="section-link"><i class="fas fa-plus mr-1"></i>Idea</a>
+                </div>
+                <div class="list-stack">
+                    {% for idea in active_business_ideas %}
+                    <a href="{% url 'business_idea_detail' idea.id %}" class="list-item block">
+                        <p class="font-semibold text-slate-900 dark:text-white">{{ idea.title }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ idea.get_status_display }}</p>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-slate-500 dark:text-slate-400">No active business ideas yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-book-open text-violet-500 mr-2"></i>Reflection</h3>
+                    <a href="{% url 'journal_entry_create' %}" class="section-link">Write</a>
+                </div>
+                {% if journal_entry_today %}
+                <a href="{% url 'journal_entry_detail' journal_entry_today.id %}" class="list-item block">
+                    <p class="font-semibold text-slate-900 dark:text-white">Journal completed today</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ journal_entry_today.get_mood_display|default:"Mood not set" }} · {{ journal_entry_today.get_energy_level_display|default:"Energy not set" }}</p>
+                </a>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-pen-nib empty-state-icon"></i>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">No journal entry for today.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title"><i class="fas fa-envelope text-teal-600 mr-2"></i>Opportunities</h3>
+                    {% if user.is_staff %}<a href="/admin/portfolio/contactlead/" class="section-link">Leads</a>{% endif %}
+                </div>
+                {% if user.is_staff %}
+                <div class="list-stack">
+                    {% for lead in new_contact_leads %}
+                    <a href="/admin/portfolio/contactlead/{{ lead.id }}/change/" class="list-item block">
+                        <p class="font-semibold text-slate-900 dark:text-white">{{ lead.name }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ lead.subject|default:"No subject" }}</p>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-slate-500 dark:text-slate-400">No new contact leads.</p>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="list-stack">
+                    {% for goal in vision_goals %}
+                    <a href="{% url 'vision_goal_update' goal.id %}" class="list-item block">
+                        <p class="font-semibold text-slate-900 dark:text-white">{{ goal.title }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ goal.progress }}% · {{ goal.get_category_display }}</p>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-slate-500 dark:text-slate-400">No active vision goals.</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="grid lg:grid-cols-3 gap-6">
             <div class="section-card">
                 <div class="section-header">

@@ -37,7 +37,7 @@ When you start Docker Compose, the following happens automatically:
 1. **PostgreSQL Database** starts and becomes healthy
 2. **Django Application** waits for database
 3. **Migrations** run automatically (`python manage.py migrate`)
-4. **Superuser** is created automatically (username: `kouekam`, password: `kklkinkklk`) if it doesn't exist
+4. **Superuser** creation is opt-in. Set `DJANGO_CREATE_SUPERUSER=True` plus `DJANGO_SUPERUSER_EMAIL` and `DJANGO_SUPERUSER_PASSWORD` if you want the container to create one.
 5. **Static Files** are collected automatically (`python manage.py collectstatic`)
 6. **Tailwind CSS** is built during Docker image build
 7. **Gunicorn Server** starts and serves the application
@@ -96,8 +96,8 @@ docker-compose exec web python manage.py collectstatic
 
 A superuser is automatically created on first startup:
 - **Username**: `kouekam`
-- **Password**: `kklkinkklk`
-- **Email**: Set via `SUPERUSER_EMAIL` environment variable (defaults to `kouekam@example.com`)
+- **Password**: Set via `DJANGO_SUPERUSER_PASSWORD`
+- **Email**: Set via `DJANGO_SUPERUSER_EMAIL`
 
 You can log in to the Django admin at `/admin/` using these credentials.
 
@@ -117,7 +117,10 @@ Key environment variables (set in `.env` file):
 - `DATABASE_URL`: Full database URL (auto-generated in docker-compose.yml)
 - `OPENAI_API_KEY`: For AI assistant features (optional)
 - `EMAIL_*`: Email configuration (optional)
-- `SUPERUSER_EMAIL`: Email for the auto-created superuser (defaults to `kouekam@example.com`)
+- `DJANGO_CREATE_SUPERUSER`: Set to `True` to create a superuser during container startup
+- `DJANGO_SUPERUSER_USERNAME`: Username for the startup-created superuser (defaults to `kouekam`)
+- `DJANGO_SUPERUSER_EMAIL`: Email for the startup-created superuser
+- `DJANGO_SUPERUSER_PASSWORD`: Password for the startup-created superuser
 
 ## Volumes
 
@@ -201,4 +204,3 @@ For production:
 - **Production**: Uses PostgreSQL (configured via `DATABASE_URL`)
 
 The entrypoint script automatically detects which database to use based on environment variables.
-

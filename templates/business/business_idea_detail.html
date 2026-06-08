@@ -13,6 +13,9 @@
                 <span class="px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                     {{ idea.get_status_display }}
                 </span>
+                <span class="ml-2 px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                    {{ idea.score_label }} · {{ idea.opportunity_score }}/100
+                </span>
             </div>
             <div class="flex gap-2">
                 <a href="{% url 'business_idea_update' idea.id %}" class="btn-primary">
@@ -112,6 +115,26 @@
             </div>
             
             <div>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4 dark:text-white">Opportunity Score</h3>
+                    <div class="mb-4">
+                        <div class="mb-2 flex items-center justify-between text-sm">
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{ idea.score_label }}</span>
+                            <span class="font-bold text-blue-700 dark:text-blue-300">{{ idea.opportunity_score }}/100</span>
+                        </div>
+                        <div class="h-3 rounded-full bg-gray-200 dark:bg-gray-700">
+                            <div class="h-3 rounded-full bg-blue-600" style="width: {{ idea.opportunity_score }}%"></div>
+                        </div>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-3 text-sm">
+                        <div><dt class="text-gray-500 dark:text-gray-400">Demand</dt><dd class="font-semibold dark:text-white">{{ idea.market_demand_score }}/5</dd></div>
+                        <div><dt class="text-gray-500 dark:text-gray-400">Revenue</dt><dd class="font-semibold dark:text-white">{{ idea.revenue_potential_score }}/5</dd></div>
+                        <div><dt class="text-gray-500 dark:text-gray-400">Execution</dt><dd class="font-semibold dark:text-white">{{ idea.execution_fit_score }}/5</dd></div>
+                        <div><dt class="text-gray-500 dark:text-gray-400">Strategic Fit</dt><dd class="font-semibold dark:text-white">{{ idea.strategic_fit_score }}/5</dd></div>
+                        <div><dt class="text-gray-500 dark:text-gray-400">Risk</dt><dd class="font-semibold dark:text-white">{{ idea.risk_level_score }}/5</dd></div>
+                    </dl>
+                </div>
+
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
                     <h3 class="text-xl font-bold mb-4 dark:text-white">Quick Actions</h3>
                     <div class="space-y-3">
@@ -133,7 +156,6 @@
     </div>
 </section>
 {% endblock %}
-
 
 
 

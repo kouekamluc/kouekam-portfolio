@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import timezone
+from kouekam_hub.validators import validate_document_upload
 from .models import Task, Habit, Goal, Transaction, Timetable, Document, Milestone
 
 
@@ -150,6 +151,9 @@ class TimetableForm(forms.ModelForm):
 
 
 class DocumentForm(forms.ModelForm):
+    def clean_file(self):
+        return validate_document_upload(self.cleaned_data.get('file'), 'document')
+
     class Meta:
         model = Document
         fields = ['title', 'file', 'category', 'tags']
@@ -198,7 +202,6 @@ class MilestoneForm(forms.ModelForm):
                 'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
             }),
         }
-
 
 
 

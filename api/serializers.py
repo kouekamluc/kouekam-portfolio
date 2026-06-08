@@ -1,5 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from kouekam_hub.validators import (
+    validate_document_upload,
+    validate_image_upload,
+    validate_pdf_upload,
+)
 from portfolio.models import Profile, Project, Skill
 from academic.models import Course, Note, Flashcard, StudySession
 from productivity.models import Task, Habit, Goal, Transaction, Milestone
@@ -18,6 +23,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    def validate_photo(self, value):
+        return validate_image_upload(value, 'profile photo')
+
+    def validate_cv_file(self, value):
+        return validate_pdf_upload(value, 'CV file')
+
     class Meta:
         model = Profile
         fields = ['id', 'bio', 'tagline', 'photo', 'cv_file', 'social_links', 'created_at', 'updated_at']
@@ -25,6 +36,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    def validate_image(self, value):
+        return validate_image_upload(value, 'project image')
+
     class Meta:
         model = Project
         fields = ['id', 'title', 'slug', 'description', 'category', 'tech_stack', 'image', 
@@ -48,6 +62,9 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     course_name = serializers.CharField(source='course.name', read_only=True)
+
+    def validate_file(self, value):
+        return validate_document_upload(value, 'note attachment')
     
     class Meta:
         model = Note
@@ -133,6 +150,9 @@ class VisionGoalSerializer(serializers.ModelSerializer):
 
 class BlogPostSerializer(serializers.ModelSerializer):
     author_email = serializers.CharField(source='author.email', read_only=True)
+
+    def validate_image(self, value):
+        return validate_image_upload(value, 'blog image')
     
     class Meta:
         model = BlogPost

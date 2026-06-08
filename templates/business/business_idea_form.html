@@ -77,6 +77,38 @@
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.competitors.errors }}</p>
                     {% endif %}
                 </div>
+
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Opportunity Score</h2>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="{{ form.market_demand_score.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Market Demand</label>
+                            {{ form.market_demand_score }}
+                            {% if form.market_demand_score.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.market_demand_score.errors }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.revenue_potential_score.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Revenue Potential</label>
+                            {{ form.revenue_potential_score }}
+                            {% if form.revenue_potential_score.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.revenue_potential_score.errors }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.execution_fit_score.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Execution Fit</label>
+                            {{ form.execution_fit_score }}
+                            {% if form.execution_fit_score.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.execution_fit_score.errors }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.strategic_fit_score.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Strategic Fit</label>
+                            {{ form.strategic_fit_score }}
+                            {% if form.strategic_fit_score.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.strategic_fit_score.errors }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.risk_level_score.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Risk Level</label>
+                            {{ form.risk_level_score }}
+                            {% if form.risk_level_score.errors %}<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.risk_level_score.errors }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">Use 1-5. Higher risk lowers the final opportunity score.</p>
+                </div>
                 
                 <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit" class="btn-primary">
@@ -91,5 +123,20 @@
         </div>
     </div>
 </section>
+<style>
+.score-input {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(209 213 219);
+    background: white;
+    padding: 0.625rem;
+    font-size: 0.875rem;
+    color: rgb(17 24 39);
+}
+.dark .score-input {
+    border-color: rgb(75 85 99);
+    background: rgb(31 41 55);
+    color: white;
+}
+</style>
 {% endblock %}
-

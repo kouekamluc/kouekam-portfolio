@@ -16,7 +16,7 @@ class BusinessPlanInline(admin.StackedInline):
 
 @admin.register(BusinessIdea)
 class BusinessIdeaAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user', 'status', 'created_at', 'updated_at']
+    list_display = ['title', 'user', 'status', 'opportunity_score', 'score_label', 'created_at', 'updated_at']
     list_filter = ['status', 'created_at', 'updated_at']
     search_fields = ['title', 'description', 'user__email']
     readonly_fields = ['created_at', 'updated_at']
@@ -29,6 +29,12 @@ class BusinessIdeaAdmin(admin.ModelAdmin):
         }),
         ('Market Analysis', {
             'fields': ('market_size', 'competitors')
+        }),
+        ('Opportunity Scoring', {
+            'fields': (
+                'market_demand_score', 'revenue_potential_score', 'execution_fit_score',
+                'strategic_fit_score', 'risk_level_score',
+            )
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

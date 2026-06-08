@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 from . import views
 
@@ -17,5 +18,9 @@ urlpatterns = [
     path('profile/', views.view_profile, name='view_profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('search/', views.search, name='search'),
-    path('debug/static-url/', views.debug_static_url, name='debug_static_url'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('debug/static-url/', views.debug_static_url, name='debug_static_url'),
+    ]

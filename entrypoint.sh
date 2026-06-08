@@ -31,8 +31,13 @@ python manage.py init_site ${SITE_DOMAIN:+--domain "$SITE_DOMAIN"} ${SITE_NAME:+
     echo "Warning: Site initialization had issues, but continuing..."
 }
 
-echo "Creating superuser (if not exists)..."
-python create_superuser.py
+CREATE_SUPERUSER_RAW=$(echo "${DJANGO_CREATE_SUPERUSER:-False}" | tr '[:upper:]' '[:lower:]')
+if [ "$CREATE_SUPERUSER_RAW" = "true" ] || [ "$CREATE_SUPERUSER_RAW" = "1" ] || [ "$CREATE_SUPERUSER_RAW" = "yes" ]; then
+    echo "Creating superuser (if not exists)..."
+    python create_superuser.py
+else
+    echo "Skipping superuser creation. Set DJANGO_CREATE_SUPERUSER=True to enable it."
+fi
 
 # Verify CSS and JS files exist (built in Dockerfile multi-stage build)
 # If missing, rebuild as fallback (for non-Docker deployments)
@@ -381,4 +386,3 @@ fi
 
 echo "Starting server..."
 exec "$@"
-

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from portfolio.models import Profile, Project, Skill
 from academic.models import Course, Note, Flashcard, StudySession
 from productivity.models import Task, Habit, Goal, Transaction, Milestone
@@ -207,7 +208,11 @@ class BlogPostViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = []  # Public read access
     
     def get_queryset(self):
-        return BlogPost.objects.all()
+        return BlogPost.objects.filter(
+            status=BlogPost.STATUS_PUBLISHED,
+            published_date__isnull=False,
+            published_date__lte=timezone.now(),
+        )
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

@@ -56,17 +56,24 @@ class Project(models.Model):
     
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
+    summary = models.CharField(max_length=280, blank=True, help_text="Short portfolio-card summary.")
     description = models.TextField()
+    problem = models.TextField(blank=True, help_text="What problem or opportunity this project addressed.")
+    solution = models.TextField(blank=True, help_text="How the project solved the problem.")
+    results = models.TextField(blank=True, help_text="Outcomes, metrics, lessons, or impact.")
+    role = models.CharField(max_length=160, blank=True, help_text="Your role or ownership in the project.")
+    timeline = models.CharField(max_length=120, blank=True, help_text="Project duration or date range.")
     category = models.CharField(max_length=100, choices=[('ai', 'AI & Machine Learning'), ('electronics', 'Electronics & IoT'), ('web', 'Web Development'), ('other', 'Other')])
     tech_stack = models.JSONField(default=list, help_text="List of technologies used e.g. ['Python', 'Django']")
     image = models.ImageField(upload_to='projects/', help_text="Main cover image", blank=True, null=True)
     github_url = models.URLField(blank=True)
     live_link = models.URLField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-is_featured', '-created_at']
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
 
@@ -147,3 +154,42 @@ class ProjectImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.project.title}"
+
+
+class ContactLead(models.Model):
+    STATUS_NEW = 'new'
+    STATUS_CONTACTED = 'contacted'
+    STATUS_CLOSED = 'closed'
+    STATUS_SPAM = 'spam'
+
+    STATUS_CHOICES = [
+        (STATUS_NEW, 'New'),
+        (STATUS_CONTACTED, 'Contacted'),
+        (STATUS_CLOSED, 'Closed'),
+        (STATUS_SPAM, 'Spam'),
+    ]
+
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200, blank=True)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW)
+    source_path = models.CharField(max_length=255, blank=True)
+    email_sent = models.BooleanField(default=False)
+    email_error = models.TextField(blank=True)
+    notes = models.TextField(blank=True, help_text="Private follow-up notes for this lead.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['email']),
+        ]
+        verbose_name = 'Contact Lead'
+        verbose_name_plural = 'Contact Leads'
+
+    def __str__(self):
+        subject = self.subject or 'No subject'
+        return f"{self.name} <{self.email}> - {subject}"

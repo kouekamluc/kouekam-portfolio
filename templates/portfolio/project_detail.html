@@ -36,10 +36,17 @@
                 {{ project.get_category_display }}
             </span>
             <h1 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">{{ project.title }}</h1>
+            {% if project.summary %}
+            <p class="max-w-3xl text-lg text-gray-200">{{ project.summary }}</p>
+            {% endif %}
             <div class="flex flex-wrap items-center gap-3 text-gray-300 sm:gap-4">
                 <span>{{ project.created_at|date:"F Y" }}</span>
                 <span>&bull;</span>
                 <span class="uppercase tracking-wider text-sm">{{ project.get_status_display }}</span>
+                {% if project.is_featured %}
+                <span>&bull;</span>
+                <span class="uppercase tracking-wider text-sm">Featured</span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -50,9 +57,38 @@
             <div class="prose prose-lg dark:prose-invert max-w-none mb-10">
                 <h3 class="text-2xl font-bold mb-4 dark:text-white">About this Project</h3>
                 <div>
-                    {{ project.description|safe }}
+                    {{ project.description|linebreaks }}
                 </div>
             </div>
+
+            {% if project.problem or project.solution or project.results %}
+            <div class="grid gap-6 mb-12">
+                {% if project.problem %}
+                <section class="section-card p-6">
+                    <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">Problem</h3>
+                    <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
+                        {{ project.problem|linebreaks }}
+                    </div>
+                </section>
+                {% endif %}
+                {% if project.solution %}
+                <section class="section-card p-6">
+                    <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">Solution</h3>
+                    <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
+                        {{ project.solution|linebreaks }}
+                    </div>
+                </section>
+                {% endif %}
+                {% if project.results %}
+                <section class="section-card p-6">
+                    <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">Results</h3>
+                    <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
+                        {{ project.results|linebreaks }}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+            {% endif %}
 
             {% if project.images.all %}
             <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -116,6 +152,23 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                {% if project.role or project.timeline %}
+                <div class="mb-6 border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
+                    {% if project.role %}
+                    <div>
+                        <h5 class="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-1">Role</h5>
+                        <p class="text-slate-700 dark:text-slate-200">{{ project.role }}</p>
+                    </div>
+                    {% endif %}
+                    {% if project.timeline %}
+                    <div>
+                        <h5 class="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-1">Timeline</h5>
+                        <p class="text-slate-700 dark:text-slate-200">{{ project.timeline }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
                     {% if project.github_url %}

@@ -20,23 +20,6 @@
             document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         })();
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Source Sans 3"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {"50":"#f0fdfa","100":"#ccfbf1","200":"#99f6e4","300":"#5eead4","400":"#2dd4bf","500":"#14b8a6","600":"#0f766e","700":"#115e59","800":"#134e4a","900":"#042f2e","950":"#022c22"}
-                    }
-                }
-            }
-        }
-    </script>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>

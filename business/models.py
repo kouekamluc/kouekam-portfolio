@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -19,6 +20,11 @@ class BusinessIdea(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='idea')
     market_size = models.TextField(blank=True, help_text="Target market size and description")
     competitors = models.TextField(blank=True, help_text="Competitor analysis")
+    market_demand_score = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="1-5 score for market demand")
+    revenue_potential_score = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="1-5 score for revenue potential")
+    execution_fit_score = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="1-5 score for your ability to execute")
+    strategic_fit_score = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="1-5 score for alignment with your goals")
+    risk_level_score = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="1-5 risk score where 5 is highest risk")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,6 +35,28 @@ class BusinessIdea(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def opportunity_score(self):
+        positive_score = (
+            self.market_demand_score +
+            self.revenue_potential_score +
+            self.execution_fit_score +
+            self.strategic_fit_score
+        )
+        risk_adjustment = 6 - self.risk_level_score
+        return round(((positive_score + risk_adjustment) / 25) * 100)
+
+    @property
+    def score_label(self):
+        score = self.opportunity_score
+        if score >= 80:
+            return 'Strong'
+        if score >= 60:
+            return 'Promising'
+        if score >= 40:
+            return 'Needs Evidence'
+        return 'Low Priority'
 
 class MarketResearch(models.Model):
     business_idea = models.ForeignKey(BusinessIdea, on_delete=models.CASCADE, related_name='market_research')

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.db.models import Q
 from .models import Profile, Timeline, Skill, Project, ProjectImage
-from .forms import ProfileForm, ProjectForm, ProjectImageForm
+from .forms import ContactLeadForm, ProfileForm, ProjectForm, ProjectImageForm
 from .email_utils import send_contact_form_email
 from blog.models import BlogPost
 from academic.models import Note
@@ -22,7 +22,7 @@ def home(request):
     skills = Skill.objects.all()
     timeline = Timeline.objects.all()
     # Featured/Recent projects can also be added here
-    recent_projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')[:3]
+    recent_projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-is_featured', '-created_at')[:3]
     
     # Dynamic counts for stats - count all non-archived projects (active and completed)
     total_projects = Project.objects.filter(status__in=['active', 'completed']).count()
@@ -65,32 +65,37 @@ def skills(request):
     return render(request, 'portfolio/skills.html', context)
 
 def contact(request):
+    profile = Profile.objects.first()
+
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message = request.POST.get('message')
-        
-        if name and email and message:
+        form = ContactLeadForm(request.POST)
+        if form.is_valid():
+            lead = form.save(commit=False)
+            lead.source_path = request.META.get('HTTP_REFERER') or request.path
+            lead.save()
+
             try:
                 import sys
-                print(f"INFO: Contact form submission received from {name} ({email})", file=sys.stderr)
-                print(f"INFO: Subject: {subject or 'No Subject'}", file=sys.stderr)
+                print(f"INFO: Contact form submission received from {lead.name} ({lead.email})", file=sys.stderr)
+                print(f"INFO: Subject: {lead.subject or 'No Subject'}", file=sys.stderr)
                 
                 # Send email via Brevo
-                success = send_contact_form_email(name, email, subject, message)
+                success = send_contact_form_email(lead.name, lead.email, lead.subject, lead.message)
+                lead.email_sent = success
                 
                 if success:
                     print(f"INFO: Contact form email sent successfully", file=sys.stderr)
+                    lead.email_error = ''
                     messages.success(request, 'Thank you! Your message has been sent successfully.')
-                    return HttpResponseRedirect(request.path)
                 else:
                     # Log the failure reason for debugging
                     import logging
                     logger = logging.getLogger(__name__)
                     logger.error("Contact form email sending failed. Check Brevo configuration.")
                     print("ERROR: Contact form email sending failed. Check Brevo API key and configuration.", file=sys.stderr)
-                    messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
+                    lead.email_error = 'Email sending failed. Check Brevo configuration.'
+                    messages.success(request, 'Thank you! Your message has been received.')
+                lead.save(update_fields=['email_sent', 'email_error', 'updated_at'])
             except Exception as e:
                 import logging
                 import sys
@@ -100,13 +105,17 @@ def contact(request):
                 print(f"ERROR: {error_msg}", file=sys.stderr)
                 import traceback
                 traceback.print_exc(file=sys.stderr)
-                messages.error(request, 'Sorry, there was an error sending your message. Please try again.')
+                lead.email_sent = False
+                lead.email_error = error_msg
+                lead.save(update_fields=['email_sent', 'email_error', 'updated_at'])
+                messages.success(request, 'Thank you! Your message has been received.')
+            return HttpResponseRedirect(request.path)
         else:
             messages.error(request, 'Please fill in all required fields.')
-        return HttpResponseRedirect(request.path)
-    
-    profile = Profile.objects.first()
-    return render(request, 'portfolio/contact.html', {'profile': profile})
+    else:
+        form = ContactLeadForm()
+
+    return render(request, 'portfolio/contact.html', {'profile': profile, 'form': form})
 
 def download_cv(request):
     profile = Profile.objects.first()
@@ -120,7 +129,7 @@ def download_cv(request):
 
 def project_list(request):
     try:
-        projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-created_at')
+        projects = Project.objects.filter(status__in=['active', 'completed']).order_by('-is_featured', '-created_at')
         category = request.GET.get('category')
         if category:
             projects = projects.filter(category=category)
@@ -328,9 +337,10 @@ def search(request):
         
         # Search projects (public)
         projects = Project.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query) | 
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(description__icontains=query) |
+            Q(problem__icontains=query) | Q(solution__icontains=query) | Q(results__icontains=query) |
             Q(category__icontains=query)
-        ).filter(status__in=['active', 'completed']).order_by('-created_at')[:10]
+        ).filter(status__in=['active', 'completed']).order_by('-is_featured', '-created_at')[:10]
         results['projects'] = projects
         
         # Search notes (only for authenticated users, their own notes)

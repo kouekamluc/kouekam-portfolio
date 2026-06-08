@@ -50,6 +50,20 @@
                             </p>
                         {% endif %}
                     </div>
+
+                    <!-- Summary Field -->
+                    <div>
+                        <label for="{{ form.summary.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                            <i class="fas fa-bullseye mr-2 text-blue-600 dark:text-blue-400"></i>
+                            Card Summary
+                        </label>
+                        {{ form.summary }}
+                        {% if form.summary.errors %}
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>{{ form.summary.errors.0 }}
+                            </p>
+                        {% endif %}
+                    </div>
                     
                     <!-- Description Field -->
                     <div>
@@ -73,6 +87,46 @@
                                     <li>Include purpose, features, and key highlights</li>
                                 </ul>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Case Study Fields -->
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="{{ form.problem.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-question-circle mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Problem
+                            </label>
+                            {{ form.problem }}
+                            {% if form.problem.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.problem.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.solution.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-lightbulb mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Solution
+                            </label>
+                            {{ form.solution }}
+                            {% if form.solution.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.solution.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.results.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-chart-line mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Results / Impact
+                            </label>
+                            {{ form.results }}
+                            {% if form.results.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.results.errors.0 }}
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -103,6 +157,38 @@
                                 </p>
                             {% endif %}
                         </div>
+                    </div>
+
+                    <!-- Role, Timeline, Featured -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.role.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-user-gear mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Role
+                            </label>
+                            {{ form.role }}
+                            {% if form.role.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.role.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.timeline.id_for_label }}" class="block mb-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                <i class="fas fa-calendar mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Timeline
+                            </label>
+                            {{ form.timeline }}
+                            {% if form.timeline.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.timeline.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <label class="md:col-span-2 flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ form.is_featured }}
+                            <span>Feature this project on portfolio surfaces</span>
+                        </label>
                     </div>
                     
                     <!-- Image Field -->

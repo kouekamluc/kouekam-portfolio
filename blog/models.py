@@ -1,10 +1,22 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.utils.text import slugify
+import re
 
 User = get_user_model()
 
 class BlogPost(models.Model):
+    STATUS_DRAFT = 'draft'
+    STATUS_SCHEDULED = 'scheduled'
+    STATUS_PUBLISHED = 'published'
+
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, 'Draft'),
+        (STATUS_SCHEDULED, 'Scheduled'),
+        (STATUS_PUBLISHED, 'Published'),
+    ]
+
     CATEGORY_CHOICES = [
         ('django', 'Django'),
         ('python', 'Python'),
@@ -18,9 +30,12 @@ class BlogPost(models.Model):
     
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
+    excerpt = models.TextField(blank=True, help_text="Short summary for cards, SEO previews, and social sharing.")
     content = models.TextField()
     image = models.ImageField(upload_to='blog/', blank=True, null=True, help_text="Featured image for the blog post")
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
+    tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated tags")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT)
     published_date = models.DateTimeField(null=True, blank=True)
     featured = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
@@ -34,7 +49,32 @@ class BlogPost(models.Model):
         """Helper to get ordering value for posts with NULL published_date"""
         return self.published_date or self.created_at
 
+    @property
+    def is_public(self):
+        return (
+            self.status == self.STATUS_PUBLISHED and
+            self.published_date is not None and
+            self.published_date <= timezone.now()
+        )
+
+    @property
+    def reading_minutes(self):
+        plain_text = re.sub(r'<[^>]+>', ' ', self.content or '')
+        word_count = len(re.findall(r'\w+', plain_text))
+        return max(1, round(word_count / 220))
+
+    @property
+    def tag_list(self):
+        return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
+
     def save(self, *args, **kwargs):
+        if self.status == self.STATUS_DRAFT and self.published_date:
+            self.status = self.STATUS_PUBLISHED
+        if self.status == self.STATUS_PUBLISHED and not self.published_date:
+            self.published_date = timezone.now()
+        elif self.status == self.STATUS_DRAFT:
+            self.published_date = None
+
         if not self.slug:
             base_slug = slugify(self.title)
             # Truncate slug to max_length (255) to prevent database errors

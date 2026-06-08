@@ -26,6 +26,7 @@
             <a href="{% url 'blog_list' %}" class="filter-chip {% if not category_filter and not show_drafts %}filter-chip-active{% endif %}">All</a>
             {% if user.is_authenticated %}
             <a href="?drafts=true" class="filter-chip {% if show_drafts == 'true' %}filter-chip-active{% endif %}">My Drafts</a>
+            <a href="?scheduled=true" class="filter-chip {% if show_scheduled == 'true' %}filter-chip-active{% endif %}">Scheduled</a>
             {% endif %}
             <a href="?category=django" class="filter-chip {% if category_filter == 'django' %}filter-chip-active{% endif %}">Django</a>
             <a href="?category=python" class="filter-chip {% if category_filter == 'python' %}filter-chip-active{% endif %}">Python</a>
@@ -66,16 +67,23 @@
                             Featured
                         </span>
                         {% endif %}
-                        {% if not post.published_date %}
+                        {% if post.status == 'draft' %}
                         <span class="pill pill-muted">
                             <i class="fas fa-file-alt text-xs"></i>
                             Draft
+                        </span>
+                        {% elif post.status == 'scheduled' %}
+                        <span class="pill pill-muted">
+                            <i class="fas fa-clock text-xs"></i>
+                            Scheduled
                         </span>
                         {% endif %}
                     </div>
 
                     <time class="block text-xs text-gray-500 dark:text-gray-400 mb-3">
-                        {% if post.published_date %}
+                        {% if post.status == 'scheduled' and post.published_date %}
+                            Scheduled: {{ post.published_date|date:"F j, Y" }}
+                        {% elif post.published_date %}
                             {{ post.published_date|date:"F j, Y" }}
                         {% else %}
                             Created: {{ post.created_at|date:"F j, Y" }}
@@ -87,15 +95,23 @@
                     </h3>
 
                     <p class="mb-4 text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed text-sm">
-                        {{ post.content|markdown_excerpt:120 }}
+                        {{ post.excerpt|default:post.content|markdown_excerpt:120 }}
                     </p>
+
+                    {% if post.tag_list %}
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        {% for tag in post.tag_list|slice:":3" %}
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">#{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
                     <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <i class="fas fa-user-circle"></i>
                             <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
                             <span class="text-gray-400 dark:text-gray-500">/</span>
-                            <span>{{ post.content|reading_time }}</span>
+                            <span>{{ post.reading_minutes }} min read</span>
                         </div>
                         <a href="{% url 'blog_detail' post.slug %}"
                             class="inline-flex items-center gap-1 text-sm font-semibold text-teal-700 dark:text-teal-300 hover:text-teal-800 dark:hover:text-teal-200 transition-colors group/link">
@@ -127,7 +143,7 @@
             <ul class="flex items-center gap-2">
                 {% if page_obj.has_previous %}
                 <li>
-                    <a href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
+                    <a href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}{% if show_scheduled %}&scheduled={{ show_scheduled }}{% endif %}"
                         class="filter-chip">
                         Previous
                     </a>
@@ -141,7 +157,7 @@
                 </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 <li>
-                    <a href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
+                    <a href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}{% if show_scheduled %}&scheduled={{ show_scheduled }}{% endif %}"
                         class="filter-chip">
                         {{ num }}
                     </a>
@@ -151,7 +167,7 @@
 
                 {% if page_obj.has_next %}
                 <li>
-                    <a href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}"
+                    <a href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if featured %}&featured={{ featured }}{% endif %}{% if show_drafts %}&drafts={{ show_drafts }}{% endif %}{% if show_scheduled %}&scheduled={{ show_scheduled }}{% endif %}"
                         class="filter-chip">
                         Next
                     </a>

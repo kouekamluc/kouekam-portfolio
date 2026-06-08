@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,17 +26,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-h$+#bnfje2#6663qlvaktl1zr@j%8(8(%=3&_e!2@k30!gg9ia")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-# Default to True for local development, but allow override via environment variable
-# In production (Railway/Heroku), set DEBUG=False in environment variables
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes', 'on')
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-local-development-only-change-me"
+    else:
+        raise ImproperlyConfigured("SECRET_KEY must be set when DEBUG=False.")
 
 # Parse ALLOWED_HOSTS from environment variable
 # Strip whitespace and filter out empty strings
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+if not DEBUG and set(ALLOWED_HOSTS).issubset({'localhost', '127.0.0.1'}):
+    raise ImproperlyConfigured("ALLOWED_HOSTS must include the production domain when DEBUG=False.")
+
+csrf_trusted_origins_str = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in csrf_trusted_origins_str.split(',') if origin.strip()
+]
 
 
 # Application definition
@@ -342,7 +351,7 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Deprecated - use ACCOUNT_LOGIN_METHODS
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_FORMS = {
     'login': 'allauth.account.forms.LoginForm',
@@ -353,6 +362,10 @@ ACCOUNT_FORMS = {
 ACCOUNT_PASSWORD_RESET_EXPIRE_HOURS = 24  # Password reset link valid for 24 hours
 
 # Security Settings (for production)
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -369,8 +382,7 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging Configuration
-# Completely disable console logging in production to avoid Railway rate limiting (500 logs/sec)
-# All logs go to file only in production
+# Keep production output focused on errors while preserving enough signal for platform logs.
 log_level = os.getenv('DJANGO_LOG_LEVEL', 'INFO' if DEBUG else 'ERROR')
 
 LOGGING = {
@@ -417,7 +429,7 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
+        'handlers': ['console'] if not DEBUG else ['console', 'file'],
         'level': log_level,
     },
     # Enable error logging for portfolio app to debug admin issues
@@ -428,7 +440,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['null'] if not DEBUG else ['console', 'file'],  # Completely silent in production
+            'handlers': ['console'] if not DEBUG else ['console', 'file'],
             'level': log_level,
             'propagate': False,
         },

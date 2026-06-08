@@ -1,4 +1,5 @@
 from django import forms
+from kouekam_hub.validators import validate_pdf_upload
 from .models import Conversation, PromptTemplate
 
 
@@ -48,6 +49,9 @@ class PDFUploadForm(forms.Form):
             'accept': '.pdf'
         })
     )
+
+    def clean_file(self):
+        return validate_pdf_upload(self.cleaned_data.get('file'), 'PDF')
 
 
 class MessageForm(forms.Form):

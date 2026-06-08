@@ -9,6 +9,7 @@ User = get_user_model()
 class BlogPostModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
+            username='testuser',
             email='test@example.com',
             password='testpass123'
         )
@@ -35,6 +36,7 @@ class BlogPostModelTest(TestCase):
 class CodeSnippetModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
+            username='testuser',
             email='test@example.com',
             password='testpass123'
         )
@@ -57,6 +59,7 @@ class CodeSnippetModelTest(TestCase):
 class TutorialModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
+            username='testuser',
             email='test@example.com',
             password='testpass123'
         )
@@ -77,6 +80,7 @@ class BlogViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
+            username='testuser',
             email='test@example.com',
             password='testpass123'
         )
@@ -84,7 +88,8 @@ class BlogViewsTest(TestCase):
             title='Test Post',
             content='Test content',
             author=self.user,
-            slug='test-post'
+            slug='test-post',
+            status=BlogPost.STATUS_PUBLISHED,
         )
 
     def test_blog_list_view(self):
